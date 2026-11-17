@@ -13,14 +13,14 @@ struct WordDetailView: View {
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // Top Navigation Bar with generous header breathing room
+                // 1. TOP HEADER (PINNED AT TOP)
                 HStack {
                     Button(action: onDismiss) {
-                        HStack(spacing: 5) {
+                        HStack(spacing: 6) {
                             Image(systemName: "chevron.left")
-                                .font(.system(size: 18, weight: .semibold))
+                                .font(.system(size: 17, weight: .semibold))
                             Text("Words")
-                                .font(.system(size: 18, weight: .semibold))
+                                .font(.system(size: 17, weight: .semibold))
                         }
                         .foregroundColor(AppTheme.accent)
                     }
@@ -29,135 +29,142 @@ struct WordDetailView: View {
                     Spacer()
                     
                     Text("\(currentIndex + 1) / \(max(wordsList.count, 1))")
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.system(size: 17, weight: .bold))
                         .foregroundColor(AppTheme.textPrimary)
                     
                     Spacer()
                     
-                    // Balancing Spacer for centered counter
-                    HStack(spacing: 5) {
+                    // Invisible balancing element for exact center alignment
+                    HStack(spacing: 6) {
                         Image(systemName: "chevron.left")
-                            .font(.system(size: 18))
+                            .font(.system(size: 17, weight: .semibold))
                         Text("Words")
-                            .font(.system(size: 18))
+                            .font(.system(size: 17, weight: .semibold))
                     }
                     .opacity(0)
                 }
-                .padding(.horizontal, 18)
-                .padding(.top, 22)
-                .padding(.bottom, 16)
+                .padding(.horizontal, 20)
+                .padding(.top, 16)
+                .padding(.bottom, 12)
+                .background(AppTheme.background)
                 
-                // Content area (Fits in one glance without scrolling)
-                VStack(alignment: .leading, spacing: 0) {
-                    // Hero Cropped Image Banner (No white wrapper card)
-                    CardImageView(imageName: currentWord.imageName, contentMode: .fit)
-                        .aspectRatio(1, contentMode: .fit)
-                        .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-                        .padding(.horizontal, 16)
-                    
-                    // Word Info & Details Section
+                // 2. SCROLLABLE MIDDLE CONTENT AREA
+                ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 14) {
-                        // Word Header & Main Audio
-                        HStack(alignment: .top) {
-                            VStack(alignment: .leading, spacing: 3) {
-                                // Large Kana
-                                Text(currentWord.kana)
-                                    .font(.system(size: 34, weight: .bold))
-                                    .foregroundColor(AppTheme.textPrimary)
-                                
-                                // Kanji with Furigana & Romaji (compact, side by side)
-                                HStack(alignment: .bottom, spacing: 8) {
-                                    if !currentWord.kanji.isEmpty && currentWord.kanji != currentWord.kana {
-                                        FuriganaText(
-                                            text: currentWord.kanji,
-                                            fontSize: 18,
-                                            furiganaSize: 10,
-                                            textColor: AppTheme.textPrimary,
-                                            furiganaColor: AppTheme.textSecondary,
-                                            boldKanji: true
-                                        )
-                                    }
-                                    
-                                    Text(currentWord.romaji)
-                                        .font(.system(size: 16, weight: .regular))
-                                        .foregroundColor(AppTheme.textSecondary)
-                                }
-                                
-                                // Word Type with Terracotta Bullet
-                                HStack(spacing: 5) {
-                                    Text("•")
-                                        .font(.system(size: 14, weight: .bold))
-                                        .foregroundColor(AppTheme.accent)
-                                    
-                                    Text(currentWord.type)
-                                        .font(.system(size: 14, weight: .medium))
-                                        .foregroundColor(AppTheme.textSecondary)
-                                }
-                                .padding(.top, 2)
-                            }
-                            
-                            Spacer()
-                            
-                            // Audio Button
-                            Button(action: {
-                                AudioService.shared.speak(currentWord.kana)
-                            }) {
-                                ZStack {
-                                    Circle()
-                                        .fill(Color.white)
-                                        .frame(width: 44, height: 44)
-                                        .shadow(color: Color.black.opacity(0.06), radius: 6, x: 0, y: 2)
-                                    
-                                    Image(systemName: "speaker.wave.2.fill")
-                                        .font(.system(size: 17))
-                                        .foregroundColor(AppTheme.audioIcon)
-                                }
-                            }
-                            .buttonStyle(.plain)
-                        }
+                        // Hero Cropped Image Banner
+                        CardImageView(imageName: currentWord.imageName, contentMode: .fit)
+                            .aspectRatio(1.08, contentMode: .fit)
+                            .frame(maxWidth: .infinity)
+                            .frame(maxHeight: 270)
+                            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                         
-                        // Example Section
-                        VStack(alignment: .leading, spacing: 6) {
-                            // Example Header with Space Between Audio Button
-                            HStack {
-                                Text("Example")
-                                    .font(.system(size: 14, weight: .regular))
-                                    .foregroundColor(AppTheme.textSecondary)
+                        // Word Details Section
+                        VStack(alignment: .leading, spacing: 8) {
+                            // Main Word Header & Audio Button Row (Perfect alignment)
+                            HStack(alignment: .center) {
+                                // Main Kana (36pt bold)
+                                Text(currentWord.kana)
+                                    .font(.system(size: 36, weight: .bold))
+                                    .foregroundColor(AppTheme.textPrimary)
                                 
                                 Spacer()
                                 
+                                // Volume Button (Circle with border matching card_001.png)
                                 Button(action: {
-                                    AudioService.shared.speak(currentWord.exampleJa, rate: 0.42)
+                                    AudioService.shared.speak(currentWord.kana)
                                 }) {
-                                    Image(systemName: "speaker.wave.2.fill")
-                                        .font(.system(size: 14))
-                                        .foregroundColor(AppTheme.textSecondary)
-                                        .padding(4)
+                                    ZStack {
+                                        Circle()
+                                            .fill(AppTheme.audioButtonBg)
+                                            .frame(width: 44, height: 44)
+                                            .overlay(
+                                                Circle()
+                                                    .stroke(AppTheme.audioButtonBorder, lineWidth: 1.2)
+                                            )
+                                            .shadow(color: Color.black.opacity(0.04), radius: 3, x: 0, y: 1.5)
+                                        
+                                        Image(systemName: "speaker.wave.2.fill")
+                                            .font(.system(size: 17))
+                                            .foregroundColor(AppTheme.audioIcon)
+                                    }
                                 }
                                 .buttonStyle(.plain)
                             }
                             
-                            // Japanese sentence with furigana
-                            FuriganaText(
-                                text: currentWord.exampleJa,
-                                fontSize: 17,
-                                furiganaSize: 10,
-                                textColor: AppTheme.textPrimary,
-                                furiganaColor: AppTheme.textSecondary
-                            )
+                            // Kanji & Romaji (Side by side)
+                            HStack(alignment: .bottom, spacing: 8) {
+                                if !currentWord.kanji.isEmpty && currentWord.kanji != currentWord.kana {
+                                    FuriganaText(
+                                        text: currentWord.kanji,
+                                        fontSize: 20,
+                                        furiganaSize: 11,
+                                        textColor: AppTheme.textPrimary,
+                                        furiganaColor: AppTheme.textSecondary,
+                                        boldKanji: true
+                                    )
+                                    .fixedSize(horizontal: true, vertical: false)
+                                }
+                                
+                                Text(currentWord.romaji)
+                                    .font(.system(size: 16, weight: .regular))
+                                    .foregroundColor(AppTheme.textSecondary)
+                                    .fixedSize(horizontal: true, vertical: false)
+                            }
                             
-                            // English sentence translation
-                            Text(currentWord.exampleEn)
-                                .font(.system(size: 15))
-                                .foregroundColor(AppTheme.textSecondary)
-                                .padding(.top, 2)
+                            // Type with Terracotta Bullet
+                            HStack(spacing: 5) {
+                                Text("•")
+                                    .font(.system(size: 14, weight: .bold))
+                                    .foregroundColor(AppTheme.accent)
+                                
+                                Text(currentWord.type)
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(AppTheme.textSecondary)
+                            }
+                            .padding(.top, 2)
+                            
+                            // Example Section
+                            VStack(alignment: .leading, spacing: 6) {
+                                // Example Header with Space Between Audio Icon (No circle background)
+                                HStack {
+                                    Text("Example")
+                                        .font(.system(size: 14, weight: .regular))
+                                        .foregroundColor(AppTheme.textSecondary)
+                                    
+                                    Spacer()
+                                    
+                                    Button(action: {
+                                        AudioService.shared.speak(currentWord.exampleJa, rate: 0.42)
+                                    }) {
+                                        Image(systemName: "speaker.wave.2.fill")
+                                            .font(.system(size: 15))
+                                            .foregroundColor(AppTheme.audioIcon)
+                                            .padding(4)
+                                    }
+                                    .buttonStyle(.plain)
+                                }
+                                
+                                // Japanese sentence with furigana (Font size 18pt)
+                                FuriganaText(
+                                    text: currentWord.exampleJa,
+                                    fontSize: 18,
+                                    furiganaSize: 10.5,
+                                    textColor: AppTheme.textPrimary,
+                                    furiganaColor: AppTheme.textSecondary
+                                )
+                                
+                                // English sentence translation (Font size 15pt)
+                                Text(currentWord.exampleEn)
+                                    .font(.system(size: 15, weight: .regular))
+                                    .foregroundColor(AppTheme.textSecondary)
+                                    .padding(.top, 2)
+                            }
+                            .padding(.top, 8)
                         }
-                        .padding(.top, 4)
+                        .padding(.horizontal, 4)
                     }
-                    .padding(.horizontal, 20)
-                    .padding(.top, 16)
-                    
-                    Spacer(minLength: 16)
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 8)
                 }
                 .contentShape(Rectangle())
                 .gesture(
@@ -171,8 +178,8 @@ struct WordDetailView: View {
                         }
                 )
                 
-                // Bottom Navigation Buttons (Previous / Next)
-                HStack(spacing: 14) {
+                // 3. BOTTOM NAVIGATION BUTTONS (PINNED AT BOTTOM, ALWAYS VISIBLE!)
+                HStack(spacing: 12) {
                     // Previous Button
                     Button(action: prevCard) {
                         HStack(spacing: 6) {
@@ -183,11 +190,11 @@ struct WordDetailView: View {
                         }
                         .foregroundColor(currentIndex > 0 ? AppTheme.textPrimary : AppTheme.buttonDisabledText)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 52)
+                        .frame(height: 48)
                         .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                         .overlay(
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 .stroke(AppTheme.buttonBorder, lineWidth: 1.2)
                         )
                         .shadow(color: Color.black.opacity(0.02), radius: 2, x: 0, y: 1)
@@ -205,11 +212,11 @@ struct WordDetailView: View {
                         }
                         .foregroundColor(currentIndex < wordsList.count - 1 ? AppTheme.textPrimary : AppTheme.buttonDisabledText)
                         .frame(maxWidth: .infinity)
-                        .frame(height: 52)
+                        .frame(height: 48)
                         .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                         .overlay(
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
                                 .stroke(AppTheme.buttonBorder, lineWidth: 1.2)
                         )
                         .shadow(color: Color.black.opacity(0.02), radius: 2, x: 0, y: 1)
@@ -218,7 +225,9 @@ struct WordDetailView: View {
                     .disabled(currentIndex >= wordsList.count - 1)
                 }
                 .padding(.horizontal, 16)
-                .padding(.bottom, 24)
+                .padding(.top, 8)
+                .padding(.bottom, 16)
+                .background(AppTheme.background)
             }
         }
         .onAppear {
