@@ -16,18 +16,19 @@ struct MainContainerView: View {
             // Centered Mobile Canvas with iPhone Pro Dimensions
             VStack {
                 WordListView()
-                    .frame(width: 410, height: 860)
-                    .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+                    .frame(width: 410)
+                    .frame(maxHeight: 900)
+                    .clipShape(RoundedRectangle(cornerRadius: 32, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        RoundedRectangle(cornerRadius: 32, style: .continuous)
                             .stroke(Color.black.opacity(0.08), lineWidth: 1)
                     )
                     .shadow(color: Color.black.opacity(0.18), radius: 30, x: 0, y: 15)
-                    .padding(.vertical, 20)
+                    .padding(.vertical, 24)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(minWidth: 460, minHeight: 900)
+        .frame(minWidth: 460, minHeight: 950)
         #endif
     }
 }

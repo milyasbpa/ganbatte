@@ -26,7 +26,7 @@ struct WordListView: View {
                 Text("Words")
                     .font(.system(size: 20, weight: .bold))
                     .foregroundColor(AppTheme.textPrimary)
-                    .padding(.top, 12)
+                    .padding(.top, 22)
                     .padding(.bottom, 12)
                 
                 // Search Bar

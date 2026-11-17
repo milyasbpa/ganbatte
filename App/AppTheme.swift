@@ -6,6 +6,8 @@ enum AppTheme {
     static let listCardBackground = Color(hex: 0xF4F0E8)
     static let inputBackground = Color(hex: 0xEEEAE1)
     static let buttonBackground = Color(hex: 0xFFFFFF)
+    static let buttonBorder = Color(hex: 0xE8E3DA)
+    static let buttonDisabledText = Color(hex: 0xB8B3AC)
     static let cardBorder = Color(hex: 0xECE7DE)
     
     // Text Colors

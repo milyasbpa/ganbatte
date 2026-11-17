@@ -13,14 +13,14 @@ struct WordDetailView: View {
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
-                // Top Navigation Bar
+                // Top Navigation Bar with generous header breathing room
                 HStack {
                     Button(action: onDismiss) {
-                        HStack(spacing: 4) {
+                        HStack(spacing: 5) {
                             Image(systemName: "chevron.left")
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(.system(size: 18, weight: .semibold))
                             Text("Words")
-                                .font(.system(size: 17, weight: .regular))
+                                .font(.system(size: 18, weight: .semibold))
                         }
                         .foregroundColor(AppTheme.accent)
                     }
@@ -29,25 +29,29 @@ struct WordDetailView: View {
                     Spacer()
                     
                     Text("\(currentIndex + 1) / \(max(wordsList.count, 1))")
-                        .font(.system(size: 16, weight: .bold))
+                        .font(.system(size: 18, weight: .bold))
                         .foregroundColor(AppTheme.textPrimary)
                     
                     Spacer()
                     
                     // Balancing Spacer for centered counter
-                    Text("Words")
-                        .font(.system(size: 17))
-                        .opacity(0)
+                    HStack(spacing: 5) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 18))
+                        Text("Words")
+                            .font(.system(size: 18))
+                    }
+                    .opacity(0)
                 }
                 .padding(.horizontal, 18)
-                .padding(.top, 8)
-                .padding(.bottom, 10)
+                .padding(.top, 22)
+                .padding(.bottom, 16)
                 
                 // Content area (Fits in one glance without scrolling)
                 VStack(alignment: .leading, spacing: 0) {
                     // Hero Cropped Image Banner (No white wrapper card)
                     CardImageView(imageName: currentWord.imageName, contentMode: .fit)
-                        .frame(maxWidth: .infinity)
+                        .aspectRatio(1, contentMode: .fit)
                         .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
                         .padding(.horizontal, 16)
                     
@@ -55,13 +59,13 @@ struct WordDetailView: View {
                     VStack(alignment: .leading, spacing: 14) {
                         // Word Header & Main Audio
                         HStack(alignment: .top) {
-                            VStack(alignment: .leading, spacing: 2) {
+                            VStack(alignment: .leading, spacing: 3) {
                                 // Large Kana
                                 Text(currentWord.kana)
                                     .font(.system(size: 34, weight: .bold))
                                     .foregroundColor(AppTheme.textPrimary)
                                 
-                                // Kanji with Furigana & Romaji
+                                // Kanji with Furigana & Romaji (compact, side by side)
                                 HStack(alignment: .bottom, spacing: 8) {
                                     if !currentWord.kanji.isEmpty && currentWord.kanji != currentWord.kana {
                                         FuriganaText(
@@ -69,12 +73,13 @@ struct WordDetailView: View {
                                             fontSize: 18,
                                             furiganaSize: 10,
                                             textColor: AppTheme.textPrimary,
-                                            furiganaColor: AppTheme.textSecondary
+                                            furiganaColor: AppTheme.textSecondary,
+                                            boldKanji: true
                                         )
                                     }
                                     
                                     Text(currentWord.romaji)
-                                        .font(.system(size: 16, weight: .medium))
+                                        .font(.system(size: 16, weight: .regular))
                                         .foregroundColor(AppTheme.textSecondary)
                                 }
                                 
@@ -145,14 +150,14 @@ struct WordDetailView: View {
                             Text(currentWord.exampleEn)
                                 .font(.system(size: 15))
                                 .foregroundColor(AppTheme.textSecondary)
-                                .padding(.top, 1)
+                                .padding(.top, 2)
                         }
                         .padding(.top, 4)
                     }
                     .padding(.horizontal, 20)
-                    .padding(.top, 14)
+                    .padding(.top, 16)
                     
-                    Spacer(minLength: 8)
+                    Spacer(minLength: 16)
                 }
                 .contentShape(Rectangle())
                 .gesture(
@@ -168,40 +173,52 @@ struct WordDetailView: View {
                 
                 // Bottom Navigation Buttons (Previous / Next)
                 HStack(spacing: 14) {
+                    // Previous Button
                     Button(action: prevCard) {
                         HStack(spacing: 6) {
                             Text("←")
+                                .font(.system(size: 16, weight: .semibold))
                             Text("Previous")
+                                .font(.system(size: 16, weight: .semibold))
                         }
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(currentIndex > 0 ? AppTheme.textPrimary : AppTheme.textTertiary)
+                        .foregroundColor(currentIndex > 0 ? AppTheme.textPrimary : AppTheme.buttonDisabledText)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 13)
+                        .frame(height: 52)
                         .background(Color.white)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .shadow(color: Color.black.opacity(0.04), radius: 4, x: 0, y: 2)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(AppTheme.buttonBorder, lineWidth: 1.2)
+                        )
+                        .shadow(color: Color.black.opacity(0.02), radius: 2, x: 0, y: 1)
                     }
                     .buttonStyle(.plain)
                     .disabled(currentIndex <= 0)
                     
+                    // Next Button
                     Button(action: nextCard) {
                         HStack(spacing: 6) {
                             Text("Next")
+                                .font(.system(size: 16, weight: .semibold))
                             Text("→")
+                                .font(.system(size: 16, weight: .semibold))
                         }
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundColor(currentIndex < wordsList.count - 1 ? AppTheme.textPrimary : AppTheme.textTertiary)
+                        .foregroundColor(currentIndex < wordsList.count - 1 ? AppTheme.textPrimary : AppTheme.buttonDisabledText)
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 13)
+                        .frame(height: 52)
                         .background(Color.white)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .shadow(color: Color.black.opacity(0.04), radius: 4, x: 0, y: 2)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(AppTheme.buttonBorder, lineWidth: 1.2)
+                        )
+                        .shadow(color: Color.black.opacity(0.02), radius: 2, x: 0, y: 1)
                     }
                     .buttonStyle(.plain)
                     .disabled(currentIndex >= wordsList.count - 1)
                 }
                 .padding(.horizontal, 16)
-                .padding(.bottom, 14)
+                .padding(.bottom, 24)
             }
         }
         .onAppear {
