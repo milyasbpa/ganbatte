@@ -1,0 +1,541 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0346AEE93C59726529F3DA6A /* WordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440F9A86BF62269E0332E585 /* WordDetailView.swift */; };
+		08414D81169E947CA5AEF3C2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ACD6152CBB6F0C43AC3BB7C2 /* Assets.xcassets */; };
+		0FDB0F11E555D6042FE40B82 /* MainContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4852D8BFEBE07C7EFA0AA8ED /* MainContainerView.swift */; };
+		11C31D9BF536616BB2E7A92C /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00773AAFAA0FF21780022E71 /* AppTheme.swift */; };
+		170FF5DFCC51B6AABCDFEB37 /* ganbatte.db in Resources */ = {isa = PBXBuildFile; fileRef = ED308E4EDCE31BF83761B7DD /* ganbatte.db */; };
+		2382156A480DCAA9136A3371 /* WordListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A06B7770583993A54DC6C75 /* WordListView.swift */; };
+		2480AD3D08ECBD8BE507AEF8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = ACD6152CBB6F0C43AC3BB7C2 /* Assets.xcassets */; };
+		2687802450D207619A219A16 /* CardImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C8144B1791DFDC90D044466 /* CardImageView.swift */; };
+		28289D8DC92D95E030CFD8CD /* Cards in Resources */ = {isa = PBXBuildFile; fileRef = 55518D03B71B2204600F08F9 /* Cards */; };
+		3F6824FA376B8229E0417FE0 /* FilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00BE56C0ED34218D98F2F6 /* FilterSheet.swift */; };
+		4690A0AAD112C2E18A3D52B2 /* GanbatteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDF04308C59530DFCE2B11CC /* GanbatteApp.swift */; };
+		47E9B70DB17E0B70B6DDDC26 /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32E72DDE2D4210E3CB2013A /* AudioService.swift */; };
+		4BD574E3A0C48E63D2E05E7C /* FuriganaText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2808250126B64C773876964C /* FuriganaText.swift */; };
+		4F187F339DCECC482CCEB1E5 /* WordRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13EFE21FF72C8D8877E2F4D2 /* WordRowView.swift */; };
+		5BAC8E6282A47EB5C7D13CD7 /* CardImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1C8144B1791DFDC90D044466 /* CardImageView.swift */; };
+		6E087530D03BCD7F4CB15FE3 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00773AAFAA0FF21780022E71 /* AppTheme.swift */; };
+		716E7E17E19E4EE02397CA54 /* Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BEC3AD1A2592AA44E4163D0 /* Word.swift */; };
+		8D24CA4F76E65056675024A3 /* FilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA00BE56C0ED34218D98F2F6 /* FilterSheet.swift */; };
+		A06A7EC1BAD92A7789045427 /* FuriganaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19A93CEDB628A343F6FCC3B /* FuriganaService.swift */; };
+		A2EA3A00856B3F6B6104E89A /* WordRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 13EFE21FF72C8D8877E2F4D2 /* WordRowView.swift */; };
+		A7ADF07EBEC17346BEC21ED0 /* FuriganaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D19A93CEDB628A343F6FCC3B /* FuriganaService.swift */; };
+		AEDDBCCCA64D7C35C3CACC98 /* GanbatteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = BDF04308C59530DFCE2B11CC /* GanbatteApp.swift */; };
+		BA9E4509B2B027CA2390320D /* DatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AAF9C66F2A31B4F2785933 /* DatabaseService.swift */; };
+		C4AA095CB4BF14020BC39F92 /* ganbatte.db in Resources */ = {isa = PBXBuildFile; fileRef = ED308E4EDCE31BF83761B7DD /* ganbatte.db */; };
+		CE67E2104AF568C88D32EBF9 /* WordListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6A06B7770583993A54DC6C75 /* WordListView.swift */; };
+		CFED5AD05CB5CD9115C0F05A /* WordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 440F9A86BF62269E0332E585 /* WordDetailView.swift */; };
+		D5887D0BBE92577A419B9EBF /* DatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17AAF9C66F2A31B4F2785933 /* DatabaseService.swift */; };
+		D81964673057FEBAA2E28FA2 /* Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2BEC3AD1A2592AA44E4163D0 /* Word.swift */; };
+		D923021FD419ED5429F873CF /* Cards in Resources */ = {isa = PBXBuildFile; fileRef = 55518D03B71B2204600F08F9 /* Cards */; };
+		E34444335BC01D3136209B69 /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C32E72DDE2D4210E3CB2013A /* AudioService.swift */; };
+		F81D9BAE94425407818742CA /* MainContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4852D8BFEBE07C7EFA0AA8ED /* MainContainerView.swift */; };
+		FFC7BC74CF268A832F907B3E /* FuriganaText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2808250126B64C773876964C /* FuriganaText.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		00773AAFAA0FF21780022E71 /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
+		13EFE21FF72C8D8877E2F4D2 /* WordRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordRowView.swift; sourceTree = "<group>"; };
+		17AAF9C66F2A31B4F2785933 /* DatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseService.swift; sourceTree = "<group>"; };
+		1C8144B1791DFDC90D044466 /* CardImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardImageView.swift; sourceTree = "<group>"; };
+		2808250126B64C773876964C /* FuriganaText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuriganaText.swift; sourceTree = "<group>"; };
+		2BEC3AD1A2592AA44E4163D0 /* Word.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Word.swift; sourceTree = "<group>"; };
+		440F9A86BF62269E0332E585 /* WordDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDetailView.swift; sourceTree = "<group>"; };
+		4852D8BFEBE07C7EFA0AA8ED /* MainContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContainerView.swift; sourceTree = "<group>"; };
+		55518D03B71B2204600F08F9 /* Cards */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Cards; path = Ganbatte/Resources/Cards; sourceTree = SOURCE_ROOT; };
+		6A06B7770583993A54DC6C75 /* WordListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordListView.swift; sourceTree = "<group>"; };
+		6F22B4C6C59C55123FDC89EB /* Ganbatte-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Ganbatte-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA00BE56C0ED34218D98F2F6 /* FilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterSheet.swift; sourceTree = "<group>"; };
+		ACD6152CBB6F0C43AC3BB7C2 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		BDF04308C59530DFCE2B11CC /* GanbatteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GanbatteApp.swift; sourceTree = "<group>"; };
+		C32E72DDE2D4210E3CB2013A /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
+		D19A93CEDB628A343F6FCC3B /* FuriganaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuriganaService.swift; sourceTree = "<group>"; };
+		ED308E4EDCE31BF83761B7DD /* ganbatte.db */ = {isa = PBXFileReference; path = ganbatte.db; sourceTree = "<group>"; };
+		F19F84B30518EE582FAAF2AC /* Ganbatte-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "Ganbatte-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXGroup section */
+		4CC85D68F65AD9543E596935 /* App */ = {
+			isa = PBXGroup;
+			children = (
+				00773AAFAA0FF21780022E71 /* AppTheme.swift */,
+				BDF04308C59530DFCE2B11CC /* GanbatteApp.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		4FC62A561CE86F6DF3B59784 = {
+			isa = PBXGroup;
+			children = (
+				55518D03B71B2204600F08F9 /* Cards */,
+				BD7D2FF30FA398BC46EA7A6C /* Ganbatte */,
+				686923FA91A7547517E858C3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		50040865E34A03AD484A5954 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				2BEC3AD1A2592AA44E4163D0 /* Word.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		686923FA91A7547517E858C3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F19F84B30518EE582FAAF2AC /* Ganbatte-iOS.app */,
+				6F22B4C6C59C55123FDC89EB /* Ganbatte-macOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		83911DF5AC8E6B1D540B52D1 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				4852D8BFEBE07C7EFA0AA8ED /* MainContainerView.swift */,
+				440F9A86BF62269E0332E585 /* WordDetailView.swift */,
+				6A06B7770583993A54DC6C75 /* WordListView.swift */,
+				13EFE21FF72C8D8877E2F4D2 /* WordRowView.swift */,
+				931073A67A1622406A77A4DB /* Components */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		855F3DD693015DC17C053D07 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				C32E72DDE2D4210E3CB2013A /* AudioService.swift */,
+				17AAF9C66F2A31B4F2785933 /* DatabaseService.swift */,
+				D19A93CEDB628A343F6FCC3B /* FuriganaService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		931073A67A1622406A77A4DB /* Components */ = {
+			isa = PBXGroup;
+			children = (
+				1C8144B1791DFDC90D044466 /* CardImageView.swift */,
+				AA00BE56C0ED34218D98F2F6 /* FilterSheet.swift */,
+				2808250126B64C773876964C /* FuriganaText.swift */,
+			);
+			path = Components;
+			sourceTree = "<group>";
+		};
+		A085BE0EF2DC1D638D890842 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				ACD6152CBB6F0C43AC3BB7C2 /* Assets.xcassets */,
+				ED308E4EDCE31BF83761B7DD /* ganbatte.db */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		BD7D2FF30FA398BC46EA7A6C /* Ganbatte */ = {
+			isa = PBXGroup;
+			children = (
+				4CC85D68F65AD9543E596935 /* App */,
+				50040865E34A03AD484A5954 /* Models */,
+				A085BE0EF2DC1D638D890842 /* Resources */,
+				855F3DD693015DC17C053D07 /* Services */,
+				83911DF5AC8E6B1D540B52D1 /* Views */,
+			);
+			path = Ganbatte;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		447101251E9DDD66D45E10A3 /* Ganbatte-iOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2CCAB8C67D7F0CF548011572 /* Build configuration list for PBXNativeTarget "Ganbatte-iOS" */;
+			buildPhases = (
+				AD6C77A48B19E64FE588D7C5 /* Sources */,
+				FC448F4285F2E4375625399C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Ganbatte-iOS";
+			packageProductDependencies = (
+			);
+			productName = "Ganbatte-iOS";
+			productReference = F19F84B30518EE582FAAF2AC /* Ganbatte-iOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+		5F5D1E20012A9CB8F652BFE0 /* Ganbatte-macOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 3522A65686F82760024ADF59 /* Build configuration list for PBXNativeTarget "Ganbatte-macOS" */;
+			buildPhases = (
+				AEA1EBFAC796B03F9B89236B /* Sources */,
+				B018B1CD4D2C27971345F380 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Ganbatte-macOS";
+			packageProductDependencies = (
+			);
+			productName = "Ganbatte-macOS";
+			productReference = 6F22B4C6C59C55123FDC89EB /* Ganbatte-macOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AFDA2B1C79EBDBD67FF7D195 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = YES;
+				LastUpgradeCheck = 1500;
+				TargetAttributes = {
+					447101251E9DDD66D45E10A3 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+					5F5D1E20012A9CB8F652BFE0 = {
+						DevelopmentTeam = "";
+						ProvisioningStyle = Automatic;
+					};
+				};
+			};
+			buildConfigurationList = 5AFB4E72C789A6607B3FAE4F /* Build configuration list for PBXProject "Ganbatte" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				Base,
+				en,
+			);
+			mainGroup = 4FC62A561CE86F6DF3B59784;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = 686923FA91A7547517E858C3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				447101251E9DDD66D45E10A3 /* Ganbatte-iOS */,
+				5F5D1E20012A9CB8F652BFE0 /* Ganbatte-macOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B018B1CD4D2C27971345F380 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				08414D81169E947CA5AEF3C2 /* Assets.xcassets in Resources */,
+				D923021FD419ED5429F873CF /* Cards in Resources */,
+				C4AA095CB4BF14020BC39F92 /* ganbatte.db in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		FC448F4285F2E4375625399C /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				2480AD3D08ECBD8BE507AEF8 /* Assets.xcassets in Resources */,
+				28289D8DC92D95E030CFD8CD /* Cards in Resources */,
+				170FF5DFCC51B6AABCDFEB37 /* ganbatte.db in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AD6C77A48B19E64FE588D7C5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6E087530D03BCD7F4CB15FE3 /* AppTheme.swift in Sources */,
+				E34444335BC01D3136209B69 /* AudioService.swift in Sources */,
+				5BAC8E6282A47EB5C7D13CD7 /* CardImageView.swift in Sources */,
+				BA9E4509B2B027CA2390320D /* DatabaseService.swift in Sources */,
+				8D24CA4F76E65056675024A3 /* FilterSheet.swift in Sources */,
+				A7ADF07EBEC17346BEC21ED0 /* FuriganaService.swift in Sources */,
+				FFC7BC74CF268A832F907B3E /* FuriganaText.swift in Sources */,
+				4690A0AAD112C2E18A3D52B2 /* GanbatteApp.swift in Sources */,
+				0FDB0F11E555D6042FE40B82 /* MainContainerView.swift in Sources */,
+				716E7E17E19E4EE02397CA54 /* Word.swift in Sources */,
+				0346AEE93C59726529F3DA6A /* WordDetailView.swift in Sources */,
+				2382156A480DCAA9136A3371 /* WordListView.swift in Sources */,
+				A2EA3A00856B3F6B6104E89A /* WordRowView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AEA1EBFAC796B03F9B89236B /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				11C31D9BF536616BB2E7A92C /* AppTheme.swift in Sources */,
+				47E9B70DB17E0B70B6DDDC26 /* AudioService.swift in Sources */,
+				2687802450D207619A219A16 /* CardImageView.swift in Sources */,
+				D5887D0BBE92577A419B9EBF /* DatabaseService.swift in Sources */,
+				3F6824FA376B8229E0417FE0 /* FilterSheet.swift in Sources */,
+				A06A7EC1BAD92A7789045427 /* FuriganaService.swift in Sources */,
+				4BD574E3A0C48E63D2E05E7C /* FuriganaText.swift in Sources */,
+				AEDDBCCCA64D7C35C3CACC98 /* GanbatteApp.swift in Sources */,
+				F81D9BAE94425407818742CA /* MainContainerView.swift in Sources */,
+				D81964673057FEBAA2E28FA2 /* Word.swift in Sources */,
+				CFED5AD05CB5CD9115C0F05A /* WordDetailView.swift in Sources */,
+				CE67E2104AF568C88D32EBF9 /* WordListView.swift in Sources */,
+				4F187F339DCECC482CCEB1E5 /* WordRowView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		13D2D1AF4281377FEBE1415B /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Ganbatte;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "co.bas.ganbatte-mac";
+				PRODUCT_NAME = Ganbatte;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		52F6368416F260ED7CDAAB35 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		880C218A9C8E68F1BD69C3EB /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				COMBINE_HIDPI_IMAGES = YES;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Ganbatte;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "co.bas.ganbatte-mac";
+				PRODUCT_NAME = Ganbatte;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		AE532A9C169396A1E08FB7BD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Ganbatte;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.bas.ganbatte;
+				PRODUCT_NAME = Ganbatte;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		E4E93B68DD40A8B0209B2DE3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					"DEBUG=1",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				MACOSX_DEPLOYMENT_TARGET = 14.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		ED4B20C1AFB371105B1430D2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = Ganbatte;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = co.bas.ganbatte;
+				PRODUCT_NAME = Ganbatte;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		2CCAB8C67D7F0CF548011572 /* Build configuration list for PBXNativeTarget "Ganbatte-iOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				ED4B20C1AFB371105B1430D2 /* Debug */,
+				AE532A9C169396A1E08FB7BD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		3522A65686F82760024ADF59 /* Build configuration list for PBXNativeTarget "Ganbatte-macOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				13D2D1AF4281377FEBE1415B /* Debug */,
+				880C218A9C8E68F1BD69C3EB /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		5AFB4E72C789A6607B3FAE4F /* Build configuration list for PBXProject "Ganbatte" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E4E93B68DD40A8B0209B2DE3 /* Debug */,
+				52F6368416F260ED7CDAAB35 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = AFDA2B1C79EBDBD67FF7D195 /* Project object */;
+}
