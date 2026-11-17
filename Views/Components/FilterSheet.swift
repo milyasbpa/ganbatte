@@ -41,7 +41,7 @@ struct DifficultyModalView: View {
                                         .foregroundColor(AppTheme.textSecondary)
                                 }
                                 
-                                Spacer()
+                                Spacer(minLength: 0)
                                 
                                 if selectedLevel == level {
                                     Image(systemName: "checkmark")
@@ -49,9 +49,11 @@ struct DifficultyModalView: View {
                                         .foregroundColor(AppTheme.accent)
                                 }
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 20)
                             .padding(.vertical, 14)
                             .background(selectedLevel == level ? AppTheme.accentLight.opacity(0.6) : Color.clear)
+                            .contentShape(Rectangle()) // Ensures entire row width is tappable
                         }
                         .buttonStyle(.plain)
                         
@@ -107,7 +109,7 @@ struct TypeModalView: View {
                                     .font(.system(size: 16, weight: selectedType == type ? .semibold : .regular))
                                     .foregroundColor(selectedType == type ? AppTheme.accent : AppTheme.textPrimary)
                                 
-                                Spacer()
+                                Spacer(minLength: 0)
                                 
                                 if selectedType == type {
                                     Image(systemName: "checkmark")
@@ -115,9 +117,11 @@ struct TypeModalView: View {
                                         .foregroundColor(AppTheme.accent)
                                 }
                             }
+                            .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 20)
                             .padding(.vertical, 14)
                             .background(selectedType == type ? AppTheme.accentLight.opacity(0.6) : Color.clear)
+                            .contentShape(Rectangle()) // Ensures entire row width is tappable
                         }
                         .buttonStyle(.plain)
                         

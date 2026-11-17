@@ -22,7 +22,7 @@ final class DatabaseService {
         guard let dbURL = Bundle.main.url(forResource: "ganbatte", withExtension: "db") ??
                 Bundle.main.url(forResource: "ganbatte", withExtension: "db", subdirectory: "Resources") else {
             // Fallback for development/testing if running from Xcode project directory
-            let devPath = "/Users/ilyasbashirah/Documents/kerja/bas.co/pictango/ganbatte/Ganbatte/Resources/ganbatte.db"
+            let devPath = "/Users/ilyasbashirah/Documents/kerja/bas.co/pictango/ganbatte/Resources/ganbatte.db"
             if FileManager.default.fileExists(atPath: devPath) {
                 if sqlite3_open_v2(devPath, &db, SQLITE_OPEN_READONLY, nil) == SQLITE_OK {
                     print("Opened database from dev path: \(devPath)")

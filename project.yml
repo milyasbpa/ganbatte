@@ -1,4 +1,4 @@
-name: Ganbatte
+name: ganbatte
 options:
   bundleIdPrefix: co.bas
   xcodeVersion: "15.0"
@@ -13,22 +13,26 @@ settings:
     CODE_SIGN_STYLE: Automatic
 
 targets:
-  Ganbatte-iOS:
+  ganbatte-iOS:
     type: application
     platform: iOS
     deploymentTarget: "17.0"
     sources:
-      - path: Ganbatte
-        excludes:
-          - Resources/Cards
-      - path: Ganbatte/Resources/Cards
+      - path: App
+      - path: Models
+      - path: Services
+      - path: Views
+      - path: Resources/ganbatte.db
+        buildPhase: resources
+      - path: Resources/Assets.xcassets
+      - path: Resources/Cards
         type: folder
         buildPhase: resources
     settings:
       base:
-        PRODUCT_NAME: Ganbatte
+        PRODUCT_NAME: ganbatte
         PRODUCT_BUNDLE_IDENTIFIER: co.bas.ganbatte
-        INFOPLIST_KEY_CFBundleDisplayName: Ganbatte
+        INFOPLIST_KEY_CFBundleDisplayName: ganbatte
         INFOPLIST_KEY_UILaunchScreen_Generation: YES
         INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait"
         GENERATE_INFOPLIST_FILE: YES
@@ -36,22 +40,26 @@ targets:
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         ENABLE_PREVIEWS: YES
 
-  Ganbatte-macOS:
+  ganbatte-macOS:
     type: application
     platform: macOS
     deploymentTarget: "14.0"
     sources:
-      - path: Ganbatte
-        excludes:
-          - Resources/Cards
-      - path: Ganbatte/Resources/Cards
+      - path: App
+      - path: Models
+      - path: Services
+      - path: Views
+      - path: Resources/ganbatte.db
+        buildPhase: resources
+      - path: Resources/Assets.xcassets
+      - path: Resources/Cards
         type: folder
         buildPhase: resources
     settings:
       base:
-        PRODUCT_NAME: Ganbatte
+        PRODUCT_NAME: ganbatte
         PRODUCT_BUNDLE_IDENTIFIER: co.bas.ganbatte-mac
-        INFOPLIST_KEY_CFBundleDisplayName: Ganbatte
+        INFOPLIST_KEY_CFBundleDisplayName: ganbatte
         GENERATE_INFOPLIST_FILE: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor

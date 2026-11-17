@@ -48,9 +48,10 @@ struct WordRowView: View {
             }
             .padding(.horizontal, 14)
             .padding(.vertical, 12)
-            .background(Color.white)
+            .background(AppTheme.listCardBackground)
             .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .shadow(color: Color.black.opacity(0.03), radius: 4, x: 0, y: 2)
+            .shadow(color: Color.black.opacity(0.02), radius: 3, x: 0, y: 1)
+            .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
     }

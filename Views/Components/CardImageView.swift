@@ -32,7 +32,7 @@ final class ImageCache {
             fileURL = url
         } else {
             // 2. Fallback to dev path if running directly in dev environment
-            let devPath = "/Users/ilyasbashirah/Documents/kerja/bas.co/pictango/ganbatte/Ganbatte/Resources/Cards/\(baseName).\(ext)"
+            let devPath = "/Users/ilyasbashirah/Documents/kerja/bas.co/pictango/ganbatte/Resources/Cards/\(baseName).\(ext)"
             if FileManager.default.fileExists(atPath: devPath) {
                 fileURL = URL(fileURLWithPath: devPath)
             }

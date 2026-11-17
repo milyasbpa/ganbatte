@@ -6,28 +6,28 @@ struct MainContainerView: View {
         WordListView()
         #elseif os(macOS)
         ZStack {
-            // Glassy macOS Ambient Background
+            // Glassy macOS Ambient Frosted Background
             VisualEffectBackground()
                 .ignoresSafeArea()
             
-            AppTheme.background.opacity(0.15)
+            AppTheme.background.opacity(0.12)
                 .ignoresSafeArea()
             
-            // Centered Mobile Canvas
+            // Centered Mobile Canvas with iPhone Pro Dimensions
             VStack {
                 WordListView()
-                    .frame(width: 420)
-                    .clipShape(RoundedRectangle(cornerRadius: 26, style: .continuous))
+                    .frame(width: 410, height: 860)
+                    .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
                     .overlay(
-                        RoundedRectangle(cornerRadius: 26, style: .continuous)
-                            .stroke(Color.black.opacity(0.1), lineWidth: 1)
+                        RoundedRectangle(cornerRadius: 28, style: .continuous)
+                            .stroke(Color.black.opacity(0.08), lineWidth: 1)
                     )
-                    .shadow(color: Color.black.opacity(0.2), radius: 30, x: 0, y: 15)
-                    .padding(.vertical, 24)
+                    .shadow(color: Color.black.opacity(0.18), radius: 30, x: 0, y: 15)
+                    .padding(.vertical, 20)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
-        .frame(minWidth: 500, minHeight: 800)
+        .frame(minWidth: 460, minHeight: 900)
         #endif
     }
 }
