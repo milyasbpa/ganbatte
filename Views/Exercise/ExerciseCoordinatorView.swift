@@ -10,18 +10,22 @@ struct ExerciseCoordinatorView: View {
     var onDismiss: () -> Void
     
     @State private var flowState: ExerciseFlowState = .config
-    @State private var config = QuizConfig()
+    @State private var config = QuizConfig.load()
     @State private var currentQuestions: [QuizQuestion] = []
     @State private var sessionResult: QuizSessionResult? = nil
     
     var body: some View {
         ZStack {
+            AppTheme.background
+                .ignoresSafeArea()
+            
             switch flowState {
             case .config:
                 ExerciseConfigView(
                     config: $config,
                     onStartQuiz: { selectedConfig in
                         self.config = selectedConfig
+                        selectedConfig.save() // Persist configuration
                         let questions = ExerciseService.shared.generateQuiz(config: selectedConfig)
                         guard !questions.isEmpty else { return }
                         self.currentQuestions = questions

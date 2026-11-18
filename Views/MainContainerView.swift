@@ -26,6 +26,15 @@ struct MainContainerView: View {
                 .padding(.vertical, 14)
         }
         .frame(minWidth: 440, idealWidth: 460, maxWidth: 500, minHeight: 780, idealHeight: 840, maxHeight: 920)
+        .onAppear {
+            DispatchQueue.main.async {
+                if let window = NSApp.windows.first(where: { $0.canBecomeMain }) {
+                    window.center()
+                    window.makeKeyAndOrderFront(nil)
+                    NSApp.activate(ignoringOtherApps: true)
+                }
+            }
+        }
         #endif
     }
 }

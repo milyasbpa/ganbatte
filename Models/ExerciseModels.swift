@@ -2,7 +2,7 @@ import Foundation
 import SwiftUI
 
 // MARK: - Question Type
-enum QuestionType: String, CaseIterable, Identifiable {
+enum QuestionType: String, CaseIterable, Identifiable, Codable {
     case image = "Image"
     case sound = "Sound"
     case sentence = "Sentence"
@@ -35,11 +35,33 @@ enum QuestionType: String, CaseIterable, Identifiable {
 }
 
 // MARK: - Quiz Configuration
-struct QuizConfig: Equatable {
+struct QuizConfig: Codable, Equatable {
     var level: JLPTLevel = .all
     var type: WordType = .all
     var questionType: QuestionType = .image
-    var questionCount: Int = 10
+    var startWord: Int = 1
+    var endWord: Int = 10
+    
+    var questionCount: Int {
+        max(1, endWord - startWord + 1)
+    }
+    
+    // MARK: - Persistence
+    private static let userDefaultsKey = "ganbatte_saved_quiz_config"
+    
+    func save() {
+        if let data = try? JSONEncoder().encode(self) {
+            UserDefaults.standard.set(data, forKey: QuizConfig.userDefaultsKey)
+        }
+    }
+    
+    static func load() -> QuizConfig {
+        guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
+              let config = try? JSONDecoder().decode(QuizConfig.self, from: data) else {
+            return QuizConfig()
+        }
+        return config
+    }
 }
 
 // MARK: - Quiz Question

@@ -6,12 +6,12 @@ final class ExerciseService {
     private init() {}
     
     func generateQuiz(config: QuizConfig) -> [QuizQuestion] {
-        // 1. Fetch matching words pool
+        // 1. Fetch matching words pool in natural order
         var candidateWords = DatabaseService.shared.fetchWords(
             level: config.level,
             type: config.type,
             searchQuery: "",
-            limit: 500,
+            limit: 2000,
             offset: 0
         )
         
@@ -21,17 +21,25 @@ final class ExerciseService {
                 level: .all,
                 type: .all,
                 searchQuery: "",
-                limit: 500,
+                limit: 2000,
                 offset: 0
             )
         }
         
         guard !candidateWords.isEmpty else { return [] }
         
-        // 2. Select target words
-        let shuffledCandidates = candidateWords.shuffled()
-        let count = min(config.questionCount, shuffledCandidates.count)
-        let targetWords = Array(shuffledCandidates.prefix(count))
+        // 2. Select target words within user range (startWord ... endWord, 1-indexed)
+        let totalCount = candidateWords.count
+        let clampedStart = max(1, min(config.startWord, totalCount))
+        let clampedEnd = max(clampedStart, min(config.endWord, totalCount))
+        
+        let startIdx = clampedStart - 1
+        let endIdx = clampedEnd - 1
+        
+        let sliceWords = Array(candidateWords[startIdx...endIdx])
+        
+        // Target words within range shuffled for quiz variety
+        let targetWords = sliceWords.shuffled()
         
         // 3. For each target word, create 4 options (1 correct + 3 distractors)
         var questions: [QuizQuestion] = []

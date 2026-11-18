@@ -5,7 +5,21 @@ struct ExerciseConfigView: View {
     var onStartQuiz: (QuizConfig) -> Void
     var onDismiss: () -> Void
     
-    let countPresets = [5, 10, 15, 20]
+    @State private var totalWords: Int = 40
+    @State private var startText: String = "1"
+    @State private var endText: String = "10"
+    
+    var batchRanges: [(start: Int, end: Int)] {
+        var batches: [(Int, Int)] = []
+        let batchSize = 10
+        var current = 1
+        while current <= totalWords {
+            let bEnd = min(current + batchSize - 1, totalWords)
+            batches.append((current, bEnd))
+            current += batchSize
+        }
+        return batches
+    }
     
     var body: some View {
         ZStack {
@@ -45,45 +59,45 @@ struct ExerciseConfigView: View {
                 }
                 .padding(.horizontal, 20)
                 #if os(macOS)
-                .padding(.top, 36)
+                .padding(.top, 16)
                 #else
                 .padding(.top, 16)
                 #endif
-                .padding(.bottom, 16)
+                .padding(.bottom, 12)
                 .background(AppTheme.background)
                 
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 22) {
+                    VStack(alignment: .leading, spacing: 16) {
                         // Section 1: Question Type
-                        VStack(alignment: .leading, spacing: 10) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("QUESTION TYPE")
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(AppTheme.textSecondary)
                                 .tracking(0.5)
                             
-                            VStack(spacing: 10) {
+                            VStack(spacing: 8) {
                                 ForEach(QuestionType.allCases) { qType in
                                     Button(action: {
                                         config.questionType = qType
                                     }) {
-                                        HStack(spacing: 14) {
+                                        HStack(spacing: 12) {
                                             ZStack {
                                                 Circle()
                                                     .fill(config.questionType == qType ? AppTheme.accent : AppTheme.inputBackground)
-                                                    .frame(width: 42, height: 42)
+                                                    .frame(width: 36, height: 36)
                                                 
                                                 Image(systemName: qType.iconName)
-                                                    .font(.system(size: 16, weight: .semibold))
+                                                    .font(.system(size: 15, weight: .semibold))
                                                     .foregroundColor(config.questionType == qType ? .white : AppTheme.textPrimary)
                                             }
                                             
-                                            VStack(alignment: .leading, spacing: 3) {
+                                            VStack(alignment: .leading, spacing: 2) {
                                                 Text(qType.title)
-                                                    .font(.system(size: 16, weight: .semibold))
+                                                    .font(.system(size: 15, weight: .semibold))
                                                     .foregroundColor(AppTheme.textPrimary)
                                                 
                                                 Text(qType.subtitle)
-                                                    .font(.system(size: 12, weight: .regular))
+                                                    .font(.system(size: 11, weight: .regular))
                                                     .foregroundColor(AppTheme.textSecondary)
                                             }
                                             
@@ -91,20 +105,20 @@ struct ExerciseConfigView: View {
                                             
                                             if config.questionType == qType {
                                                 Image(systemName: "checkmark.circle.fill")
-                                                    .font(.system(size: 20))
+                                                    .font(.system(size: 18))
                                                     .foregroundColor(AppTheme.accent)
                                             } else {
                                                 Circle()
                                                     .stroke(AppTheme.buttonBorder, lineWidth: 1.5)
-                                                    .frame(width: 20, height: 20)
+                                                    .frame(width: 18, height: 18)
                                             }
                                         }
-                                        .padding(.horizontal, 14)
-                                        .padding(.vertical, 12)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 8)
                                         .background(config.questionType == qType ? AppTheme.accentLight.opacity(0.5) : Color.white)
-                                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                                         .overlay(
-                                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                            RoundedRectangle(cornerRadius: 14, style: .continuous)
                                                 .stroke(config.questionType == qType ? AppTheme.accent : AppTheme.buttonBorder, lineWidth: config.questionType == qType ? 1.5 : 1)
                                         )
                                     }
@@ -114,7 +128,7 @@ struct ExerciseConfigView: View {
                         }
                         
                         // Section 2: Difficulty
-                        VStack(alignment: .leading, spacing: 10) {
+                        VStack(alignment: .leading, spacing: 8) {
                             Text("DIFFICULTY")
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(AppTheme.textSecondary)
@@ -125,6 +139,7 @@ struct ExerciseConfigView: View {
                                     ForEach(JLPTLevel.allCases, id: \.self) { level in
                                         Button(action: {
                                             config.level = level
+                                            updateTotalWords()
                                         }) {
                                             Text(level.rawValue)
                                                 .font(.system(size: 14, weight: .semibold))
@@ -156,6 +171,7 @@ struct ExerciseConfigView: View {
                                     ForEach(WordType.allCases, id: \.self) { wType in
                                         Button(action: {
                                             config.type = wType
+                                            updateTotalWords()
                                         }) {
                                             Text(wType.rawValue)
                                                 .font(.system(size: 14, weight: .semibold))
@@ -175,89 +191,238 @@ struct ExerciseConfigView: View {
                             }
                         }
                         
-                        // Section 4: Question Count
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text("NUMBER OF QUESTIONS")
-                                .font(.system(size: 12, weight: .bold))
-                                .foregroundColor(AppTheme.textSecondary)
-                                .tracking(0.5)
-                            
-                            // Preset Chips
-                            HStack(spacing: 8) {
-                                ForEach(countPresets, id: \.self) { preset in
-                                    Button(action: {
-                                        config.questionCount = preset
-                                    }) {
-                                        Text("\(preset)")
-                                            .font(.system(size: 14, weight: .semibold))
-                                            .foregroundColor(config.questionCount == preset ? .white : AppTheme.textPrimary)
-                                            .frame(maxWidth: .infinity)
-                                            .padding(.vertical, 10)
-                                            .background(config.questionCount == preset ? AppTheme.accent : Color.white)
-                                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                                            .overlay(
-                                                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                                    .stroke(config.questionCount == preset ? AppTheme.accent : AppTheme.buttonBorder, lineWidth: 1)
-                                            )
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                            }
-                            
-                            // Custom Stepper
+                        // Section 4: Word Range (Quick Batches + Slider + Manual Inputs)
+                        VStack(alignment: .leading, spacing: 14) {
                             HStack {
-                                Text("Custom Count")
-                                    .font(.system(size: 14, weight: .medium))
+                                Text("WORD RANGE")
+                                    .font(.system(size: 12, weight: .bold))
                                     .foregroundColor(AppTheme.textSecondary)
+                                    .tracking(0.5)
                                 
                                 Spacer()
                                 
-                                HStack(spacing: 14) {
-                                    Button(action: {
-                                        if config.questionCount > 3 {
-                                            config.questionCount -= 1
+                                Text("\(totalWords) words available")
+                                    .font(.system(size: 12, weight: .medium))
+                                    .foregroundColor(AppTheme.textSecondary)
+                            }
+                            
+                            // Quick Batch Chips (e.g. 1-10, 11-20, 21-30, etc.)
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 8) {
+                                    ForEach(Array(batchRanges.enumerated()), id: \.offset) { _, batch in
+                                        let isSelected = (config.startWord == batch.start && config.endWord == batch.end)
+                                        Button(action: {
+                                            config.startWord = batch.start
+                                            config.endWord = batch.end
+                                            startText = "\(batch.start)"
+                                            endText = "\(batch.end)"
+                                        }) {
+                                            Text("\(batch.start) – \(batch.end)")
+                                                .font(.system(size: 13, weight: .semibold))
+                                                .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
+                                                .padding(.horizontal, 14)
+                                                .padding(.vertical, 8)
+                                                .background(isSelected ? AppTheme.accent : Color.white)
+                                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                                .overlay(
+                                                    RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                                        .stroke(isSelected ? AppTheme.accent : AppTheme.buttonBorder, lineWidth: 1)
+                                                )
                                         }
-                                    }) {
-                                        Image(systemName: "minus")
-                                            .font(.system(size: 14, weight: .bold))
-                                            .foregroundColor(config.questionCount > 3 ? AppTheme.textPrimary : AppTheme.buttonDisabledText)
-                                            .frame(width: 32, height: 32)
-                                            .background(AppTheme.inputBackground)
-                                            .clipShape(Circle())
+                                        .buttonStyle(.plain)
                                     }
-                                    .buttonStyle(.plain)
-                                    .disabled(config.questionCount <= 3)
-                                    
-                                    Text("\(config.questionCount)")
-                                        .font(.system(size: 16, weight: .bold))
-                                        .foregroundColor(AppTheme.textPrimary)
-                                        .frame(minWidth: 28)
-                                    
-                                    Button(action: {
-                                        if config.questionCount < 50 {
-                                            config.questionCount += 1
-                                        }
-                                    }) {
-                                        Image(systemName: "plus")
-                                            .font(.system(size: 14, weight: .bold))
-                                            .foregroundColor(config.questionCount < 50 ? AppTheme.textPrimary : AppTheme.buttonDisabledText)
-                                            .frame(width: 32, height: 32)
-                                            .background(AppTheme.inputBackground)
-                                            .clipShape(Circle())
-                                    }
-                                    .buttonStyle(.plain)
-                                    .disabled(config.questionCount >= 50)
                                 }
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 4)
-                                .background(Color.white)
-                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                                .overlay(
-                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                        .stroke(AppTheme.buttonBorder, lineWidth: 1)
+                            }
+                            
+                            // Dual Range Interactive Slider
+                            VStack(spacing: 6) {
+                                DualRangeSlider(
+                                    start: $config.startWord,
+                                    end: $config.endWord,
+                                    range: 1...max(totalWords, 1)
                                 )
+                                .onChange(of: config.startWord) { newVal in
+                                    startText = "\(newVal)"
+                                }
+                                .onChange(of: config.endWord) { newVal in
+                                    endText = "\(newVal)"
+                                }
+                                
+                                HStack {
+                                    Text("1")
+                                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                        .foregroundColor(AppTheme.textTertiary)
+                                    
+                                    Spacer()
+                                    
+                                    Text("\(totalWords)")
+                                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                                        .foregroundColor(AppTheme.textTertiary)
+                                }
+                                .padding(.horizontal, 4)
                             }
                             .padding(.top, 4)
+                            
+                            // Manual Inputs (Start & End with Stepper and Direct Input)
+                            HStack(spacing: 12) {
+                                // Start Input Card
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("START")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundColor(AppTheme.textSecondary)
+                                    
+                                    HStack(spacing: 8) {
+                                        Button(action: {
+                                            if config.startWord > 1 {
+                                                config.startWord -= 1
+                                                startText = "\(config.startWord)"
+                                            }
+                                        }) {
+                                            Image(systemName: "minus")
+                                                .font(.system(size: 12, weight: .bold))
+                                                .foregroundColor(config.startWord > 1 ? AppTheme.textPrimary : AppTheme.buttonDisabledText)
+                                                .frame(width: 28, height: 28)
+                                                .background(AppTheme.inputBackground)
+                                                .clipShape(Circle())
+                                        }
+                                        .buttonStyle(.plain)
+                                        .disabled(config.startWord <= 1)
+                                        
+                                        TextField("1", text: $startText)
+                                            .font(.system(size: 16, weight: .bold, design: .monospaced))
+                                            .foregroundColor(AppTheme.textPrimary)
+                                            .multilineTextAlignment(.center)
+                                            .textFieldStyle(.plain)
+                                            .onChange(of: startText) { val in
+                                                if let num = Int(val.trimmingCharacters(in: .whitespaces)) {
+                                                    let clamped = max(1, min(num, totalWords))
+                                                    config.startWord = clamped
+                                                    if config.endWord < clamped {
+                                                        config.endWord = min(clamped + 9, totalWords)
+                                                    }
+                                                }
+                                            }
+                                        
+                                        Button(action: {
+                                            if config.startWord < totalWords {
+                                                config.startWord += 1
+                                                if config.endWord < config.startWord {
+                                                    config.endWord = min(config.startWord + 9, totalWords)
+                                                }
+                                                startText = "\(config.startWord)"
+                                            }
+                                        }) {
+                                            Image(systemName: "plus")
+                                                .font(.system(size: 12, weight: .bold))
+                                                .foregroundColor(config.startWord < totalWords ? AppTheme.textPrimary : AppTheme.buttonDisabledText)
+                                                .frame(width: 28, height: 28)
+                                                .background(AppTheme.inputBackground)
+                                                .clipShape(Circle())
+                                        }
+                                        .buttonStyle(.plain)
+                                        .disabled(config.startWord >= totalWords)
+                                    }
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 6)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                            .stroke(AppTheme.buttonBorder, lineWidth: 1)
+                                    )
+                                }
+                                .frame(maxWidth: .infinity)
+                                
+                                Text("to")
+                                    .font(.system(size: 14, weight: .medium))
+                                    .foregroundColor(AppTheme.textSecondary)
+                                    .padding(.top, 14)
+                                
+                                // End Input Card
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text("END")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundColor(AppTheme.textSecondary)
+                                    
+                                    HStack(spacing: 8) {
+                                        Button(action: {
+                                            if config.endWord > 1 {
+                                                config.endWord -= 1
+                                                if config.startWord > config.endWord {
+                                                    config.startWord = max(1, config.endWord - 9)
+                                                }
+                                                endText = "\(config.endWord)"
+                                            }
+                                        }) {
+                                            Image(systemName: "minus")
+                                                .font(.system(size: 12, weight: .bold))
+                                                .foregroundColor(config.endWord > 1 ? AppTheme.textPrimary : AppTheme.buttonDisabledText)
+                                                .frame(width: 28, height: 28)
+                                                .background(AppTheme.inputBackground)
+                                                .clipShape(Circle())
+                                        }
+                                        .buttonStyle(.plain)
+                                        .disabled(config.endWord <= 1)
+                                        
+                                        TextField("10", text: $endText)
+                                            .font(.system(size: 16, weight: .bold, design: .monospaced))
+                                            .foregroundColor(AppTheme.textPrimary)
+                                            .multilineTextAlignment(.center)
+                                            .textFieldStyle(.plain)
+                                            .onChange(of: endText) { val in
+                                                if let num = Int(val.trimmingCharacters(in: .whitespaces)) {
+                                                    let clamped = max(1, min(num, totalWords))
+                                                    config.endWord = clamped
+                                                    if config.startWord > clamped {
+                                                        config.startWord = max(1, clamped - 9)
+                                                    }
+                                                }
+                                            }
+                                        
+                                        Button(action: {
+                                            if config.endWord < totalWords {
+                                                config.endWord += 1
+                                                endText = "\(config.endWord)"
+                                            }
+                                        }) {
+                                            Image(systemName: "plus")
+                                                .font(.system(size: 12, weight: .bold))
+                                                .foregroundColor(config.endWord < totalWords ? AppTheme.textPrimary : AppTheme.buttonDisabledText)
+                                                .frame(width: 28, height: 28)
+                                                .background(AppTheme.inputBackground)
+                                                .clipShape(Circle())
+                                        }
+                                        .buttonStyle(.plain)
+                                        .disabled(config.endWord >= totalWords)
+                                    }
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 6)
+                                    .background(Color.white)
+                                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                            .stroke(AppTheme.buttonBorder, lineWidth: 1)
+                                    )
+                                }
+                                .frame(maxWidth: .infinity)
+                            }
+                            
+                            // Info Badge
+                            HStack(spacing: 6) {
+                                Image(systemName: "scope")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundColor(AppTheme.accent)
+                                
+                                Text("Selected: Words \(config.startWord) – \(config.endWord) (\(config.questionCount) Questions)")
+                                    .font(.system(size: 13, weight: .medium))
+                                    .foregroundColor(AppTheme.textPrimary)
+                                
+                                Spacer()
+                            }
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 10)
+                            .background(AppTheme.accentLight.opacity(0.4))
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         }
                     }
                     .padding(.horizontal, 20)
@@ -290,5 +455,103 @@ struct ExerciseConfigView: View {
                 .background(AppTheme.background)
             }
         }
+        .onAppear {
+            updateTotalWords()
+        }
+    }
+    
+    private func updateTotalWords() {
+        let count = DatabaseService.shared.countWords(level: config.level, type: config.type)
+        totalWords = max(count, 4)
+        if config.endWord > totalWords {
+            config.endWord = totalWords
+        }
+        if config.startWord > config.endWord {
+            config.startWord = max(1, config.endWord - 9)
+        }
+        startText = "\(config.startWord)"
+        endText = "\(config.endWord)"
+    }
+}
+
+// MARK: - Dual Range Slider Component
+struct DualRangeSlider: View {
+    @Binding var start: Int
+    @Binding var end: Int
+    let range: ClosedRange<Int>
+    
+    @State private var dragInitialStart: Int? = nil
+    @State private var dragInitialEnd: Int? = nil
+    
+    var body: some View {
+        GeometryReader { geo in
+            let trackWidth = max(geo.size.width - 24, 1)
+            let total = max(range.upperBound - range.lowerBound, 1)
+            
+            let startPct = CGFloat(start - range.lowerBound) / CGFloat(total)
+            let endPct = CGFloat(end - range.lowerBound) / CGFloat(total)
+            
+            let startX = startPct * trackWidth + 12
+            let endX = endPct * trackWidth + 12
+            
+            ZStack(alignment: .leading) {
+                // Background Track
+                Capsule()
+                    .fill(AppTheme.inputBackground)
+                    .frame(height: 6)
+                
+                // Active Range Highlight
+                Capsule()
+                    .fill(AppTheme.accent)
+                    .frame(width: max(4, endX - startX), height: 6)
+                    .offset(x: startX)
+                
+                // Start Thumb
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 24, height: 24)
+                    .overlay(Circle().stroke(AppTheme.accent, lineWidth: 2.5))
+                    .shadow(color: Color.black.opacity(0.12), radius: 3, x: 0, y: 1.5)
+                    .offset(x: startX - 12)
+                    .gesture(
+                        DragGesture(minimumDistance: 1)
+                            .onChanged { val in
+                                if dragInitialStart == nil {
+                                    dragInitialStart = start
+                                }
+                                let deltaVal = Int(round((val.translation.width / trackWidth) * CGFloat(total)))
+                                let newStart = (dragInitialStart ?? start) + deltaVal
+                                start = max(range.lowerBound, min(newStart, end))
+                            }
+                            .onEnded { _ in
+                                dragInitialStart = nil
+                            }
+                    )
+                
+                // End Thumb
+                Circle()
+                    .fill(Color.white)
+                    .frame(width: 24, height: 24)
+                    .overlay(Circle().stroke(AppTheme.accent, lineWidth: 2.5))
+                    .shadow(color: Color.black.opacity(0.12), radius: 3, x: 0, y: 1.5)
+                    .offset(x: endX - 12)
+                    .gesture(
+                        DragGesture(minimumDistance: 1)
+                            .onChanged { val in
+                                if dragInitialEnd == nil {
+                                    dragInitialEnd = end
+                                }
+                                let deltaVal = Int(round((val.translation.width / trackWidth) * CGFloat(total)))
+                                let newEnd = (dragInitialEnd ?? end) + deltaVal
+                                end = max(start, min(newEnd, range.upperBound))
+                            }
+                            .onEnded { _ in
+                                dragInitialEnd = nil
+                            }
+                    )
+            }
+            .frame(height: 24)
+        }
+        .frame(height: 24)
     }
 }

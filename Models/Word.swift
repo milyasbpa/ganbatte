@@ -1,6 +1,6 @@
 import Foundation
 
-enum JLPTLevel: String, CaseIterable, Identifiable, Hashable {
+enum JLPTLevel: String, CaseIterable, Identifiable, Hashable, Codable {
     case all = "All"
     case n5 = "N5"
     case n4 = "N4"
@@ -33,7 +33,7 @@ enum JLPTLevel: String, CaseIterable, Identifiable, Hashable {
     }
 }
 
-enum WordType: String, CaseIterable, Identifiable, Hashable {
+enum WordType: String, CaseIterable, Identifiable, Hashable, Codable {
     case all = "All"
     case noun = "Noun"
     case verb = "Verb"
