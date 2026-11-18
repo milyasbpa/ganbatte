@@ -186,4 +186,69 @@ final class DatabaseService {
             return 0
         }
     }
+    
+    // MARK: - Kana Practice Words
+    func fetchKanaPracticeWords(type: KanaType, limit: Int = 1000) -> [KanaWord] {
+        queue.sync {
+            guard let db = db else { return [] }
+            
+            let query: String
+            if type == .katakana {
+                query = """
+                SELECT id, kanji, kana, romaji, meaning_en 
+                FROM words 
+                WHERE (kanji GLOB '*[ァ-ン]*' OR kana GLOB '*[ァ-ン]*')
+                ORDER BY id ASC
+                LIMIT ?
+                """
+            } else {
+                query = """
+                SELECT id, kanji, kana, romaji, meaning_en 
+                FROM words 
+                WHERE level IN ('N5', 'N4', 'N3') 
+                  AND kana NOT GLOB '*[ァ-ン]*' 
+                  AND kana NOT LIKE '%(%' 
+                  AND kana NOT LIKE '%（%'
+                  AND kana NOT LIKE '%～%'
+                ORDER BY level DESC, id ASC
+                LIMIT ?
+                """
+            }
+            
+            var statement: OpaquePointer?
+            defer { sqlite3_finalize(statement) }
+            
+            guard sqlite3_prepare_v2(db, query, -1, &statement, nil) == SQLITE_OK else {
+                return []
+            }
+            
+            sqlite3_bind_int(statement, 1, Int32(limit))
+            
+            var results: [KanaWord] = []
+            while sqlite3_step(statement) == SQLITE_ROW {
+                let id = Int(sqlite3_column_int(statement, 0))
+                let kanji = String(cString: sqlite3_column_text(statement, 1))
+                let kana = String(cString: sqlite3_column_text(statement, 2))
+                let romaji = String(cString: sqlite3_column_text(statement, 3))
+                let meaningEn = String(cString: sqlite3_column_text(statement, 4))
+                
+                var displayKana = kana
+                if type == .katakana {
+                    let hasKatakana = kanji.unicodeScalars.contains { scalar in
+                        (0x30A0...0x30FF).contains(scalar.value)
+                    }
+                    displayKana = hasKatakana ? kanji : kana
+                }
+                
+                results.append(KanaWord(
+                    id: id,
+                    kana: displayKana,
+                    romaji: romaji,
+                    meaningEn: meaningEn,
+                    type: type
+                ))
+            }
+            return results
+        }
+    }
 }

@@ -1,9 +1,40 @@
 import SwiftUI
 
 struct MainContainerView: View {
+    @AppStorage("ganbatte_active_main_tab") private var activeTabRaw: String = AppTab.words.rawValue
+    @State private var hideBottomBar: Bool = false
+    
+    private var selectedTab: Binding<AppTab> {
+        Binding(
+            get: { AppTab(rawValue: activeTabRaw) ?? .words },
+            set: { activeTabRaw = $0.rawValue }
+        )
+    }
+    
+    @ViewBuilder
+    private var mainContent: some View {
+        VStack(spacing: 0) {
+            ZStack {
+                switch selectedTab.wrappedValue {
+                case .words:
+                    WordListView(hideBottomBar: $hideBottomBar)
+                case .kana:
+                    KanaChartView(hideBottomBar: $hideBottomBar)
+                }
+            }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
+            if !hideBottomBar {
+                BottomNavBar(selectedTab: selectedTab)
+                    .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+        }
+    }
+    
     var body: some View {
         #if os(iOS)
-        WordListView()
+        mainContent
+            .ignoresSafeArea(.keyboard)
         #elseif os(macOS)
         ZStack {
             // Glassy macOS Ambient Frosted Background
@@ -14,7 +45,7 @@ struct MainContainerView: View {
                 .ignoresSafeArea()
             
             // Centered Mobile Canvas with iPhone Dimensions
-            WordListView()
+            mainContent
                 .frame(width: 410)
                 .frame(maxHeight: .infinity)
                 .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))

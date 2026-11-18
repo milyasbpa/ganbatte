@@ -1,6 +1,12 @@
 import SwiftUI
 
 struct WordListView: View {
+    @Binding var hideBottomBar: Bool
+    
+    init(hideBottomBar: Binding<Bool> = .constant(false)) {
+        self._hideBottomBar = hideBottomBar
+    }
+    
     @State private var words: [Word] = []
     @State private var totalCount: Int = 0
     @State private var searchQuery: String = ""
@@ -242,6 +248,16 @@ struct WordListView: View {
         }
         .onChange(of: searchQuery) { _ in
             reloadWords()
+        }
+        .onChange(of: showExerciseFlow) { val in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                hideBottomBar = val || (selectedWordForDetail != nil)
+            }
+        }
+        .onChange(of: selectedWordForDetail) { val in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                hideBottomBar = (val != nil) || showExerciseFlow
+            }
         }
     }
     
