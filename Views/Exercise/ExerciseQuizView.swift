@@ -109,22 +109,21 @@ struct ExerciseQuizView: View {
                 
                 // Question Content + Options
                 ScrollView(showsIndicators: false) {
-                    VStack(spacing: 18) {
+                    VStack(spacing: 12) {
                         // 1. Question Prompt Area
                         questionPromptView
                             .frame(maxWidth: .infinity)
-                            .padding(.top, 4)
+                            .padding(.top, 2)
                         
                         // 2. Options Grid (4 Multiple Choice Options)
-                        VStack(spacing: 10) {
+                        VStack(spacing: 8) {
                             ForEach(Array(currentQuestion.options.enumerated()), id: \.element.id) { index, word in
                                 optionCard(index: index, word: word)
                             }
                         }
-                        .padding(.top, 6)
                     }
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 24)
+                    .padding(.bottom, 16)
                 }
             }
         }
@@ -151,9 +150,9 @@ struct ExerciseQuizView: View {
     private var questionPromptView: some View {
         switch currentQuestion.questionType {
         case .sound:
-            VStack(spacing: 14) {
+            VStack(spacing: 10) {
                 Text("Listen to the pronunciation and select the correct word:")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundColor(AppTheme.textSecondary)
                     .multilineTextAlignment(.center)
                 
@@ -163,77 +162,82 @@ struct ExerciseQuizView: View {
                     ZStack {
                         Circle()
                             .fill(Color.white)
-                            .frame(width: 90, height: 90)
+                            .frame(width: 76, height: 76)
                             .overlay(
                                 Circle()
                                     .stroke(AppTheme.accent, lineWidth: 2)
                             )
-                            .shadow(color: AppTheme.accent.opacity(0.15), radius: 12, x: 0, y: 6)
+                            .shadow(color: AppTheme.accent.opacity(0.15), radius: 10, x: 0, y: 5)
                         
                         Image(systemName: "speaker.wave.3.fill")
-                            .font(.system(size: 34))
+                            .font(.system(size: 28))
                             .foregroundColor(AppTheme.accent)
                     }
                 }
                 .buttonStyle(.plain)
                 
                 Text("Tap to replay audio")
-                    .font(.system(size: 12))
+                    .font(.system(size: 11))
                     .foregroundColor(AppTheme.textTertiary)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 24)
+            .padding(.vertical, 16)
             .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .stroke(AppTheme.buttonBorder, lineWidth: 1)
             )
             
         case .image:
-            VStack(spacing: 12) {
+            VStack(spacing: 8) {
                 Text("Select the word that matches the image:")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundColor(AppTheme.textSecondary)
                 
                 CardImageView(imageName: currentQuestion.targetWord.imageName, contentMode: .fit)
                     .aspectRatio(1.0, contentMode: .fit)
-                    .frame(maxWidth: .infinity)
-                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+                    .frame(maxHeight: 185)
+                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 16, style: .continuous)
+                            .stroke(AppTheme.cardBorder.opacity(0.8), lineWidth: 1)
+                    )
+                    .shadow(color: Color.black.opacity(0.04), radius: 6, x: 0, y: 2)
             }
             
         case .sentence:
-            VStack(alignment: .leading, spacing: 14) {
+            VStack(alignment: .leading, spacing: 10) {
                 Text("Complete the missing word:")
-                    .font(.system(size: 14, weight: .medium))
+                    .font(.system(size: 13, weight: .medium))
                     .foregroundColor(AppTheme.textSecondary)
                 
                 // Masked Japanese Sentence
                 Text(currentQuestion.maskedSentenceJa)
-                    .font(.system(size: 20, weight: .bold))
+                    .font(.system(size: 18, weight: .bold))
                     .foregroundColor(AppTheme.textPrimary)
-                    .lineSpacing(6)
+                    .lineSpacing(5)
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 8)
+                    .padding(.vertical, 4)
                 
                 // English Sentence Translation
                 HStack(alignment: .top, spacing: 6) {
                     Image(systemName: "text.bubble")
-                        .font(.system(size: 13))
+                        .font(.system(size: 12))
                         .foregroundColor(AppTheme.textSecondary)
                         .padding(.top, 2)
                     
                     Text(currentQuestion.targetWord.exampleEn)
-                        .font(.system(size: 15, weight: .regular))
+                        .font(.system(size: 14, weight: .regular))
                         .foregroundColor(AppTheme.textSecondary)
                 }
             }
-            .padding(18)
+            .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
             .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
                     .stroke(AppTheme.buttonBorder, lineWidth: 1)
             )
         }
@@ -320,7 +324,7 @@ struct ExerciseQuizView: View {
                 }
             }
             .padding(.horizontal, 14)
-            .padding(.vertical, 14)
+            .padding(.vertical, 11)
             .background(bgColor)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(
