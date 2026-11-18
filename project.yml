@@ -11,6 +11,7 @@ settings:
     SWIFT_VERSION: "5.0"
     DEVELOPMENT_TEAM: ""
     CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_IDENTITY: "-"
 
 targets:
   ganbatte-iOS:
@@ -60,6 +61,7 @@ targets:
         PRODUCT_NAME: ganbatte
         PRODUCT_BUNDLE_IDENTIFIER: co.bas.ganbatte-mac
         INFOPLIST_KEY_CFBundleDisplayName: ganbatte
+        CODE_SIGN_IDENTITY: "-"
         GENERATE_INFOPLIST_FILE: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
