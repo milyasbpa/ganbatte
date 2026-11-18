@@ -11,17 +11,17 @@ enum QuestionType: String, CaseIterable, Identifiable {
     
     var title: String {
         switch self {
-        case .image: return "Gambar"
-        case .sound: return "Suara"
-        case .sentence: return "Kalimat Bolong"
+        case .image: return "Image"
+        case .sound: return "Audio"
+        case .sentence: return "Fill in the Blank"
         }
     }
     
     var subtitle: String {
         switch self {
-        case .image: return "Tebak kata dari gambar ilustrasi"
-        case .sound: return "Tebak kata dari pelafalan audio"
-        case .sentence: return "Lengkapi kata yang hilang di kalimat"
+        case .image: return "Guess the word from the image"
+        case .sound: return "Guess the word from the audio"
+        case .sentence: return "Complete the sentence with the missing word"
         }
     }
     

@@ -15,7 +15,7 @@ struct ExerciseResultView: View {
                 // Header
                 HStack {
                     Spacer()
-                    Text("Hasil Latihan")
+                    Text("Quiz Results")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(AppTheme.textPrimary)
                     Spacer()
@@ -33,7 +33,7 @@ struct ExerciseResultView: View {
                     VStack(spacing: 20) {
                         // 1. Main Score Card
                         VStack(spacing: 14) {
-                            Text("SKOR AKHIR")
+                            Text("FINAL SCORE")
                                 .font(.system(size: 11, weight: .bold))
                                 .foregroundColor(AppTheme.textSecondary)
                                 .tracking(0.6)
@@ -55,7 +55,7 @@ struct ExerciseResultView: View {
                             // Stats Row
                             HStack {
                                 VStack(spacing: 4) {
-                                    Text("BENAR")
+                                    Text("CORRECT")
                                         .font(.system(size: 10, weight: .bold))
                                         .foregroundColor(AppTheme.textSecondary)
                                     Text("\(summary.correctCount) / \(summary.totalQuestions)")
@@ -69,7 +69,7 @@ struct ExerciseResultView: View {
                                     .frame(width: 1, height: 28)
                                 
                                 VStack(spacing: 4) {
-                                    Text("TOTAL WAKTU")
+                                    Text("TOTAL TIME")
                                         .font(.system(size: 10, weight: .bold))
                                         .foregroundColor(AppTheme.textSecondary)
                                     Text(String(format: "%.1fs", summary.totalTime))
@@ -83,10 +83,10 @@ struct ExerciseResultView: View {
                                     .frame(width: 1, height: 28)
                                 
                                 VStack(spacing: 4) {
-                                    Text("RATA-RATA")
+                                    Text("AVERAGE")
                                         .font(.system(size: 10, weight: .bold))
                                         .foregroundColor(AppTheme.textSecondary)
-                                    Text(String(format: "%.1fs/soal", summary.averageTime))
+                                    Text(String(format: "%.1fs/question", summary.averageTime))
                                         .font(.system(size: 16, weight: .bold, design: .monospaced))
                                         .foregroundColor(AppTheme.textPrimary)
                                 }
@@ -106,7 +106,7 @@ struct ExerciseResultView: View {
                         
                         // 2. Question Breakdown List
                         VStack(alignment: .leading, spacing: 12) {
-                            Text("DETAIL PERTANYAAN")
+                            Text("QUESTION BREAKDOWN")
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(AppTheme.textSecondary)
                                 .tracking(0.5)
@@ -124,12 +124,12 @@ struct ExerciseResultView: View {
                 
                 // Bottom 3 Action Buttons (Pinned)
                 VStack(spacing: 10) {
-                    // 1. Primary: Ulangi Soal yang Sama
+                    // 1. Primary: Retry Same Questions
                     Button(action: onRetrySameQuestions) {
                         HStack(spacing: 8) {
                             Image(systemName: "arrow.counterclockwise")
                                 .font(.system(size: 15, weight: .bold))
-                            Text("Ulangi Soal yang Sama")
+                            Text("Retry Same Questions")
                                 .font(.system(size: 16, weight: .bold))
                         }
                         .foregroundColor(.white)
@@ -141,12 +141,12 @@ struct ExerciseResultView: View {
                     }
                     .buttonStyle(.plain)
                     
-                    // 2. Secondary: Ubah Pengaturan Kuis
+                    // 2. Secondary: Change Quiz Settings
                     Button(action: onChangeConfig) {
                         HStack(spacing: 8) {
                             Image(systemName: "slider.horizontal.3")
                                 .font(.system(size: 14, weight: .semibold))
-                            Text("Ubah Pengaturan Kuis")
+                            Text("Change Quiz Settings")
                                 .font(.system(size: 15, weight: .semibold))
                         }
                         .foregroundColor(AppTheme.textPrimary)
@@ -161,9 +161,9 @@ struct ExerciseResultView: View {
                     }
                     .buttonStyle(.plain)
                     
-                    // 3. Tertiary: Selesai / Kembali ke Daftar Kata
+                    // 3. Tertiary: Finish / Back to Words
                     Button(action: onFinish) {
-                        Text("← Selesai (Kembali ke Daftar Kata)")
+                        Text("← Finish (Back to Words)")
                             .font(.system(size: 14, weight: .medium))
                             .foregroundColor(AppTheme.textSecondary)
                             .padding(.vertical, 6)
@@ -195,7 +195,7 @@ struct ExerciseResultView: View {
                     HStack(spacing: 4) {
                         Image(systemName: res.isCorrect ? "checkmark.circle.fill" : "xmark.circle.fill")
                             .font(.system(size: 12, weight: .bold))
-                        Text(res.isCorrect ? "Benar" : "Salah")
+                        Text(res.isCorrect ? "Correct" : "Incorrect")
                             .font(.system(size: 12, weight: .bold))
                     }
                     .foregroundColor(res.isCorrect ? Color(hex: 0x28A745) : Color(hex: 0xDC3545))
@@ -215,7 +215,7 @@ struct ExerciseResultView: View {
                         .font(.system(size: 11, weight: .bold, design: .monospaced))
                     
                     if isSlowest && summary.results.count > 1 {
-                        Text("(Paling Lama)")
+                        Text("(Slowest)")
                             .font(.system(size: 10, weight: .semibold))
                     }
                 }
@@ -250,7 +250,7 @@ struct ExerciseResultView: View {
                     if res.selectedIndex < res.question.options.count {
                         let chosen = res.question.options[res.selectedIndex]
                         HStack(spacing: 4) {
-                            Text("Jawaban Anda:")
+                            Text("Your Answer:")
                                 .font(.system(size: 12, weight: .medium))
                                 .foregroundColor(Color(hex: 0xDC3545))
                             Text(chosen.kanji.isEmpty ? chosen.kana : chosen.kanji)
@@ -263,7 +263,7 @@ struct ExerciseResultView: View {
                     }
                     
                     HStack(spacing: 4) {
-                        Text("Kunci Jawaban:")
+                        Text("Correct Answer:")
                             .font(.system(size: 12, weight: .medium))
                             .foregroundColor(Color(hex: 0x28A745))
                         Text(target.kanji.isEmpty ? target.kana : target.kanji)

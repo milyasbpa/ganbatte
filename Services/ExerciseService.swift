@@ -29,7 +29,7 @@ final class ExerciseService {
         guard !candidateWords.isEmpty else { return [] }
         
         // 2. Select target words
-        var shuffledCandidates = candidateWords.shuffled()
+        let shuffledCandidates = candidateWords.shuffled()
         let count = min(config.questionCount, shuffledCandidates.count)
         let targetWords = Array(shuffledCandidates.prefix(count))
         

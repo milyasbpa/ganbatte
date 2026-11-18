@@ -46,7 +46,7 @@ struct ExerciseQuizView: View {
                         HStack(spacing: 4) {
                             Image(systemName: "xmark")
                                 .font(.system(size: 16, weight: .semibold))
-                            Text("Keluar")
+                            Text("Quit")
                                 .font(.system(size: 16, weight: .semibold))
                         }
                         .foregroundColor(AppTheme.textSecondary)
@@ -57,7 +57,7 @@ struct ExerciseQuizView: View {
                     
                     // Question Counter & Timer
                     VStack(spacing: 2) {
-                        Text("Soal \(currentIndex + 1) / \(questions.count)")
+                        Text("Question \(currentIndex + 1) / \(questions.count)")
                             .font(.system(size: 16, weight: .bold))
                             .foregroundColor(AppTheme.textPrimary)
                         
@@ -76,7 +76,7 @@ struct ExerciseQuizView: View {
                     HStack(spacing: 4) {
                         Image(systemName: "xmark")
                             .font(.system(size: 16))
-                        Text("Keluar")
+                        Text("Quit")
                             .font(.system(size: 16))
                     }
                     .opacity(0)
@@ -136,13 +136,13 @@ struct ExerciseQuizView: View {
             stopTimer()
             removeKeyMonitor()
         }
-        .alert("Keluar dari Kuis?", isPresented: $showQuitConfirmation) {
-            Button("Tetap di Kuis", role: .cancel) {}
-            Button("Keluar", role: .destructive) {
+        .alert("Quit Quiz?", isPresented: $showQuitConfirmation) {
+            Button("Stay", role: .cancel) {}
+            Button("Quit", role: .destructive) {
                 onQuit()
             }
         } message: {
-            Text("Progres latihan sesi ini tidak akan tersimpan.")
+            Text("Your quiz progress will not be saved.")
         }
     }
     
@@ -152,7 +152,7 @@ struct ExerciseQuizView: View {
         switch currentQuestion.questionType {
         case .sound:
             VStack(spacing: 14) {
-                Text("Dengarkan pelafalan dan pilih kata yang benar:")
+                Text("Listen to the pronunciation and select the correct word:")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppTheme.textSecondary)
                     .multilineTextAlignment(.center)
@@ -177,7 +177,7 @@ struct ExerciseQuizView: View {
                 }
                 .buttonStyle(.plain)
                 
-                Text("Ketuk untuk memutar ulang audio")
+                Text("Tap to replay audio")
                     .font(.system(size: 12))
                     .foregroundColor(AppTheme.textTertiary)
             }
@@ -192,7 +192,7 @@ struct ExerciseQuizView: View {
             
         case .image:
             VStack(spacing: 12) {
-                Text("Pilih kata yang sesuai dengan gambar:")
+                Text("Select the word that matches the image:")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppTheme.textSecondary)
                 
@@ -205,7 +205,7 @@ struct ExerciseQuizView: View {
             
         case .sentence:
             VStack(alignment: .leading, spacing: 14) {
-                Text("Lengkapi bagian yang hilang:")
+                Text("Complete the missing word:")
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppTheme.textSecondary)
                 
@@ -293,24 +293,17 @@ struct ExerciseQuizView: View {
                     .background(badgeBg)
                     .clipShape(Circle())
                 
-                // Word Details
-                VStack(alignment: .leading, spacing: 3) {
-                    HStack(spacing: 6) {
-                        Text(word.kanji.isEmpty ? word.kana : word.kanji)
-                            .font(.system(size: 17, weight: .bold))
-                            .foregroundColor(textColor)
-                        
-                        if !word.kanji.isEmpty && word.kanji != word.kana {
-                            Text("(\(word.kana))")
-                                .font(.system(size: 13, weight: .regular))
-                                .foregroundColor(subtextColor)
-                        }
-                    }
+                // Japanese Word (Kanji + Kana reading, NO Latin meaning)
+                HStack(spacing: 8) {
+                    Text(word.kanji.isEmpty ? word.kana : word.kanji)
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(textColor)
                     
-                    Text(word.meaningEn)
-                        .font(.system(size: 13, weight: .regular))
-                        .foregroundColor(subtextColor)
-                        .lineLimit(1)
+                    if !word.kanji.isEmpty && word.kanji != word.kana {
+                        Text("(\(word.kana))")
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(subtextColor)
+                    }
                 }
                 
                 Spacer()
@@ -328,7 +321,7 @@ struct ExerciseQuizView: View {
                 }
             }
             .padding(.horizontal, 14)
-            .padding(.vertical, 12)
+            .padding(.vertical, 14)
             .background(bgColor)
             .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
             .overlay(

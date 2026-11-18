@@ -28,7 +28,7 @@ struct ExerciseConfigView: View {
                     
                     Spacer()
                     
-                    Text("Latihan Kata")
+                    Text("Word Practice")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(AppTheme.textPrimary)
                     
@@ -54,9 +54,9 @@ struct ExerciseConfigView: View {
                 
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 22) {
-                        // Section 1: Tipe Pertanyaan
+                        // Section 1: Question Type
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("TIPE PERTANYAAN")
+                            Text("QUESTION TYPE")
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(AppTheme.textSecondary)
                                 .tracking(0.5)
@@ -113,9 +113,9 @@ struct ExerciseConfigView: View {
                             }
                         }
                         
-                        // Section 2: Tingkat Kesulitan (Difficulty)
+                        // Section 2: Difficulty
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("TINGKAT KESULITAN")
+                            Text("DIFFICULTY")
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(AppTheme.textSecondary)
                                 .tracking(0.5)
@@ -144,9 +144,9 @@ struct ExerciseConfigView: View {
                             }
                         }
                         
-                        // Section 3: Jenis Kata (Type)
+                        // Section 3: Word Type
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("JENIS KATA")
+                            Text("WORD TYPE")
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(AppTheme.textSecondary)
                                 .tracking(0.5)
@@ -175,9 +175,9 @@ struct ExerciseConfigView: View {
                             }
                         }
                         
-                        // Section 4: Jumlah Soal
+                        // Section 4: Question Count
                         VStack(alignment: .leading, spacing: 10) {
-                            Text("JUMLAH SOAL")
+                            Text("NUMBER OF QUESTIONS")
                                 .font(.system(size: 12, weight: .bold))
                                 .foregroundColor(AppTheme.textSecondary)
                                 .tracking(0.5)
@@ -206,7 +206,7 @@ struct ExerciseConfigView: View {
                             
                             // Custom Stepper
                             HStack {
-                                Text("Atur Jumlah Soal")
+                                Text("Custom Count")
                                     .font(.system(size: 14, weight: .medium))
                                     .foregroundColor(AppTheme.textSecondary)
                                 
@@ -264,7 +264,7 @@ struct ExerciseConfigView: View {
                     .padding(.bottom, 24)
                 }
                 
-                // Bottom Action: Mulai Kuis
+                // Bottom Action: Start Quiz
                 VStack {
                     Button(action: {
                         onStartQuiz(config)
@@ -272,7 +272,7 @@ struct ExerciseConfigView: View {
                         HStack(spacing: 8) {
                             Image(systemName: "play.fill")
                                 .font(.system(size: 15, weight: .bold))
-                            Text("Mulai Kuis (\(config.questionCount) Soal)")
+                            Text("Start Quiz (\(config.questionCount) Questions)")
                                 .font(.system(size: 16, weight: .bold))
                         }
                         .foregroundColor(.white)
