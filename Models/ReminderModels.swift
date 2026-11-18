@@ -22,39 +22,65 @@ struct ReminderTime: Codable, Identifiable, Equatable, Hashable {
     }
 }
 
-enum WordReminderFilter: String, Codable, CaseIterable, Identifiable {
-    case all = "all"
-    case verbsOnly = "verbs"
+// MARK: - Kana Reminder Item
+struct KanaReminderItem: Codable, Identifiable, Equatable, Hashable {
+    var id: String
+    var script: KanaType
+    var hour: Int
+    var minute: Int
     
-    var id: String { rawValue }
+    init(id: String = UUID().uuidString, script: KanaType = .katakana, hour: Int, minute: Int) {
+        self.id = id
+        self.script = script
+        self.hour = hour
+        self.minute = minute
+    }
     
-    var title: String {
-        switch self {
-        case .all: return "All Words"
-        case .verbsOnly: return "Verbs Only (動詞)"
-        }
+    var formatted24: String {
+        String(format: "%02d:%02d", hour, minute)
     }
 }
 
+// MARK: - Word Reminder Item
+struct WordReminderItem: Codable, Identifiable, Equatable, Hashable {
+    var id: String
+    var level: JLPTLevel
+    var type: WordType
+    var hour: Int
+    var minute: Int
+    
+    init(id: String = UUID().uuidString, level: JLPTLevel = .n5, type: WordType = .verb, hour: Int, minute: Int) {
+        self.id = id
+        self.level = level
+        self.type = type
+        self.hour = hour
+        self.minute = minute
+    }
+    
+    var formatted24: String {
+        String(format: "%02d:%02d", hour, minute)
+    }
+}
+
+// MARK: - Kana Settings
 struct KanaReminderSettings: Codable, Equatable {
     var isEnabled: Bool
-    var script: KanaType
-    var times: [ReminderTime]
+    var items: [KanaReminderItem]
     
     init(
         isEnabled: Bool = true,
-        script: KanaType = .katakana,
-        times: [ReminderTime] = [
-            ReminderTime(hour: 11, minute: 0),
-            ReminderTime(hour: 16, minute: 0)
+        items: [KanaReminderItem] = [
+            KanaReminderItem(script: .katakana, hour: 7, minute: 30),
+            KanaReminderItem(script: .hiragana, hour: 12, minute: 30),
+            KanaReminderItem(script: .katakana, hour: 12, minute: 45),
+            KanaReminderItem(script: .katakana, hour: 20, minute: 30)
         ]
     ) {
         self.isEnabled = isEnabled
-        self.script = script
-        self.times = times
+        self.items = items
     }
     
-    private static let userDefaultsKey = "ganbatte_kana_reminder_settings"
+    private static let userDefaultsKey = "ganbatte_kana_reminder_settings_v2"
     
     static func load() -> KanaReminderSettings {
         guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
@@ -71,25 +97,24 @@ struct KanaReminderSettings: Codable, Equatable {
     }
 }
 
+// MARK: - Word Settings
 struct WordReminderSettings: Codable, Equatable {
     var isEnabled: Bool
-    var filter: WordReminderFilter
-    var times: [ReminderTime]
+    var items: [WordReminderItem]
     
     init(
         isEnabled: Bool = true,
-        filter: WordReminderFilter = .verbsOnly,
-        times: [ReminderTime] = [
-            ReminderTime(hour: 8, minute: 0),
-            ReminderTime(hour: 20, minute: 30)
+        items: [WordReminderItem] = [
+            WordReminderItem(level: .n5, type: .verb, hour: 8, minute: 0),
+            WordReminderItem(level: .n5, type: .adjective, hour: 13, minute: 0),
+            WordReminderItem(level: .n2, type: .all, hour: 21, minute: 0)
         ]
     ) {
         self.isEnabled = isEnabled
-        self.filter = filter
-        self.times = times
+        self.items = items
     }
     
-    private static let userDefaultsKey = "ganbatte_word_reminder_settings"
+    private static let userDefaultsKey = "ganbatte_word_reminder_settings_v2"
     
     static func load() -> WordReminderSettings {
         guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
@@ -106,7 +131,8 @@ struct WordReminderSettings: Codable, Equatable {
     }
 }
 
+// MARK: - Deep Link Target
 enum ReminderDeepLink: Equatable {
     case kana(KanaType)
-    case words(WordReminderFilter)
+    case words(level: JLPTLevel, type: WordType)
 }

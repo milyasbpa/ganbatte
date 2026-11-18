@@ -9,15 +9,21 @@ struct ReminderSheetView: View {
     @State private var wordSettings = WordReminderSettings.load()
     @State private var testSentFeedback: String? = nil
     
-    // Quick time presets for adding
-    let quickTimePresets: [(label: String, h: Int, m: Int)] = [
-        ("08:00", 8, 0),
-        ("11:00", 11, 0),
-        ("14:00", 14, 0),
-        ("16:00", 16, 0),
-        ("20:30", 20, 30),
-        ("21:30", 21, 30)
-    ]
+    // Form state for adding Kana reminder
+    @State private var newKanaScript: KanaType = .katakana
+    @State private var newKanaTime: Date = Self.makeDate(hour: 7, minute: 30)
+    
+    // Form state for adding Vocabulary reminder
+    @State private var newWordLevel: JLPTLevel = .n5
+    @State private var newWordType: WordType = .verb
+    @State private var newWordTime: Date = Self.makeDate(hour: 8, minute: 0)
+    
+    private static func makeDate(hour: Int, minute: Int) -> Date {
+        var comps = Calendar.current.dateComponents([.year, .month, .day], from: Date())
+        comps.hour = hour
+        comps.minute = minute
+        return Calendar.current.date(from: comps) ?? Date()
+    }
     
     var body: some View {
         ZStack {
@@ -82,8 +88,8 @@ struct ReminderSheetView: View {
                         // 2. Card 1: Kana Speed Practice Reminder
                         kanaCard
                         
-                        // 3. Card 2: Vocabulary & Verbs Reminder
-                        wordCard
+                        // 3. Card 2: Vocabulary Reminder
+                        vocabularyCard
                         
                         // 4. Offline Info Footer
                         HStack(spacing: 8) {
@@ -197,112 +203,142 @@ struct ReminderSheetView: View {
                 Divider()
                     .background(AppTheme.cardBorder)
                 
-                // Script Selector (Hiragana vs Katakana)
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("PRACTICE SCRIPT")
+                // Add New Reminder Row
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("ADD REMINDER")
                         .font(.system(size: 10, weight: .bold))
                         .foregroundColor(AppTheme.textSecondary)
                         .tracking(0.5)
                     
-                    HStack(spacing: 6) {
-                        ForEach(KanaType.allCases) { kType in
-                            Button(action: {
-                                withAnimation(.easeInOut(duration: 0.15)) {
-                                    kanaSettings.script = kType
-                                    saveAndReschedule()
+                    HStack(spacing: 8) {
+                        // Script Menu
+                        Menu {
+                            ForEach(KanaType.allCases) { script in
+                                Button(script.title) {
+                                    newKanaScript = script
                                 }
-                            }) {
-                                Text(kType.title)
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(kanaSettings.script == kType ? .white : AppTheme.textPrimary)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 8)
-                                    .background(kanaSettings.script == kType ? AppTheme.accent : AppTheme.inputBackground)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             }
-                            .buttonStyle(.plain)
+                        } label: {
+                            HStack(spacing: 4) {
+                                Text(newKanaScript == .katakana ? "⚡ Katakana" : "🌸 Hiragana")
+                                    .font(.system(size: 13, weight: .bold))
+                                Image(systemName: "chevron.up.chevron.down")
+                                    .font(.system(size: 9, weight: .semibold))
+                            }
+                            .foregroundColor(AppTheme.accent)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
+                            .background(AppTheme.accentLight.opacity(0.7))
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                         }
+                        .buttonStyle(.plain)
+                        
+                        Spacer()
+                        
+                        DatePicker("", selection: $newKanaTime, displayedComponents: .hourAndMinute)
+                            .labelsHidden()
+                            .datePickerStyle(.compact)
+                        
+                        Button(action: addKanaReminder) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "plus")
+                                    .font(.system(size: 12, weight: .bold))
+                                Text("Add")
+                                    .font(.system(size: 13, weight: .bold))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 7)
+                            .background(AppTheme.accent)
+                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                        }
+                        .buttonStyle(.plain)
                     }
+                    .padding(10)
+                    .background(AppTheme.inputBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
                 
-                // Times List
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("SCHEDULED TIMES")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(AppTheme.textSecondary)
-                        .tracking(0.5)
-                    
-                    // Chips of currently active times
-                    if kanaSettings.times.isEmpty {
-                        Text("No reminder times added yet.")
-                            .font(.system(size: 12))
+                // Scheduled List
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("SCHEDULED DRILLS")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(AppTheme.textSecondary)
+                            .tracking(0.5)
+                        
+                        Spacer()
+                        
+                        Text("\(kanaSettings.items.count) active")
+                            .font(.system(size: 11, weight: .medium))
                             .foregroundColor(AppTheme.textTertiary)
-                            .padding(.vertical, 4)
+                    }
+                    
+                    if kanaSettings.items.isEmpty {
+                        HStack {
+                            Spacer()
+                            Text("No reminders scheduled yet.")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.textTertiary)
+                                .padding(.vertical, 10)
+                            Spacer()
+                        }
+                        .background(AppTheme.inputBackground.opacity(0.5))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     } else {
-                        FlowLayout(spacing: 8) {
-                            ForEach(kanaSettings.times) { item in
-                                HStack(spacing: 6) {
-                                    Image(systemName: "clock")
-                                        .font(.system(size: 10, weight: .semibold))
-                                        .foregroundColor(AppTheme.accent)
+                        VStack(spacing: 6) {
+                            ForEach(kanaSettings.items) { item in
+                                HStack(spacing: 10) {
+                                    HStack(spacing: 5) {
+                                        Text(item.script == .katakana ? "⚡" : "🌸")
+                                            .font(.system(size: 12))
+                                        Text(item.script.title)
+                                            .font(.system(size: 13, weight: .bold))
+                                            .foregroundColor(AppTheme.accent)
+                                    }
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 5)
+                                    .background(AppTheme.accentLight.opacity(0.7))
+                                    .clipShape(Capsule())
                                     
-                                    Text(item.formatted24)
-                                        .font(.system(size: 13, weight: .bold, design: .monospaced))
-                                        .foregroundColor(AppTheme.textPrimary)
+                                    Spacer()
+                                    
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "clock")
+                                            .font(.system(size: 11))
+                                            .foregroundColor(AppTheme.textSecondary)
+                                        Text(item.formatted24)
+                                            .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                            .foregroundColor(AppTheme.textPrimary)
+                                    }
                                     
                                     Button(action: {
                                         withAnimation(.easeInOut(duration: 0.15)) {
-                                            kanaSettings.times.removeAll(where: { $0.id == item.id })
+                                            kanaSettings.items.removeAll(where: { $0.id == item.id })
                                             saveAndReschedule()
                                         }
                                     }) {
-                                        Image(systemName: "xmark")
-                                            .font(.system(size: 10, weight: .bold))
+                                        Image(systemName: "trash")
+                                            .font(.system(size: 11, weight: .semibold))
                                             .foregroundColor(AppTheme.textTertiary)
+                                            .frame(width: 28, height: 28)
+                                            .background(Color.white)
+                                            .clipShape(Circle())
+                                            .overlay(Circle().stroke(AppTheme.buttonBorder.opacity(0.8), lineWidth: 1))
                                     }
                                     .buttonStyle(.plain)
                                 }
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(AppTheme.inputBackground)
-                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(AppTheme.background.opacity(0.6))
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .stroke(AppTheme.buttonBorder.opacity(0.6), lineWidth: 1)
+                                )
                             }
                         }
                     }
-                    
-                    // Quick Add Presets
-                    HStack(spacing: 6) {
-                        Text("Add:")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundColor(AppTheme.textTertiary)
-                        
-                        ForEach(quickTimePresets, id: \.label) { p in
-                            let alreadyAdded = kanaSettings.times.contains(where: { $0.hour == p.h && $0.minute == p.m })
-                            if !alreadyAdded {
-                                Button(action: {
-                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                        kanaSettings.times.append(ReminderTime(hour: p.h, minute: p.m))
-                                        kanaSettings.times.sort(by: { ($0.hour * 60 + $0.minute) < ($1.hour * 60 + $1.minute) })
-                                        saveAndReschedule()
-                                    }
-                                }) {
-                                    Text("+\(p.label)")
-                                        .font(.system(size: 11, weight: .medium, design: .monospaced))
-                                        .foregroundColor(AppTheme.textSecondary)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 4)
-                                        .background(Color.white)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                                .stroke(AppTheme.buttonBorder, lineWidth: 1)
-                                        )
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                    }
-                    .padding(.top, 4)
                 }
                 
                 Divider()
@@ -310,7 +346,7 @@ struct ReminderSheetView: View {
                 
                 // Test Notification Button
                 Button(action: {
-                    triggerTest(target: .kana(kanaSettings.script))
+                    triggerTest(target: .kana(newKanaScript))
                 }) {
                     HStack(spacing: 6) {
                         Image(systemName: "paperplane.fill")
@@ -337,8 +373,8 @@ struct ReminderSheetView: View {
         .shadow(color: Color.black.opacity(0.02), radius: 4, x: 0, y: 2)
     }
     
-    // MARK: - Word Card
-    private var wordCard: some View {
+    // MARK: - Vocabulary Card
+    private var vocabularyCard: some View {
         VStack(spacing: 14) {
             // Title & Toggle
             HStack {
@@ -353,10 +389,10 @@ struct ReminderSheetView: View {
                     }
                     
                     VStack(alignment: .leading, spacing: 2) {
-                        Text("Vocabulary & Verbs")
+                        Text("Vocabulary")
                             .font(.system(size: 15, weight: .bold))
                             .foregroundColor(AppTheme.textPrimary)
-                        Text("Morning & evening word drills")
+                        Text("Daily word & grammar training alerts")
                             .font(.system(size: 11, weight: .regular))
                             .foregroundColor(AppTheme.textSecondary)
                     }
@@ -380,111 +416,168 @@ struct ReminderSheetView: View {
                 Divider()
                     .background(AppTheme.cardBorder)
                 
-                // Target Filter Selector
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("PRACTICE TARGET")
+                // Add New Reminder Row
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("ADD REMINDER")
                         .font(.system(size: 10, weight: .bold))
                         .foregroundColor(AppTheme.textSecondary)
                         .tracking(0.5)
                     
                     HStack(spacing: 6) {
-                        ForEach(WordReminderFilter.allCases) { filter in
-                            Button(action: {
-                                withAnimation(.easeInOut(duration: 0.15)) {
-                                    wordSettings.filter = filter
-                                    saveAndReschedule()
+                        // Level Menu
+                        Menu {
+                            ForEach(JLPTLevel.allCases, id: \.self) { level in
+                                Button(level.rawValue) {
+                                    newWordLevel = level
                                 }
-                            }) {
-                                Text(filter.title)
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(wordSettings.filter == filter ? .white : AppTheme.textPrimary)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 8)
-                                    .background(wordSettings.filter == filter ? AppTheme.accent : AppTheme.inputBackground)
-                                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
                             }
-                            .buttonStyle(.plain)
+                        } label: {
+                            HStack(spacing: 3) {
+                                Text(newWordLevel == .all ? "All" : newWordLevel.rawValue)
+                                    .font(.system(size: 12, weight: .bold))
+                                Image(systemName: "chevron.up.chevron.down")
+                                    .font(.system(size: 8, weight: .semibold))
+                            }
+                            .foregroundColor(Color(hex: 0xE65100))
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 7)
+                            .background(Color.orange.opacity(0.15))
+                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                         }
+                        .buttonStyle(.plain)
+                        
+                        // Type Menu
+                        Menu {
+                            ForEach(WordType.allCases, id: \.self) { type in
+                                Button(type.title) {
+                                    newWordType = type
+                                }
+                            }
+                        } label: {
+                            HStack(spacing: 3) {
+                                Text(newWordType.title)
+                                    .font(.system(size: 12, weight: .semibold))
+                                Image(systemName: "chevron.up.chevron.down")
+                                    .font(.system(size: 8, weight: .semibold))
+                            }
+                            .foregroundColor(AppTheme.textPrimary)
+                            .padding(.horizontal, 8)
+                            .padding(.vertical, 7)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                    .stroke(AppTheme.buttonBorder, lineWidth: 1)
+                            )
+                        }
+                        .buttonStyle(.plain)
+                        
+                        Spacer()
+                        
+                        DatePicker("", selection: $newWordTime, displayedComponents: .hourAndMinute)
+                            .labelsHidden()
+                            .datePickerStyle(.compact)
+                        
+                        Button(action: addWordReminder) {
+                            HStack(spacing: 3) {
+                                Image(systemName: "plus")
+                                    .font(.system(size: 11, weight: .bold))
+                                Text("Add")
+                                    .font(.system(size: 12, weight: .bold))
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 7)
+                            .background(Color.orange)
+                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                        }
+                        .buttonStyle(.plain)
                     }
+                    .padding(10)
+                    .background(AppTheme.inputBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                 }
                 
-                // Times List
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("SCHEDULED TIMES")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundColor(AppTheme.textSecondary)
-                        .tracking(0.5)
-                    
-                    if wordSettings.times.isEmpty {
-                        Text("No reminder times added yet.")
-                            .font(.system(size: 12))
+                // Scheduled List
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("SCHEDULED DRILLS")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(AppTheme.textSecondary)
+                            .tracking(0.5)
+                        
+                        Spacer()
+                        
+                        Text("\(wordSettings.items.count) active")
+                            .font(.system(size: 11, weight: .medium))
                             .foregroundColor(AppTheme.textTertiary)
-                            .padding(.vertical, 4)
+                    }
+                    
+                    if wordSettings.items.isEmpty {
+                        HStack {
+                            Spacer()
+                            Text("No reminders scheduled yet.")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppTheme.textTertiary)
+                                .padding(.vertical, 10)
+                            Spacer()
+                        }
+                        .background(AppTheme.inputBackground.opacity(0.5))
+                        .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                     } else {
-                        FlowLayout(spacing: 8) {
-                            ForEach(wordSettings.times) { item in
-                                HStack(spacing: 6) {
-                                    Image(systemName: "clock")
-                                        .font(.system(size: 10, weight: .semibold))
-                                        .foregroundColor(Color.orange)
+                        VStack(spacing: 6) {
+                            ForEach(wordSettings.items) { item in
+                                HStack(spacing: 8) {
+                                    Text(item.level.rawValue)
+                                        .font(.system(size: 11, weight: .heavy))
+                                        .foregroundColor(Color(hex: 0xE65100))
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(Color.orange.opacity(0.15))
+                                        .clipShape(Capsule())
                                     
-                                    Text(item.formatted24)
-                                        .font(.system(size: 13, weight: .bold, design: .monospaced))
+                                    Text(item.type.title)
+                                        .font(.system(size: 12, weight: .semibold))
                                         .foregroundColor(AppTheme.textPrimary)
+                                    
+                                    Spacer()
+                                    
+                                    HStack(spacing: 4) {
+                                        Image(systemName: "clock")
+                                            .font(.system(size: 11))
+                                            .foregroundColor(AppTheme.textSecondary)
+                                        Text(item.formatted24)
+                                            .font(.system(size: 14, weight: .bold, design: .monospaced))
+                                            .foregroundColor(AppTheme.textPrimary)
+                                    }
                                     
                                     Button(action: {
                                         withAnimation(.easeInOut(duration: 0.15)) {
-                                            wordSettings.times.removeAll(where: { $0.id == item.id })
+                                            wordSettings.items.removeAll(where: { $0.id == item.id })
                                             saveAndReschedule()
                                         }
                                     }) {
-                                        Image(systemName: "xmark")
-                                            .font(.system(size: 10, weight: .bold))
+                                        Image(systemName: "trash")
+                                            .font(.system(size: 11, weight: .semibold))
                                             .foregroundColor(AppTheme.textTertiary)
+                                            .frame(width: 28, height: 28)
+                                            .background(Color.white)
+                                            .clipShape(Circle())
+                                            .overlay(Circle().stroke(AppTheme.buttonBorder.opacity(0.8), lineWidth: 1))
                                     }
                                     .buttonStyle(.plain)
                                 }
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(AppTheme.inputBackground)
-                                .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 8)
+                                .background(AppTheme.background.opacity(0.6))
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                        .stroke(AppTheme.buttonBorder.opacity(0.6), lineWidth: 1)
+                                )
                             }
                         }
                     }
-                    
-                    // Quick Add Presets
-                    HStack(spacing: 6) {
-                        Text("Add:")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundColor(AppTheme.textTertiary)
-                        
-                        ForEach(quickTimePresets, id: \.label) { p in
-                            let alreadyAdded = wordSettings.times.contains(where: { $0.hour == p.h && $0.minute == p.m })
-                            if !alreadyAdded {
-                                Button(action: {
-                                    withAnimation(.easeInOut(duration: 0.15)) {
-                                        wordSettings.times.append(ReminderTime(hour: p.h, minute: p.m))
-                                        wordSettings.times.sort(by: { ($0.hour * 60 + $0.minute) < ($1.hour * 60 + $1.minute) })
-                                        saveAndReschedule()
-                                    }
-                                }) {
-                                    Text("+\(p.label)")
-                                        .font(.system(size: 11, weight: .medium, design: .monospaced))
-                                        .foregroundColor(AppTheme.textSecondary)
-                                        .padding(.horizontal, 8)
-                                        .padding(.vertical, 4)
-                                        .background(Color.white)
-                                        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                                .stroke(AppTheme.buttonBorder, lineWidth: 1)
-                                        )
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                    }
-                    .padding(.top, 4)
                 }
                 
                 Divider()
@@ -492,7 +585,7 @@ struct ReminderSheetView: View {
                 
                 // Test Notification Button
                 Button(action: {
-                    triggerTest(target: .words(wordSettings.filter))
+                    triggerTest(target: .words(level: newWordLevel, type: newWordType))
                 }) {
                     HStack(spacing: 6) {
                         Image(systemName: "paperplane.fill")
@@ -519,6 +612,31 @@ struct ReminderSheetView: View {
         .shadow(color: Color.black.opacity(0.02), radius: 4, x: 0, y: 2)
     }
     
+    // MARK: - Actions
+    private func addKanaReminder() {
+        let comps = Calendar.current.dateComponents([.hour, .minute], from: newKanaTime)
+        let hour = comps.hour ?? 7
+        let minute = comps.minute ?? 30
+        let item = KanaReminderItem(script: newKanaScript, hour: hour, minute: minute)
+        withAnimation(.easeInOut(duration: 0.15)) {
+            kanaSettings.items.append(item)
+            kanaSettings.items.sort { ($0.hour * 60 + $0.minute) < ($1.hour * 60 + $1.minute) }
+            saveAndReschedule()
+        }
+    }
+    
+    private func addWordReminder() {
+        let comps = Calendar.current.dateComponents([.hour, .minute], from: newWordTime)
+        let hour = comps.hour ?? 8
+        let minute = comps.minute ?? 0
+        let item = WordReminderItem(level: newWordLevel, type: newWordType, hour: hour, minute: minute)
+        withAnimation(.easeInOut(duration: 0.15)) {
+            wordSettings.items.append(item)
+            wordSettings.items.sort { ($0.hour * 60 + $0.minute) < ($1.hour * 60 + $1.minute) }
+            saveAndReschedule()
+        }
+    }
+    
     private func saveAndReschedule() {
         kanaSettings.save()
         wordSettings.save()
@@ -533,50 +651,6 @@ struct ReminderSheetView: View {
                     testSentFeedback = nil
                 }
             }
-        }
-    }
-}
-
-// Simple FlowLayout for chips wrapping
-struct FlowLayout: Layout {
-    var spacing: CGFloat = 8
-    
-    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
-        let width = proposal.width ?? 0
-        var height: CGFloat = 0
-        var x: CGFloat = 0
-        var y: CGFloat = 0
-        var maxHeightInRow: CGFloat = 0
-        
-        for view in subviews {
-            let size = view.sizeThatFits(.unspecified)
-            if x + size.width > width, x > 0 {
-                x = 0
-                y += maxHeightInRow + spacing
-                maxHeightInRow = 0
-            }
-            maxHeightInRow = max(maxHeightInRow, size.height)
-            x += size.width + spacing
-        }
-        height = y + maxHeightInRow
-        return CGSize(width: width, height: height)
-    }
-    
-    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
-        var x = bounds.minX
-        var y = bounds.minY
-        var maxHeightInRow: CGFloat = 0
-        
-        for view in subviews {
-            let size = view.sizeThatFits(.unspecified)
-            if x + size.width > bounds.maxX, x > bounds.minX {
-                x = bounds.minX
-                y += maxHeightInRow + spacing
-                maxHeightInRow = 0
-            }
-            view.place(at: CGPoint(x: x, y: y), proposal: ProposedViewSize(size))
-            maxHeightInRow = max(maxHeightInRow, size.height)
-            x += size.width + spacing
         }
     }
 }

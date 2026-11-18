@@ -64,26 +64,26 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
         guard settings.isEnabled else { return }
         
         let center = UNUserNotificationCenter.current()
-        let scriptTitle = settings.script == .katakana ? "Katakana" : "Hiragana"
         
-        for time in settings.times {
+        for item in settings.items {
             let content = UNMutableNotificationContent()
             content.title = "⚡ Kana Speed Practice"
-            content.body = "Time to practice your \(scriptTitle) reading speed! Complete 10 words in 1 minute."
+            let scriptTitle = item.script == .katakana ? "Katakana" : "Hiragana"
+            content.body = "Time to practice your \(scriptTitle) reading speed! Complete 15 words in 60 seconds."
             content.sound = .default
             content.attachments = makeNotificationAttachments()
             content.userInfo = [
                 "type": "kana",
-                "script": settings.script.rawValue
+                "script": item.script.rawValue
             ]
             
             var comps = DateComponents()
-            comps.hour = time.hour
-            comps.minute = time.minute
+            comps.hour = item.hour
+            comps.minute = item.minute
             
             let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
             let req = UNNotificationRequest(
-                identifier: "ganbatte.reminder.kana.\(time.hour)_\(time.minute)",
+                identifier: "ganbatte.reminder.kana.\(item.id)",
                 content: content,
                 trigger: trigger
             )
@@ -97,29 +97,28 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
         
         let center = UNUserNotificationCenter.current()
         
-        for time in settings.times {
+        for item in settings.items {
             let content = UNMutableNotificationContent()
-            if settings.filter == .verbsOnly {
-                content.title = "⚔️ Morning Verb Drill"
-                content.body = "Time to practice 20 verbs! Master meanings and kanji patterns."
-            } else {
-                content.title = "📖 Daily Vocab Drill"
-                content.body = "Time for your daily 20-word drill! Keep your learning streak strong."
-            }
+            let levelTitle = item.level == .all ? "All Levels" : item.level.rawValue
+            let typeTitle = item.type == .all ? "Vocabulary" : "\(item.type.title)s"
+            
+            content.title = "📖 \(levelTitle) \(typeTitle) Drill"
+            content.body = "Time to practice \(levelTitle) \(typeTitle.lowercased())! Keep your N2 streak strong."
             content.sound = .default
             content.attachments = makeNotificationAttachments()
             content.userInfo = [
                 "type": "words",
-                "filter": settings.filter.rawValue
+                "level": item.level.rawValue,
+                "wordType": item.type.rawValue
             ]
             
             var comps = DateComponents()
-            comps.hour = time.hour
-            comps.minute = time.minute
+            comps.hour = item.hour
+            comps.minute = item.minute
             
             let trigger = UNCalendarNotificationTrigger(dateMatching: comps, repeats: true)
             let req = UNNotificationRequest(
-                identifier: "ganbatte.reminder.word.\(time.hour)_\(time.minute)",
+                identifier: "ganbatte.reminder.word.\(item.id)",
                 content: content,
                 trigger: trigger
             )
@@ -147,15 +146,16 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
                 content.body = "Tap to practice \(title) reading speed now!"
                 content.userInfo = ["type": "kana", "script": script.rawValue]
                 
-            case .words(let filter):
-                if filter == .verbsOnly {
-                    content.title = "⚔️ Verb Drill (Test)"
-                    content.body = "Tap to practice 20 N5 verbs now!"
-                } else {
-                    content.title = "📖 Vocab Drill (Test)"
-                    content.body = "Tap to practice daily vocabulary now!"
-                }
-                content.userInfo = ["type": "words", "filter": filter.rawValue]
+            case .words(let level, let type):
+                let levelTitle = level == .all ? "All Levels" : level.rawValue
+                let typeTitle = type == .all ? "Vocabulary" : "\(type.title)s"
+                content.title = "📖 \(levelTitle) \(typeTitle) Drill (Test)"
+                content.body = "Tap to practice \(levelTitle) \(typeTitle.lowercased()) now!"
+                content.userInfo = [
+                    "type": "words",
+                    "level": level.rawValue,
+                    "wordType": type.rawValue
+                ]
             }
             
             let trigger = UNTimeIntervalNotificationTrigger(timeInterval: max(1, delay), repeats: false)
@@ -218,10 +218,12 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
                     self.pendingDeepLink = .kana(script)
                 }
             } else if type == "words" {
-                let filterRaw = userInfo["filter"] as? String ?? ""
-                let filter = WordReminderFilter(rawValue: filterRaw) ?? .verbsOnly
+                let levelRaw = userInfo["level"] as? String ?? "N5"
+                let wordTypeRaw = userInfo["wordType"] as? String ?? "Verb"
+                let level = JLPTLevel(rawValue: levelRaw) ?? .n5
+                let wordType = WordType(rawValue: wordTypeRaw) ?? .verb
                 DispatchQueue.main.async {
-                    self.pendingDeepLink = .words(filter)
+                    self.pendingDeepLink = .words(level: level, type: wordType)
                 }
             }
         }

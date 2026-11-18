@@ -283,6 +283,15 @@ struct WordListView: View {
                 hideBottomBar = (val != nil) || showExerciseFlow
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ganbatte_apply_word_filter"))) { notif in
+            if let levelRaw = notif.userInfo?["level"] as? String, let level = JLPTLevel(rawValue: levelRaw) {
+                selectedLevel = level
+            }
+            if let typeRaw = notif.userInfo?["type"] as? String, let type = WordType(rawValue: typeRaw) {
+                selectedType = type
+            }
+            reloadWords()
+        }
     }
     
     private func reloadWords() {

@@ -68,8 +68,13 @@ struct MainContainerView: View {
                 case .kana(let script):
                     activeTabRaw = AppTab.kana.rawValue
                     UserDefaults.standard.set(script.rawValue, forKey: "ganbatte_active_kana_subtab")
-                case .words:
+                case .words(let level, let type):
                     activeTabRaw = AppTab.words.rawValue
+                    NotificationCenter.default.post(
+                        name: NSNotification.Name("ganbatte_apply_word_filter"),
+                        object: nil,
+                        userInfo: ["level": level.rawValue, "type": type.rawValue]
+                    )
                 }
             }
             notifService.pendingDeepLink = nil
