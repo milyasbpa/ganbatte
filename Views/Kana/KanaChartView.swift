@@ -2,9 +2,11 @@ import SwiftUI
 
 struct KanaChartView: View {
     @Binding var hideBottomBar: Bool
+    var onOpenReminders: (() -> Void)?
     
-    init(hideBottomBar: Binding<Bool> = .constant(false)) {
+    init(hideBottomBar: Binding<Bool> = .constant(false), onOpenReminders: (() -> Void)? = nil) {
         self._hideBottomBar = hideBottomBar
+        self.onOpenReminders = onOpenReminders
     }
     
     @AppStorage("ganbatte_active_kana_subtab") private var activeSubTabRaw: String = KanaType.hiragana.rawValue
@@ -23,9 +25,28 @@ struct KanaChartView: View {
             VStack(spacing: 0) {
                 // Header & Segmented Switcher
                 VStack(spacing: 14) {
-                    Text("Kana Chart")
-                        .font(.system(size: 22, weight: .bold))
-                        .foregroundColor(AppTheme.textPrimary)
+                    HStack {
+                        Spacer()
+                        Text("Kana Chart")
+                            .font(.system(size: 20, weight: .bold))
+                            .foregroundColor(AppTheme.textPrimary)
+                        Spacer()
+                    }
+                    .overlay(alignment: .trailing) {
+                        if let onOpenReminders = onOpenReminders {
+                            Button(action: onOpenReminders) {
+                                Image(systemName: "bell.fill")
+                                    .font(.system(size: 14))
+                                    .foregroundColor(AppTheme.textSecondary)
+                                    .frame(width: 32, height: 32)
+                                    .background(Color.white)
+                                    .clipShape(Circle())
+                                    .overlay(Circle().stroke(AppTheme.buttonBorder, lineWidth: 1))
+                                    .shadow(color: Color.black.opacity(0.04), radius: 3, x: 0, y: 1)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
                     
                     // Segmented Control (Hiragana vs Katakana)
                     HStack(spacing: 4) {

@@ -2,6 +2,10 @@ import SwiftUI
 
 @main
 struct GanbatteApp: App {
+    init() {
+        NotificationService.shared.setup()
+    }
+    
     var body: some Scene {
         WindowGroup {
             MainContainerView()

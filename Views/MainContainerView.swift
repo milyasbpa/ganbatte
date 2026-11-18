@@ -3,6 +3,8 @@ import SwiftUI
 struct MainContainerView: View {
     @AppStorage("ganbatte_active_main_tab") private var activeTabRaw: String = AppTab.words.rawValue
     @State private var hideBottomBar: Bool = false
+    @State private var showReminderSheet: Bool = false
+    @ObservedObject private var notifService = NotificationService.shared
     
     private var selectedTab: Binding<AppTab> {
         Binding(
@@ -17,17 +19,60 @@ struct MainContainerView: View {
             ZStack {
                 switch selectedTab.wrappedValue {
                 case .words:
-                    WordListView(hideBottomBar: $hideBottomBar)
+                    WordListView(
+                        hideBottomBar: $hideBottomBar,
+                        onOpenReminders: {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                showReminderSheet = true
+                            }
+                        }
+                    )
                 case .kana:
-                    KanaChartView(hideBottomBar: $hideBottomBar)
+                    KanaChartView(
+                        hideBottomBar: $hideBottomBar,
+                        onOpenReminders: {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                showReminderSheet = true
+                            }
+                        }
+                    )
+                }
+                
+                if showReminderSheet {
+                    ReminderSheetView(onDismiss: {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            showReminderSheet = false
+                        }
+                    })
+                    .transition(.move(edge: .bottom))
+                    .zIndex(300)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             
-            if !hideBottomBar {
+            if !hideBottomBar && !showReminderSheet {
                 BottomNavBar(selectedTab: selectedTab)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
+        }
+        .onChange(of: showReminderSheet) { val in
+            withAnimation(.easeInOut(duration: 0.2)) {
+                hideBottomBar = val
+            }
+        }
+        .onReceive(notifService.$pendingDeepLink) { link in
+            guard let link = link else { return }
+            withAnimation(.easeInOut(duration: 0.25)) {
+                showReminderSheet = false
+                switch link {
+                case .kana(let script):
+                    activeTabRaw = AppTab.kana.rawValue
+                    UserDefaults.standard.set(script.rawValue, forKey: "ganbatte_active_kana_subtab")
+                case .words:
+                    activeTabRaw = AppTab.words.rawValue
+                }
+            }
+            notifService.pendingDeepLink = nil
         }
     }
     

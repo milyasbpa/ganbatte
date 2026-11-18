@@ -2,9 +2,11 @@ import SwiftUI
 
 struct WordListView: View {
     @Binding var hideBottomBar: Bool
+    var onOpenReminders: (() -> Void)?
     
-    init(hideBottomBar: Binding<Bool> = .constant(false)) {
+    init(hideBottomBar: Binding<Bool> = .constant(false), onOpenReminders: (() -> Void)? = nil) {
         self._hideBottomBar = hideBottomBar
+        self.onOpenReminders = onOpenReminders
     }
     
     @State private var words: [Word] = []
@@ -30,11 +32,31 @@ struct WordListView: View {
             
             VStack(spacing: 0) {
                 // Header
-                Text("Words")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(AppTheme.textPrimary)
-                    .padding(.top, 22)
-                    .padding(.bottom, 12)
+                HStack {
+                    Spacer()
+                    Text("Words")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(AppTheme.textPrimary)
+                    Spacer()
+                }
+                .overlay(alignment: .trailing) {
+                    if let onOpenReminders = onOpenReminders {
+                        Button(action: onOpenReminders) {
+                            Image(systemName: "bell.fill")
+                                .font(.system(size: 14))
+                                .foregroundColor(AppTheme.textSecondary)
+                                .frame(width: 32, height: 32)
+                                .background(Color.white)
+                                .clipShape(Circle())
+                                .overlay(Circle().stroke(AppTheme.buttonBorder, lineWidth: 1))
+                                .shadow(color: Color.black.opacity(0.04), radius: 3, x: 0, y: 1)
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.trailing, 16)
+                    }
+                }
+                .padding(.top, 22)
+                .padding(.bottom, 12)
                 
                 // Search Bar
                 HStack(spacing: 10) {
