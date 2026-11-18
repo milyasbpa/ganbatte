@@ -150,8 +150,8 @@ struct ExerciseQuizView: View {
     private var questionPromptView: some View {
         switch currentQuestion.questionType {
         case .sound:
-            VStack(spacing: 10) {
-                Text("Listen to the pronunciation and select the correct word:")
+            VStack(spacing: 12) {
+                Text("Listen and choose the meaning:")
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(AppTheme.textSecondary)
                     .multilineTextAlignment(.center)
@@ -162,22 +162,23 @@ struct ExerciseQuizView: View {
                     ZStack {
                         Circle()
                             .fill(Color.white)
-                            .frame(width: 76, height: 76)
+                            .frame(width: 58, height: 58)
                             .overlay(
                                 Circle()
                                     .stroke(AppTheme.accent, lineWidth: 2)
                             )
-                            .shadow(color: AppTheme.accent.opacity(0.15), radius: 10, x: 0, y: 5)
+                            .shadow(color: AppTheme.accent.opacity(0.12), radius: 8, x: 0, y: 4)
                         
-                        Image(systemName: "speaker.wave.3.fill")
-                            .font(.system(size: 28))
+                        Image(systemName: "speaker.wave.2.fill")
+                            .font(.system(size: 22, weight: .semibold))
                             .foregroundColor(AppTheme.accent)
                     }
                 }
                 .buttonStyle(.plain)
+                .padding(.vertical, 2)
                 
                 Text("Tap to replay audio")
-                    .font(.system(size: 11))
+                    .font(.system(size: 11, weight: .medium))
                     .foregroundColor(AppTheme.textTertiary)
             }
             .frame(maxWidth: .infinity)
@@ -296,16 +297,40 @@ struct ExerciseQuizView: View {
                     .background(badgeBg)
                     .clipShape(Circle())
                 
-                // Japanese Word (Kanji + Kana reading, NO Latin meaning)
-                HStack(spacing: 8) {
-                    Text(word.kanji.isEmpty ? word.kana : word.kanji)
-                        .font(.system(size: 18, weight: .bold))
-                        .foregroundColor(textColor)
-                    
-                    if !word.kanji.isEmpty && word.kanji != word.kana {
-                        Text("(\(word.kana))")
-                            .font(.system(size: 14, weight: .medium))
+                if currentQuestion.questionType == .sound {
+                    // English Meaning for audio exercises
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(word.meaningEn)
+                            .font(.system(size: 15, weight: .semibold))
+                            .foregroundColor(textColor)
+                            .lineLimit(2)
+                            .multilineTextAlignment(.leading)
+                        
+                        if isShowingFeedback {
+                            HStack(spacing: 6) {
+                                Text(word.kanji.isEmpty ? word.kana : word.kanji)
+                                    .font(.system(size: 12, weight: .bold))
+                                
+                                if !word.kanji.isEmpty && word.kanji != word.kana {
+                                    Text("(\(word.kana))")
+                                        .font(.system(size: 11, weight: .medium))
+                                }
+                            }
                             .foregroundColor(subtextColor)
+                        }
+                    }
+                } else {
+                    // Japanese Word (Kanji + Kana reading, NO Latin meaning)
+                    HStack(spacing: 8) {
+                        Text(word.kanji.isEmpty ? word.kana : word.kanji)
+                            .font(.system(size: 18, weight: .bold))
+                            .foregroundColor(textColor)
+                        
+                        if !word.kanji.isEmpty && word.kanji != word.kana {
+                            Text("(\(word.kana))")
+                                .font(.system(size: 14, weight: .medium))
+                                .foregroundColor(subtextColor)
+                        }
                     }
                 }
                 

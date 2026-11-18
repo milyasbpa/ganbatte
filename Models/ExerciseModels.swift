@@ -20,7 +20,7 @@ enum QuestionType: String, CaseIterable, Identifiable, Codable {
     var subtitle: String {
         switch self {
         case .image: return "Guess the word from the image"
-        case .sound: return "Guess the word from the audio"
+        case .sound: return "Guess the meaning from the audio"
         case .sentence: return "Complete the sentence with the missing word"
         }
     }
