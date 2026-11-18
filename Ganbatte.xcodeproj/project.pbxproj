@@ -70,6 +70,7 @@
 		E4893DAD946EC677C88734F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 23B563651401CBDC0C463839 /* Assets.xcassets */; };
 		E595B5AB0FED5AEB4AE24E67 /* ExerciseCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5177098E3202B280565751D5 /* ExerciseCoordinatorView.swift */; };
 		EBC76540AC645E58CCEB5EC1 /* ExerciseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D372E70E1D793985196EADB4 /* ExerciseService.swift */; };
+		ECE135CE99B8B79A22E4B893 /* AppIcon.icns in Resources */ = {isa = PBXBuildFile; fileRef = 9E2C26F8542E2E7F6513E9CF /* AppIcon.icns */; };
 		EDEA2ED9E748D233D0E91B42 /* ReminderSheetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 565E1A4E37218CB720AE6061 /* ReminderSheetView.swift */; };
 		F2EABB207E93A433659D276F /* CardImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A788E58A61081DF1B779F771 /* CardImageView.swift */; };
 		FA134728316B32B28FA39BCB /* FilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7DB4A0F2FF382ECE83C7B18 /* FilterSheet.swift */; };
@@ -96,6 +97,7 @@
 		7CECE15EBC7D9388C5E6919F /* KanaExerciseCoordinatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanaExerciseCoordinatorView.swift; sourceTree = "<group>"; };
 		8D50C38D8467934BAB90EEC9 /* KanaExerciseResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanaExerciseResultView.swift; sourceTree = "<group>"; };
 		90BE7E0BBA16730D28BC42E7 /* FuriganaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuriganaService.swift; sourceTree = "<group>"; };
+		9E2C26F8542E2E7F6513E9CF /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
 		9FD89E0EACD160CAEB08974E /* ganbatte-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ganbatte-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7278B79F1189F1D22D8E122 /* GanbatteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GanbatteApp.swift; sourceTree = "<group>"; };
 		A788E58A61081DF1B779F771 /* CardImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardImageView.swift; sourceTree = "<group>"; };
@@ -165,6 +167,7 @@
 		8089CD4E6964A37583A79F68 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				9E2C26F8542E2E7F6513E9CF /* AppIcon.icns */,
 				23B563651401CBDC0C463839 /* Assets.xcassets */,
 				BD8DC8FA002AD63403D12718 /* ganbatte.db */,
 			);
@@ -344,6 +347,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				ECE135CE99B8B79A22E4B893 /* AppIcon.icns in Resources */,
 				E4893DAD946EC677C88734F0 /* Assets.xcassets in Resources */,
 				5B16A539C4F56F4A31AD6283 /* Cards in Resources */,
 				CF2504D30AA33A6AC8E9A8E9 /* ganbatte.db in Resources */,
@@ -611,6 +615,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = ganbatte;
+				INFOPLIST_KEY_CFBundleIconFile = AppIcon.icns;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -632,6 +637,7 @@
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = ganbatte;
+				INFOPLIST_KEY_CFBundleIconFile = AppIcon.icns;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",

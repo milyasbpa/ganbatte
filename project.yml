@@ -56,11 +56,14 @@ targets:
       - path: Resources/Cards
         type: folder
         buildPhase: resources
+      - path: Resources/AppIcon.icns
+        buildPhase: resources
     settings:
       base:
         PRODUCT_NAME: ganbatte
         PRODUCT_BUNDLE_IDENTIFIER: co.bas.ganbatte-mac
         INFOPLIST_KEY_CFBundleDisplayName: ganbatte
+        INFOPLIST_KEY_CFBundleIconFile: AppIcon.icns
         CODE_SIGN_IDENTITY: "-"
         GENERATE_INFOPLIST_FILE: YES
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
