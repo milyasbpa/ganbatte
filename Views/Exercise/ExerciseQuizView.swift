@@ -196,10 +196,9 @@ struct ExerciseQuizView: View {
                     .font(.system(size: 14, weight: .medium))
                     .foregroundColor(AppTheme.textSecondary)
                 
-                CardImageView(imageName: currentQuestion.targetWord.imageName, contentMode: .fill)
-                    .aspectRatio(1.0, contentMode: .fill)
+                CardImageView(imageName: currentQuestion.targetWord.imageName, contentMode: .fit)
+                    .aspectRatio(1.0, contentMode: .fit)
                     .frame(maxWidth: .infinity)
-                    .frame(maxHeight: 250)
                     .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
             }
             

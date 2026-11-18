@@ -190,6 +190,7 @@ struct WordListView: View {
                     Button(action: {
                         withAnimation(.easeInOut(duration: 0.25)) {
                             showExerciseFlow = true
+                            hideBottomBar = true
                         }
                     }) {
                         ZStack {
@@ -252,6 +253,7 @@ struct WordListView: View {
                     onDismiss: {
                         withAnimation(.easeInOut(duration: 0.25)) {
                             showExerciseFlow = false
+                            hideBottomBar = selectedWordForDetail != nil
                         }
                     }
                 )
