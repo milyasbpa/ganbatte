@@ -52,34 +52,26 @@ struct ExerciseQuizView: View {
                         .foregroundColor(AppTheme.textSecondary)
                     }
                     .buttonStyle(.plain)
+                    .frame(minWidth: 72, alignment: .leading)
                     
                     Spacer()
                     
-                    // Question Counter & Timer
-                    VStack(spacing: 2) {
-                        Text("Question \(currentIndex + 1) / \(questions.count)")
-                            .font(.system(size: 16, weight: .bold))
-                            .foregroundColor(AppTheme.textPrimary)
-                        
-                        HStack(spacing: 4) {
-                            Image(systemName: "stopwatch")
-                                .font(.system(size: 11))
-                            Text(String(format: "%.1fs", currentElapsed))
-                                .font(.system(size: 12, weight: .medium, design: .monospaced))
-                        }
-                        .foregroundColor(AppTheme.accent)
-                    }
+                    // Question Counter
+                    Text("Question \(currentIndex + 1) / \(questions.count)")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(AppTheme.textPrimary)
                     
                     Spacer()
                     
-                    // Invisible balancing element
+                    // Timer in top-right corner
                     HStack(spacing: 4) {
-                        Image(systemName: "xmark")
-                            .font(.system(size: 16))
-                        Text("Quit")
-                            .font(.system(size: 16))
+                        Image(systemName: "stopwatch")
+                            .font(.system(size: 12, weight: .semibold))
+                        Text(String(format: "%.1fs", currentElapsed))
+                            .font(.system(size: 13, weight: .semibold, design: .monospaced))
                     }
-                    .opacity(0)
+                    .foregroundColor(AppTheme.accent)
+                    .frame(minWidth: 72, alignment: .trailing)
                 }
                 .padding(.horizontal, 20)
                 #if os(macOS)

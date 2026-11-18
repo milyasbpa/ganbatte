@@ -58,47 +58,49 @@ struct KanaSpeedQuizView: View {
                             .clipShape(Capsule())
                         }
                         .buttonStyle(.plain)
+                        .frame(minWidth: 120, alignment: .leading)
                         
                         Spacer()
                         
-                        VStack(spacing: 2) {
-                            Text("Word \(currentIndex + 1) / \(questions.count)")
-                                .font(.system(size: 15, weight: .bold))
-                                .foregroundColor(AppTheme.textPrimary)
+                        Text("Word \(currentIndex + 1) / \(questions.count)")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(AppTheme.textPrimary)
+                        
+                        Spacer()
+                        
+                        // Right Side: Skip Button & Stopwatch Timer
+                        HStack(spacing: 8) {
+                            Button(action: {
+                                submitAnswer(isSkip: true)
+                            }) {
+                                Text("Skip")
+                                    .font(.system(size: 13, weight: .semibold))
+                                    .foregroundColor(AppTheme.textTertiary)
+                                    .padding(.vertical, 6)
+                                    .padding(.horizontal, 10)
+                                    .background(Color.white.opacity(0.8))
+                                    .clipShape(Capsule())
+                            }
+                            .buttonStyle(.plain)
+                            .disabled(feedbackState != .none)
                             
                             HStack(spacing: 4) {
                                 Image(systemName: "stopwatch")
-                                    .font(.system(size: 11))
+                                    .font(.system(size: 12, weight: .semibold))
                                 Text(String(format: "%.1fs", questionElapsedTime))
-                                    .font(.system(size: 12, weight: .medium, design: .monospaced))
+                                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
                             }
                             .foregroundColor(AppTheme.accent)
                         }
-                        
-                        Spacer()
-                        
-                        // Skip / Don't Know Button
-                        Button(action: {
-                            submitAnswer(isSkip: true)
-                        }) {
-                            Text("Skip")
-                                .font(.system(size: 13, weight: .semibold))
-                                .foregroundColor(AppTheme.textTertiary)
-                                .padding(.vertical, 6)
-                                .padding(.horizontal, 10)
-                                .background(Color.white.opacity(0.8))
-                                .clipShape(Capsule())
-                        }
-                        .buttonStyle(.plain)
-                        .disabled(feedbackState != .none)
+                        .frame(minWidth: 120, alignment: .trailing)
                     }
                     .padding(.horizontal, 20)
                     #if os(macOS)
-                    .padding(.top, 16)
+                    .padding(.top, 36)
                     #else
-                    .padding(.top, 10)
+                    .padding(.top, 16)
                     #endif
-                    .padding(.bottom, 12)
+                    .padding(.bottom, 14)
                     
                     // Progress Bar
                     GeometryReader { geo in
