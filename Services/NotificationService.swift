@@ -71,6 +71,7 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
             content.title = "⚡ Kana Speed Practice"
             content.body = "Waktunya melatih kecepatan baca \(scriptTitle)! Selesaikan 10 kata dalam 1 menit."
             content.sound = .default
+            content.attachments = makeNotificationAttachments()
             content.userInfo = [
                 "type": "kana",
                 "script": settings.script.rawValue
@@ -106,6 +107,7 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
                 content.body = "Waktunya latihan 20 kosakata harian! Jaga konsistensi belajarmu."
             }
             content.sound = .default
+            content.attachments = makeNotificationAttachments()
             content.userInfo = [
                 "type": "words",
                 "filter": settings.filter.rawValue
@@ -136,6 +138,7 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
             let center = UNUserNotificationCenter.current()
             let content = UNMutableNotificationContent()
             content.sound = .default
+            content.attachments = self.makeNotificationAttachments()
             
             switch target {
             case .kana(let script):
@@ -167,6 +170,22 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
                     completion(error == nil)
                 }
             }
+        }
+    }
+    
+    private func makeNotificationAttachments() -> [UNNotificationAttachment] {
+        guard let url = Bundle.main.url(forResource: "NotificationIcon", withExtension: "png") else {
+            return []
+        }
+        let tempURL = FileManager.default.temporaryDirectory
+            .appendingPathComponent("ganbatte_icon_\(UUID().uuidString).png")
+        do {
+            try? FileManager.default.removeItem(at: tempURL)
+            try FileManager.default.copyItem(at: url, to: tempURL)
+            let att = try UNNotificationAttachment(identifier: "app_icon", url: tempURL, options: nil)
+            return [att]
+        } catch {
+            return []
         }
     }
     

@@ -16,6 +16,7 @@
 		1EB9AA90F6A66FBA7244A2D5 /* FuriganaText.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E8321309796EB901B7360F /* FuriganaText.swift */; };
 		206F171197561180A4AC81A4 /* CardImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A788E58A61081DF1B779F771 /* CardImageView.swift */; };
 		2530E69A9B871EA9BB9F6512 /* ReminderModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A93236321B5A4F96679183 /* ReminderModels.swift */; };
+		26E93AB26DF0DF28A071B07B /* NotificationIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = A79D4BC0306CCFF83B0CC042 /* NotificationIcon.png */; };
 		26F2B088F9E61ECF7AA4576E /* ReminderModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A93236321B5A4F96679183 /* ReminderModels.swift */; };
 		276EBD130544A84134DAD584 /* KanaSpeedQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4ABF935638840541B213EC5 /* KanaSpeedQuizView.swift */; };
 		2AE3D4EBF30B222F79B836BF /* DatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2729E67E02F93FDAA4D7E9B4 /* DatabaseService.swift */; };
@@ -101,6 +102,7 @@
 		9FD89E0EACD160CAEB08974E /* ganbatte-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ganbatte-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7278B79F1189F1D22D8E122 /* GanbatteApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GanbatteApp.swift; sourceTree = "<group>"; };
 		A788E58A61081DF1B779F771 /* CardImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardImageView.swift; sourceTree = "<group>"; };
+		A79D4BC0306CCFF83B0CC042 /* NotificationIcon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = NotificationIcon.png; sourceTree = "<group>"; };
 		B7DB4A0F2FF382ECE83C7B18 /* FilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterSheet.swift; sourceTree = "<group>"; };
 		BD8DC8FA002AD63403D12718 /* ganbatte.db */ = {isa = PBXFileReference; path = ganbatte.db; sourceTree = "<group>"; };
 		C4ABF935638840541B213EC5 /* KanaSpeedQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanaSpeedQuizView.swift; sourceTree = "<group>"; };
@@ -170,6 +172,7 @@
 				9E2C26F8542E2E7F6513E9CF /* AppIcon.icns */,
 				23B563651401CBDC0C463839 /* Assets.xcassets */,
 				BD8DC8FA002AD63403D12718 /* ganbatte.db */,
+				A79D4BC0306CCFF83B0CC042 /* NotificationIcon.png */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -281,6 +284,7 @@
 			buildPhases = (
 				769DDBD7CCAB21708F814F22 /* Sources */,
 				4325257190DE13698EFA9239 /* Resources */,
+				7948FFEBD68FD0F23742279B /* Fix AppIcon */,
 			);
 			buildRules = (
 			);
@@ -350,11 +354,33 @@
 				ECE135CE99B8B79A22E4B893 /* AppIcon.icns in Resources */,
 				E4893DAD946EC677C88734F0 /* Assets.xcassets in Resources */,
 				5B16A539C4F56F4A31AD6283 /* Cards in Resources */,
+				26E93AB26DF0DF28A071B07B /* NotificationIcon.png in Resources */,
 				CF2504D30AA33A6AC8E9A8E9 /* ganbatte.db in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		7948FFEBD68FD0F23742279B /* Fix AppIcon */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Fix AppIcon";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/libexec/PlistBuddy -c \"Delete :CFBundleIconName\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n/usr/libexec/PlistBuddy -c \"Set :CFBundleIconFile AppIcon.icns\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Add :CFBundleIconFile string AppIcon.icns\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\ncodesign --force --sign - \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		769DDBD7CCAB21708F814F22 /* Sources */ = {
@@ -614,14 +640,16 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = ganbatte;
+				INFOPLIST_KEY_CFBundleDisplayName = Ganbatte;
 				INFOPLIST_KEY_CFBundleIconFile = AppIcon.icns;
+				INFOPLIST_KEY_CFBundleShortVersionString = 1.0.0;
+				INFOPLIST_KEY_CFBundleVersion = 1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "co.bas.ganbatte-mac";
+				PRODUCT_BUNDLE_IDENTIFIER = co.bas.ganbatte.app;
 				PRODUCT_NAME = ganbatte;
 				SDKROOT = macosx;
 			};
@@ -636,14 +664,16 @@
 				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = ganbatte;
+				INFOPLIST_KEY_CFBundleDisplayName = Ganbatte;
 				INFOPLIST_KEY_CFBundleIconFile = AppIcon.icns;
+				INFOPLIST_KEY_CFBundleShortVersionString = 1.0.0;
+				INFOPLIST_KEY_CFBundleVersion = 1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 14.0;
-				PRODUCT_BUNDLE_IDENTIFIER = "co.bas.ganbatte-mac";
+				PRODUCT_BUNDLE_IDENTIFIER = co.bas.ganbatte.app;
 				PRODUCT_NAME = ganbatte;
 				SDKROOT = macosx;
 			};

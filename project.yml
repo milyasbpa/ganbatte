@@ -58,15 +58,24 @@ targets:
         buildPhase: resources
       - path: Resources/AppIcon.icns
         buildPhase: resources
+      - path: Resources/NotificationIcon.png
+        buildPhase: resources
     settings:
       base:
         PRODUCT_NAME: ganbatte
-        PRODUCT_BUNDLE_IDENTIFIER: co.bas.ganbatte-mac
-        INFOPLIST_KEY_CFBundleDisplayName: ganbatte
+        PRODUCT_BUNDLE_IDENTIFIER: co.bas.ganbatte.app
+        INFOPLIST_KEY_CFBundleDisplayName: Ganbatte
+        INFOPLIST_KEY_CFBundleShortVersionString: "1.0.0"
+        INFOPLIST_KEY_CFBundleVersion: "1"
         INFOPLIST_KEY_CFBundleIconFile: AppIcon.icns
         CODE_SIGN_IDENTITY: "-"
         GENERATE_INFOPLIST_FILE: YES
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         COMBINE_HIDPI_IMAGES: YES
         ENABLE_PREVIEWS: YES
+    postBuildScripts:
+      - name: Fix AppIcon
+        script: |
+          /usr/libexec/PlistBuddy -c "Delete :CFBundleIconName" "${TARGET_BUILD_DIR}/${INFOPLIST_PATH}" 2>/dev/null || true
+          /usr/libexec/PlistBuddy -c "Set :CFBundleIconFile AppIcon.icns" "${TARGET_BUILD_DIR}/${INFOPLIST_PATH}" 2>/dev/null || /usr/libexec/PlistBuddy -c "Add :CFBundleIconFile string AppIcon.icns" "${TARGET_BUILD_DIR}/${INFOPLIST_PATH}"
+          codesign --force --sign - "${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}"
