@@ -11,19 +11,14 @@ struct ReminderSheetView: View {
     
     // Form state for adding Kana reminder
     @State private var newKanaScript: KanaType = .katakana
-    @State private var newKanaTime: Date = Self.makeDate(hour: 7, minute: 30)
+    @State private var newKanaHour: Int = 7
+    @State private var newKanaMinute: Int = 30
     
     // Form state for adding Vocabulary reminder
     @State private var newWordLevel: JLPTLevel = .n5
     @State private var newWordType: WordType = .verb
-    @State private var newWordTime: Date = Self.makeDate(hour: 8, minute: 0)
-    
-    private static func makeDate(hour: Int, minute: Int) -> Date {
-        var comps = Calendar.current.dateComponents([.year, .month, .day], from: Date())
-        comps.hour = hour
-        comps.minute = minute
-        return Calendar.current.date(from: comps) ?? Date()
-    }
+    @State private var newWordHour: Int = 8
+    @State private var newWordMinute: Int = 0
     
     var body: some View {
         ZStack {
@@ -220,13 +215,13 @@ struct ReminderSheetView: View {
                             }
                         } label: {
                             HStack(spacing: 4) {
-                                Text(newKanaScript == .katakana ? "⚡ Katakana" : "🌸 Hiragana")
+                                Text(newKanaScript.title)
                                     .font(.system(size: 13, weight: .bold))
                                 Image(systemName: "chevron.up.chevron.down")
                                     .font(.system(size: 9, weight: .semibold))
                             }
                             .foregroundColor(AppTheme.accent)
-                            .padding(.horizontal, 10)
+                            .padding(.horizontal, 12)
                             .padding(.vertical, 7)
                             .background(AppTheme.accentLight.opacity(0.7))
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -235,10 +230,10 @@ struct ReminderSheetView: View {
                         
                         Spacer()
                         
-                        DatePicker("", selection: $newKanaTime, displayedComponents: .hourAndMinute)
-                            .labelsHidden()
-                            .datePickerStyle(.compact)
+                        // Custom Styled Time Selector Pill
+                        TimeSelectorPill(hour: $newKanaHour, minute: $newKanaMinute)
                         
+                        // Add Button
                         Button(action: addKanaReminder) {
                             HStack(spacing: 4) {
                                 Image(systemName: "plus")
@@ -247,7 +242,7 @@ struct ReminderSheetView: View {
                                     .font(.system(size: 13, weight: .bold))
                             }
                             .foregroundColor(.white)
-                            .padding(.horizontal, 12)
+                            .padding(.horizontal, 14)
                             .padding(.vertical, 7)
                             .background(AppTheme.accent)
                             .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -289,17 +284,13 @@ struct ReminderSheetView: View {
                         VStack(spacing: 6) {
                             ForEach(kanaSettings.items) { item in
                                 HStack(spacing: 10) {
-                                    HStack(spacing: 5) {
-                                        Text(item.script == .katakana ? "⚡" : "🌸")
-                                            .font(.system(size: 12))
-                                        Text(item.script.title)
-                                            .font(.system(size: 13, weight: .bold))
-                                            .foregroundColor(AppTheme.accent)
-                                    }
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 5)
-                                    .background(AppTheme.accentLight.opacity(0.7))
-                                    .clipShape(Capsule())
+                                    Text(item.script.title)
+                                        .font(.system(size: 12, weight: .bold))
+                                        .foregroundColor(AppTheme.accent)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 4)
+                                        .background(AppTheme.accentLight.opacity(0.8))
+                                        .clipShape(Capsule())
                                     
                                     Spacer()
                                     
@@ -330,7 +321,7 @@ struct ReminderSheetView: View {
                                 }
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 8)
-                                .background(AppTheme.background.opacity(0.6))
+                                .background(Color.white)
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -439,7 +430,7 @@ struct ReminderSheetView: View {
                                     .font(.system(size: 8, weight: .semibold))
                             }
                             .foregroundColor(Color(hex: 0xE65100))
-                            .padding(.horizontal, 8)
+                            .padding(.horizontal, 9)
                             .padding(.vertical, 7)
                             .background(Color.orange.opacity(0.15))
                             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
@@ -461,7 +452,7 @@ struct ReminderSheetView: View {
                                     .font(.system(size: 8, weight: .semibold))
                             }
                             .foregroundColor(AppTheme.textPrimary)
-                            .padding(.horizontal, 8)
+                            .padding(.horizontal, 9)
                             .padding(.vertical, 7)
                             .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
@@ -474,10 +465,10 @@ struct ReminderSheetView: View {
                         
                         Spacer()
                         
-                        DatePicker("", selection: $newWordTime, displayedComponents: .hourAndMinute)
-                            .labelsHidden()
-                            .datePickerStyle(.compact)
+                        // Custom Styled Time Selector Pill
+                        TimeSelectorPill(hour: $newWordHour, minute: $newWordMinute)
                         
+                        // Add Button
                         Button(action: addWordReminder) {
                             HStack(spacing: 3) {
                                 Image(systemName: "plus")
@@ -486,7 +477,7 @@ struct ReminderSheetView: View {
                                     .font(.system(size: 12, weight: .bold))
                             }
                             .foregroundColor(.white)
-                            .padding(.horizontal, 10)
+                            .padding(.horizontal, 12)
                             .padding(.vertical, 7)
                             .background(Color.orange)
                             .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
@@ -569,7 +560,7 @@ struct ReminderSheetView: View {
                                 }
                                 .padding(.horizontal, 12)
                                 .padding(.vertical, 8)
-                                .background(AppTheme.background.opacity(0.6))
+                                .background(Color.white)
                                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                                 .overlay(
                                     RoundedRectangle(cornerRadius: 12, style: .continuous)
@@ -614,10 +605,7 @@ struct ReminderSheetView: View {
     
     // MARK: - Actions
     private func addKanaReminder() {
-        let comps = Calendar.current.dateComponents([.hour, .minute], from: newKanaTime)
-        let hour = comps.hour ?? 7
-        let minute = comps.minute ?? 30
-        let item = KanaReminderItem(script: newKanaScript, hour: hour, minute: minute)
+        let item = KanaReminderItem(script: newKanaScript, hour: newKanaHour, minute: newKanaMinute)
         withAnimation(.easeInOut(duration: 0.15)) {
             kanaSettings.items.append(item)
             kanaSettings.items.sort { ($0.hour * 60 + $0.minute) < ($1.hour * 60 + $1.minute) }
@@ -626,10 +614,7 @@ struct ReminderSheetView: View {
     }
     
     private func addWordReminder() {
-        let comps = Calendar.current.dateComponents([.hour, .minute], from: newWordTime)
-        let hour = comps.hour ?? 8
-        let minute = comps.minute ?? 0
-        let item = WordReminderItem(level: newWordLevel, type: newWordType, hour: hour, minute: minute)
+        let item = WordReminderItem(level: newWordLevel, type: newWordType, hour: newWordHour, minute: newWordMinute)
         withAnimation(.easeInOut(duration: 0.15)) {
             wordSettings.items.append(item)
             wordSettings.items.sort { ($0.hour * 60 + $0.minute) < ($1.hour * 60 + $1.minute) }
@@ -652,6 +637,69 @@ struct ReminderSheetView: View {
                 }
             }
         }
+    }
+}
+
+// MARK: - Time Selector Pill Component
+struct TimeSelectorPill: View {
+    @Binding var hour: Int
+    @Binding var minute: Int
+    
+    var body: some View {
+        HStack(spacing: 2) {
+            Image(systemName: "clock")
+                .font(.system(size: 11, weight: .medium))
+                .foregroundColor(AppTheme.textSecondary)
+                .padding(.leading, 7)
+            
+            // Hour Menu
+            Menu {
+                ForEach(0..<24, id: \.self) { h in
+                    Button(String(format: "%02d", h)) {
+                        hour = h
+                    }
+                }
+            } label: {
+                Text(String(format: "%02d", hour))
+                    .font(.system(size: 13, weight: .bold, design: .monospaced))
+                    .foregroundColor(AppTheme.textPrimary)
+                    .padding(.vertical, 7)
+                    .padding(.horizontal, 3)
+            }
+            .buttonStyle(.plain)
+            
+            Text(":")
+                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                .foregroundColor(AppTheme.textSecondary)
+            
+            // Minute Menu
+            Menu {
+                ForEach(Array(stride(from: 0, to: 60, by: 5)), id: \.self) { m in
+                    Button(String(format: "%02d", m)) {
+                        minute = m
+                    }
+                }
+            } label: {
+                HStack(spacing: 2) {
+                    Text(String(format: "%02d", minute))
+                        .font(.system(size: 13, weight: .bold, design: .monospaced))
+                        .foregroundColor(AppTheme.textPrimary)
+                    
+                    Image(systemName: "chevron.up.chevron.down")
+                        .font(.system(size: 8, weight: .semibold))
+                        .foregroundColor(AppTheme.textTertiary)
+                }
+                .padding(.vertical, 7)
+                .padding(.trailing, 7)
+            }
+            .buttonStyle(.plain)
+        }
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 8, style: .continuous)
+                .stroke(AppTheme.buttonBorder, lineWidth: 1)
+        )
     }
 }
 

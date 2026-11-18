@@ -67,7 +67,7 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
         
         for item in settings.items {
             let content = UNMutableNotificationContent()
-            content.title = "⚡ Kana Speed Practice"
+            content.title = "Kana Speed Practice"
             let scriptTitle = item.script == .katakana ? "Katakana" : "Hiragana"
             content.body = "Time to practice your \(scriptTitle) reading speed! Complete 15 words in 60 seconds."
             content.sound = .default
@@ -141,7 +141,7 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
             
             switch target {
             case .kana(let script):
-                content.title = "⚡ Kana Speed Practice (Test)"
+                content.title = "Kana Speed Practice (Test)"
                 let title = script == .katakana ? "Katakana" : "Hiragana"
                 content.body = "Tap to practice \(title) reading speed now!"
                 content.userInfo = ["type": "kana", "script": script.rawValue]
