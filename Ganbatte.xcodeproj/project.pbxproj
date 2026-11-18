@@ -13,8 +13,11 @@
 		1EB9AA90F6A66FBA7244A2D5 /* FuriganaText.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E8321309796EB901B7360F /* FuriganaText.swift */; };
 		206F171197561180A4AC81A4 /* CardImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A788E58A61081DF1B779F771 /* CardImageView.swift */; };
 		2AE3D4EBF30B222F79B836BF /* DatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2729E67E02F93FDAA4D7E9B4 /* DatabaseService.swift */; };
+		2B567F370C5BF3B6A6789A14 /* ExerciseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D234FA525F395C02D05BB53D /* ExerciseModels.swift */; };
 		2B7F0FA7130BA6ED59502A21 /* FuriganaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90BE7E0BBA16730D28BC42E7 /* FuriganaService.swift */; };
+		2DE2836BBB0400703D4C7099 /* ExerciseResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000A77C6170EDC644FB6FF8 /* ExerciseResultView.swift */; };
 		4392DDA3B5524E85E9BA23EB /* WordRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144576BC51639397EE639740 /* WordRowView.swift */; };
+		4548B49A13BBC8800193DE18 /* ExerciseCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5177098E3202B280565751D5 /* ExerciseCoordinatorView.swift */; };
 		47FA0C13FDB05DF08C7C2D4C /* Cards in Resources */ = {isa = PBXBuildFile; fileRef = 046D34CC71FDD248D11EF2E7 /* Cards */; };
 		4E3B3A67CD27E10F5BB7BA5B /* ganbatte.db in Resources */ = {isa = PBXBuildFile; fileRef = BD8DC8FA002AD63403D12718 /* ganbatte.db */; };
 		50263F714CDAB363F0992626 /* FuriganaText.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E8321309796EB901B7360F /* FuriganaText.swift */; };
@@ -22,32 +25,44 @@
 		5B16A539C4F56F4A31AD6283 /* Cards in Resources */ = {isa = PBXBuildFile; fileRef = 046D34CC71FDD248D11EF2E7 /* Cards */; };
 		600E8C52D3B035ABD66EB315 /* WordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F1CE9BBB4EC0D93EB81E5 /* WordDetailView.swift */; };
 		6742DA109063470CC06544D7 /* GanbatteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7278B79F1189F1D22D8E122 /* GanbatteApp.swift */; };
+		6F6613F0DF62F33C65192AF8 /* ExerciseQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5DF2C45218D0A42A3BA7700 /* ExerciseQuizView.swift */; };
+		784AD848B4DB94E070CE9AC7 /* ExerciseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D372E70E1D793985196EADB4 /* ExerciseService.swift */; };
+		84E9BC487A7D0A5E86635743 /* ExerciseResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000A77C6170EDC644FB6FF8 /* ExerciseResultView.swift */; };
 		8DF06B3B787E43DFBCB68BC3 /* GanbatteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7278B79F1189F1D22D8E122 /* GanbatteApp.swift */; };
 		9112FD7957B838F542B6D0ED /* WordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F1CE9BBB4EC0D93EB81E5 /* WordDetailView.swift */; };
 		939DAC6EC89021CC8E40062F /* FilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7DB4A0F2FF382ECE83C7B18 /* FilterSheet.swift */; };
+		945FBBFC96ABE4FE94AEE99F /* ExerciseConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C09D2F9529A0EE00FA7CF4A /* ExerciseConfigView.swift */; };
 		9D048E2EBC2E5A4D9A7FBEC1 /* MainContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AFB82848FC89296628C886C /* MainContainerView.swift */; };
 		A2C1838210F3FB14D0B0251C /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A49D41154CDF6CE8F2404F3 /* AudioService.swift */; };
 		AEE7708452D4DB9DF11DCFD3 /* WordListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC05B9E38A8EACC834E6C5E6 /* WordListView.swift */; };
 		B3BE986C6325F593C70640AA /* Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF8C54701C78CA7183E5DDB /* Word.swift */; };
 		C1719E586D40000F4A1569F4 /* Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF8C54701C78CA7183E5DDB /* Word.swift */; };
 		CF2504D30AA33A6AC8E9A8E9 /* ganbatte.db in Resources */ = {isa = PBXBuildFile; fileRef = BD8DC8FA002AD63403D12718 /* ganbatte.db */; };
+		D16D810C110D63EDF386A90D /* ExerciseQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5DF2C45218D0A42A3BA7700 /* ExerciseQuizView.swift */; };
 		D48506FEA385908BE9B89618 /* DatabaseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2729E67E02F93FDAA4D7E9B4 /* DatabaseService.swift */; };
+		D618561E8E05A9B0D96011A9 /* ExerciseModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D234FA525F395C02D05BB53D /* ExerciseModels.swift */; };
 		D75C55403673DB0F475CE862 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D3977DB41E13529DEC0564E /* AppTheme.swift */; };
 		D7E6E825287E7981F721DF1E /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A49D41154CDF6CE8F2404F3 /* AudioService.swift */; };
 		DA88C117846ADBB9AE288511 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D3977DB41E13529DEC0564E /* AppTheme.swift */; };
+		DDDE0C7DD032D02D96115D76 /* ExerciseConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C09D2F9529A0EE00FA7CF4A /* ExerciseConfigView.swift */; };
 		DF23D6CC87D6BE3B1539F014 /* WordListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC05B9E38A8EACC834E6C5E6 /* WordListView.swift */; };
 		E4893DAD946EC677C88734F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 23B563651401CBDC0C463839 /* Assets.xcassets */; };
+		E595B5AB0FED5AEB4AE24E67 /* ExerciseCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5177098E3202B280565751D5 /* ExerciseCoordinatorView.swift */; };
+		EBC76540AC645E58CCEB5EC1 /* ExerciseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D372E70E1D793985196EADB4 /* ExerciseService.swift */; };
 		F2EABB207E93A433659D276F /* CardImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A788E58A61081DF1B779F771 /* CardImageView.swift */; };
 		FA134728316B32B28FA39BCB /* FilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7DB4A0F2FF382ECE83C7B18 /* FilterSheet.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0000A77C6170EDC644FB6FF8 /* ExerciseResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseResultView.swift; sourceTree = "<group>"; };
 		046D34CC71FDD248D11EF2E7 /* Cards */ = {isa = PBXFileReference; lastKnownFileType = folder; name = Cards; path = Resources/Cards; sourceTree = SOURCE_ROOT; };
 		0D3977DB41E13529DEC0564E /* AppTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppTheme.swift; sourceTree = "<group>"; };
 		144576BC51639397EE639740 /* WordRowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordRowView.swift; sourceTree = "<group>"; };
 		23B563651401CBDC0C463839 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		2729E67E02F93FDAA4D7E9B4 /* DatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseService.swift; sourceTree = "<group>"; };
 		2AFB82848FC89296628C886C /* MainContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContainerView.swift; sourceTree = "<group>"; };
+		2C09D2F9529A0EE00FA7CF4A /* ExerciseConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseConfigView.swift; sourceTree = "<group>"; };
+		5177098E3202B280565751D5 /* ExerciseCoordinatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCoordinatorView.swift; sourceTree = "<group>"; };
 		7A49D41154CDF6CE8F2404F3 /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		90BE7E0BBA16730D28BC42E7 /* FuriganaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuriganaService.swift; sourceTree = "<group>"; };
 		9FD89E0EACD160CAEB08974E /* ganbatte-macOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "ganbatte-macOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -56,7 +71,10 @@
 		B7DB4A0F2FF382ECE83C7B18 /* FilterSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FilterSheet.swift; sourceTree = "<group>"; };
 		BD8DC8FA002AD63403D12718 /* ganbatte.db */ = {isa = PBXFileReference; path = ganbatte.db; sourceTree = "<group>"; };
 		D1122E0CB817C39085B8EA01 /* ganbatte-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "ganbatte-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D234FA525F395C02D05BB53D /* ExerciseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseModels.swift; sourceTree = "<group>"; };
+		D372E70E1D793985196EADB4 /* ExerciseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseService.swift; sourceTree = "<group>"; };
 		DEF8C54701C78CA7183E5DDB /* Word.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Word.swift; sourceTree = "<group>"; };
+		E5DF2C45218D0A42A3BA7700 /* ExerciseQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseQuizView.swift; sourceTree = "<group>"; };
 		E95F1CE9BBB4EC0D93EB81E5 /* WordDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDetailView.swift; sourceTree = "<group>"; };
 		EC05B9E38A8EACC834E6C5E6 /* WordListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordListView.swift; sourceTree = "<group>"; };
 		F5E8321309796EB901B7360F /* FuriganaText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuriganaText.swift; sourceTree = "<group>"; };
@@ -66,6 +84,7 @@
 		61C0335FF68460087A2808EE /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				D234FA525F395C02D05BB53D /* ExerciseModels.swift */,
 				DEF8C54701C78CA7183E5DDB /* Word.swift */,
 			);
 			path = Models;
@@ -78,6 +97,17 @@
 				9FD89E0EACD160CAEB08974E /* ganbatte-macOS.app */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		7EF0CD483DEA327B2F81D202 /* Exercise */ = {
+			isa = PBXGroup;
+			children = (
+				2C09D2F9529A0EE00FA7CF4A /* ExerciseConfigView.swift */,
+				5177098E3202B280565751D5 /* ExerciseCoordinatorView.swift */,
+				E5DF2C45218D0A42A3BA7700 /* ExerciseQuizView.swift */,
+				0000A77C6170EDC644FB6FF8 /* ExerciseResultView.swift */,
+			);
+			path = Exercise;
 			sourceTree = "<group>";
 		};
 		8089CD4E6964A37583A79F68 /* Resources */ = {
@@ -104,6 +134,7 @@
 			children = (
 				7A49D41154CDF6CE8F2404F3 /* AudioService.swift */,
 				2729E67E02F93FDAA4D7E9B4 /* DatabaseService.swift */,
+				D372E70E1D793985196EADB4 /* ExerciseService.swift */,
 				90BE7E0BBA16730D28BC42E7 /* FuriganaService.swift */,
 			);
 			path = Services;
@@ -139,6 +170,7 @@
 				EC05B9E38A8EACC834E6C5E6 /* WordListView.swift */,
 				144576BC51639397EE639740 /* WordRowView.swift */,
 				86C120236AE35BC306AAB58E /* Components */,
+				7EF0CD483DEA327B2F81D202 /* Exercise */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -253,6 +285,12 @@
 				D7E6E825287E7981F721DF1E /* AudioService.swift in Sources */,
 				F2EABB207E93A433659D276F /* CardImageView.swift in Sources */,
 				D48506FEA385908BE9B89618 /* DatabaseService.swift in Sources */,
+				945FBBFC96ABE4FE94AEE99F /* ExerciseConfigView.swift in Sources */,
+				E595B5AB0FED5AEB4AE24E67 /* ExerciseCoordinatorView.swift in Sources */,
+				2B567F370C5BF3B6A6789A14 /* ExerciseModels.swift in Sources */,
+				6F6613F0DF62F33C65192AF8 /* ExerciseQuizView.swift in Sources */,
+				84E9BC487A7D0A5E86635743 /* ExerciseResultView.swift in Sources */,
+				EBC76540AC645E58CCEB5EC1 /* ExerciseService.swift in Sources */,
 				FA134728316B32B28FA39BCB /* FilterSheet.swift in Sources */,
 				2B7F0FA7130BA6ED59502A21 /* FuriganaService.swift in Sources */,
 				50263F714CDAB363F0992626 /* FuriganaText.swift in Sources */,
@@ -273,6 +311,12 @@
 				A2C1838210F3FB14D0B0251C /* AudioService.swift in Sources */,
 				206F171197561180A4AC81A4 /* CardImageView.swift in Sources */,
 				2AE3D4EBF30B222F79B836BF /* DatabaseService.swift in Sources */,
+				DDDE0C7DD032D02D96115D76 /* ExerciseConfigView.swift in Sources */,
+				4548B49A13BBC8800193DE18 /* ExerciseCoordinatorView.swift in Sources */,
+				D618561E8E05A9B0D96011A9 /* ExerciseModels.swift in Sources */,
+				D16D810C110D63EDF386A90D /* ExerciseQuizView.swift in Sources */,
+				2DE2836BBB0400703D4C7099 /* ExerciseResultView.swift in Sources */,
+				784AD848B4DB94E070CE9AC7 /* ExerciseService.swift in Sources */,
 				939DAC6EC89021CC8E40062F /* FilterSheet.swift in Sources */,
 				51AF4BEA4F77E892390CFB6F /* FuriganaService.swift in Sources */,
 				1EB9AA90F6A66FBA7244A2D5 /* FuriganaText.swift in Sources */,

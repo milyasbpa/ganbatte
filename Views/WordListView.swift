@@ -10,6 +10,7 @@ struct WordListView: View {
     @State private var showDifficultyModal: Bool = false
     @State private var showTypeModal: Bool = false
     @State private var selectedWordForDetail: Word? = nil
+    @State private var showExerciseFlow: Bool = false
     
     private let pageSize = 40
     @State private var currentOffset = 0
@@ -149,7 +150,34 @@ struct WordListView: View {
                     }
                     .padding(.horizontal, 16)
                     .padding(.top, 4)
-                    .padding(.bottom, 32)
+                    .padding(.bottom, 80)
+                }
+            }
+            
+            // Floating Action Button (Exercise - Pencil)
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Button(action: {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            showExerciseFlow = true
+                        }
+                    }) {
+                        ZStack {
+                            Circle()
+                                .fill(AppTheme.accent)
+                                .frame(width: 56, height: 56)
+                                .shadow(color: AppTheme.accent.opacity(0.35), radius: 10, x: 0, y: 5)
+                            
+                            Image(systemName: "pencil")
+                                .font(.system(size: 22, weight: .bold))
+                                .foregroundColor(.white)
+                        }
+                    }
+                    .buttonStyle(.plain)
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 24)
                 }
             }
             
@@ -188,6 +216,19 @@ struct WordListView: View {
                 .id(word.id)
                 .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .trailing)))
                 .zIndex(200)
+            }
+            
+            // Exercise Flow Overlay
+            if showExerciseFlow {
+                ExerciseCoordinatorView(
+                    onDismiss: {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            showExerciseFlow = false
+                        }
+                    }
+                )
+                .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .trailing)))
+                .zIndex(300)
             }
         }
         .onAppear {

@@ -8,7 +8,8 @@ struct GanbatteApp: App {
         }
         #if os(macOS)
         .windowStyle(.hiddenTitleBar)
-        .defaultSize(width: 460, height: 800)
+        .defaultSize(width: 460, height: 840)
+        .windowResizability(.contentSize)
         #endif
     }
 }

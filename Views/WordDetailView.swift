@@ -186,6 +186,7 @@ struct WordDetailView: View {
                     .padding(.horizontal, 16)
                     .padding(.bottom, 8)
                 }
+                .frame(maxHeight: .infinity)
                 .contentShape(Rectangle())
                 .gesture(
                     DragGesture(minimumDistance: 30)
@@ -251,6 +252,7 @@ struct WordDetailView: View {
                 .padding(.bottom, 16)
                 .background(AppTheme.background)
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
         .focusable()
         .focusEffectDisabled()

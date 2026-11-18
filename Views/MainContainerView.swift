@@ -25,7 +25,7 @@ struct MainContainerView: View {
                 .shadow(color: Color.black.opacity(0.18), radius: 24, x: 0, y: 12)
                 .padding(.vertical, 14)
         }
-        .frame(minWidth: 440, minHeight: 650)
+        .frame(minWidth: 440, idealWidth: 460, maxWidth: 500, minHeight: 780, idealHeight: 840, maxHeight: 920)
         #endif
     }
 }
