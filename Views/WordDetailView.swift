@@ -1,14 +1,28 @@
 import SwiftUI
 
 struct WordDetailView: View {
-    @State var currentWord: Word
+    let initialIndex: Int
     let wordsList: [Word]
     var onDismiss: () -> Void
     
-    @State private var currentIndex: Int = 0
+    @State private var currentIndex: Int
     #if os(macOS)
     @State private var keyMonitor: Any?
     #endif
+    
+    init(initialIndex: Int, wordsList: [Word], onDismiss: @escaping () -> Void) {
+        self.initialIndex = initialIndex
+        self.wordsList = wordsList
+        self.onDismiss = onDismiss
+        self._currentIndex = State(initialValue: initialIndex)
+    }
+    
+    var currentWord: Word {
+        guard currentIndex >= 0 && currentIndex < wordsList.count else {
+            return wordsList.first!
+        }
+        return wordsList[currentIndex]
+    }
     
     var body: some View {
         ZStack {
@@ -249,9 +263,6 @@ struct WordDetailView: View {
             return .handled
         }
         .onAppear {
-            if let idx = wordsList.firstIndex(where: { $0.id == currentWord.id }) {
-                currentIndex = idx
-            }
             // Auto play voice on initial open
             AudioService.shared.speak(currentWord.kana)
             
@@ -282,7 +293,6 @@ struct WordDetailView: View {
         guard currentIndex < wordsList.count - 1 else { return }
         withAnimation(.easeInOut(duration: 0.2)) {
             currentIndex += 1
-            currentWord = wordsList[currentIndex]
         }
         // Auto play voice on next
         AudioService.shared.speak(currentWord.kana)
@@ -292,7 +302,6 @@ struct WordDetailView: View {
         guard currentIndex > 0 else { return }
         withAnimation(.easeInOut(duration: 0.2)) {
             currentIndex -= 1
-            currentWord = wordsList[currentIndex]
         }
         // Auto play voice on previous
         AudioService.shared.speak(currentWord.kana)

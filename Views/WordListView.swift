@@ -174,9 +174,10 @@ struct WordListView: View {
             }
             
             // Word Detail Overlay (Multiplatform)
-            if let word = selectedWordForDetail {
+            if let word = selectedWordForDetail,
+               let idx = words.firstIndex(where: { $0.id == word.id }) {
                 WordDetailView(
-                    currentWord: word,
+                    initialIndex: idx,
                     wordsList: words,
                     onDismiss: {
                         withAnimation(.easeInOut(duration: 0.25)) {
@@ -184,6 +185,7 @@ struct WordListView: View {
                         }
                     }
                 )
+                .id(word.id)
                 .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .trailing)))
                 .zIndex(200)
             }

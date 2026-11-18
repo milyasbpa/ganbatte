@@ -60,11 +60,9 @@ struct CardImageView: View {
     let imageName: String
     var contentMode: ContentMode = .fit
     
-    @State private var platformImage: PlatformImage?
-    
     var body: some View {
         Group {
-            if let img = platformImage {
+            if let img = ImageCache.shared.image(named: imageName) {
                 #if os(iOS)
                 Image(uiImage: img)
                     .resizable()
@@ -77,29 +75,6 @@ struct CardImageView: View {
             } else {
                 Rectangle()
                     .fill(AppTheme.cardBorder.opacity(0.4))
-                    .overlay(
-                        ProgressView()
-                            .scaleEffect(0.7)
-                    )
-            }
-        }
-        .onAppear {
-            loadImage()
-        }
-        .onChange(of: imageName) { _ in
-            loadImage()
-        }
-    }
-    
-    private func loadImage() {
-        if let cached = ImageCache.shared.image(named: imageName) {
-            self.platformImage = cached
-        } else {
-            DispatchQueue.global(qos: .userInitiated).async {
-                let img = ImageCache.shared.image(named: imageName)
-                DispatchQueue.main.async {
-                    self.platformImage = img
-                }
             }
         }
     }
