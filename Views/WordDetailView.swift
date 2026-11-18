@@ -18,9 +18,9 @@ struct WordDetailView: View {
                     Button(action: onDismiss) {
                         HStack(spacing: 6) {
                             Image(systemName: "chevron.left")
-                                .font(.system(size: 17, weight: .semibold))
+                                .font(.system(size: 18, weight: .semibold))
                             Text("Words")
-                                .font(.system(size: 17, weight: .semibold))
+                                .font(.system(size: 18, weight: .semibold))
                         }
                         .foregroundColor(AppTheme.accent)
                     }
@@ -29,7 +29,7 @@ struct WordDetailView: View {
                     Spacer()
                     
                     Text("\(currentIndex + 1) / \(max(wordsList.count, 1))")
-                        .font(.system(size: 17, weight: .bold))
+                        .font(.system(size: 18, weight: .bold))
                         .foregroundColor(AppTheme.textPrimary)
                     
                     Spacer()
@@ -37,25 +37,28 @@ struct WordDetailView: View {
                     // Invisible balancing element for exact center alignment
                     HStack(spacing: 6) {
                         Image(systemName: "chevron.left")
-                            .font(.system(size: 17, weight: .semibold))
+                            .font(.system(size: 18, weight: .semibold))
                         Text("Words")
-                            .font(.system(size: 17, weight: .semibold))
+                            .font(.system(size: 18, weight: .semibold))
                     }
                     .opacity(0)
                 }
                 .padding(.horizontal, 20)
+                #if os(macOS)
+                .padding(.top, 36)
+                #else
                 .padding(.top, 16)
-                .padding(.bottom, 12)
+                #endif
+                .padding(.bottom, 24)
                 .background(AppTheme.background)
                 
                 // 2. SCROLLABLE MIDDLE CONTENT AREA
                 ScrollView(showsIndicators: false) {
                     VStack(alignment: .leading, spacing: 14) {
-                        // Hero Cropped Image Banner
-                        CardImageView(imageName: currentWord.imageName, contentMode: .fit)
-                            .aspectRatio(1.08, contentMode: .fit)
+                        // Hero Cropped Image Banner (Full Width within container margins)
+                        CardImageView(imageName: currentWord.imageName, contentMode: .fill)
+                            .aspectRatio(1.0, contentMode: .fill)
                             .frame(maxWidth: .infinity)
-                            .frame(maxHeight: 270)
                             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
                         
                         // Word Details Section
