@@ -45,11 +45,11 @@ struct KanaExerciseConfigView: View {
                 }
                 .padding(.horizontal, 20)
                 #if os(macOS)
-                .padding(.top, 16)
+                .padding(.top, 36)
                 #else
                 .padding(.top, 16)
                 #endif
-                .padding(.bottom, 12)
+                .padding(.bottom, 16)
                 .background(AppTheme.background)
                 
                 ScrollView(showsIndicators: false) {
@@ -225,6 +225,7 @@ struct KanaExerciseConfigView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
                     }
                     .padding(.horizontal, 20)
+                    .padding(.top, 8)
                     .padding(.bottom, 30)
                 }
                 

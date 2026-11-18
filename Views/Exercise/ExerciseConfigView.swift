@@ -59,15 +59,15 @@ struct ExerciseConfigView: View {
                 }
                 .padding(.horizontal, 20)
                 #if os(macOS)
-                .padding(.top, 16)
+                .padding(.top, 36)
                 #else
                 .padding(.top, 16)
                 #endif
-                .padding(.bottom, 12)
+                .padding(.bottom, 16)
                 .background(AppTheme.background)
                 
                 ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 16) {
+                    VStack(alignment: .leading, spacing: 18) {
                         // Section 1: Question Type
                         VStack(alignment: .leading, spacing: 8) {
                             Text("QUESTION TYPE")
@@ -234,35 +234,6 @@ struct ExerciseConfigView: View {
                                 }
                             }
                             
-                            // Dual Range Interactive Slider
-                            VStack(spacing: 6) {
-                                DualRangeSlider(
-                                    start: $config.startWord,
-                                    end: $config.endWord,
-                                    range: 1...max(totalWords, 1)
-                                )
-                                .onChange(of: config.startWord) { newVal in
-                                    startText = "\(newVal)"
-                                }
-                                .onChange(of: config.endWord) { newVal in
-                                    endText = "\(newVal)"
-                                }
-                                
-                                HStack {
-                                    Text("1")
-                                        .font(.system(size: 11, weight: .medium, design: .monospaced))
-                                        .foregroundColor(AppTheme.textTertiary)
-                                    
-                                    Spacer()
-                                    
-                                    Text("\(totalWords)")
-                                        .font(.system(size: 11, weight: .medium, design: .monospaced))
-                                        .foregroundColor(AppTheme.textTertiary)
-                                }
-                                .padding(.horizontal, 4)
-                            }
-                            .padding(.top, 4)
-                            
                             // Manual Inputs (Start & End with Stepper and Direct Input)
                             HStack(spacing: 12) {
                                 // Start Input Card
@@ -426,6 +397,7 @@ struct ExerciseConfigView: View {
                         }
                     }
                     .padding(.horizontal, 20)
+                    .padding(.top, 8)
                     .padding(.bottom, 24)
                 }
                 
@@ -471,87 +443,5 @@ struct ExerciseConfigView: View {
         }
         startText = "\(config.startWord)"
         endText = "\(config.endWord)"
-    }
-}
-
-// MARK: - Dual Range Slider Component
-struct DualRangeSlider: View {
-    @Binding var start: Int
-    @Binding var end: Int
-    let range: ClosedRange<Int>
-    
-    @State private var dragInitialStart: Int? = nil
-    @State private var dragInitialEnd: Int? = nil
-    
-    var body: some View {
-        GeometryReader { geo in
-            let trackWidth = max(geo.size.width - 24, 1)
-            let total = max(range.upperBound - range.lowerBound, 1)
-            
-            let startPct = CGFloat(start - range.lowerBound) / CGFloat(total)
-            let endPct = CGFloat(end - range.lowerBound) / CGFloat(total)
-            
-            let startX = startPct * trackWidth + 12
-            let endX = endPct * trackWidth + 12
-            
-            ZStack(alignment: .leading) {
-                // Background Track
-                Capsule()
-                    .fill(AppTheme.inputBackground)
-                    .frame(height: 6)
-                
-                // Active Range Highlight
-                Capsule()
-                    .fill(AppTheme.accent)
-                    .frame(width: max(4, endX - startX), height: 6)
-                    .offset(x: startX)
-                
-                // Start Thumb
-                Circle()
-                    .fill(Color.white)
-                    .frame(width: 24, height: 24)
-                    .overlay(Circle().stroke(AppTheme.accent, lineWidth: 2.5))
-                    .shadow(color: Color.black.opacity(0.12), radius: 3, x: 0, y: 1.5)
-                    .offset(x: startX - 12)
-                    .gesture(
-                        DragGesture(minimumDistance: 1)
-                            .onChanged { val in
-                                if dragInitialStart == nil {
-                                    dragInitialStart = start
-                                }
-                                let deltaVal = Int(round((val.translation.width / trackWidth) * CGFloat(total)))
-                                let newStart = (dragInitialStart ?? start) + deltaVal
-                                start = max(range.lowerBound, min(newStart, end))
-                            }
-                            .onEnded { _ in
-                                dragInitialStart = nil
-                            }
-                    )
-                
-                // End Thumb
-                Circle()
-                    .fill(Color.white)
-                    .frame(width: 24, height: 24)
-                    .overlay(Circle().stroke(AppTheme.accent, lineWidth: 2.5))
-                    .shadow(color: Color.black.opacity(0.12), radius: 3, x: 0, y: 1.5)
-                    .offset(x: endX - 12)
-                    .gesture(
-                        DragGesture(minimumDistance: 1)
-                            .onChanged { val in
-                                if dragInitialEnd == nil {
-                                    dragInitialEnd = end
-                                }
-                                let deltaVal = Int(round((val.translation.width / trackWidth) * CGFloat(total)))
-                                let newEnd = (dragInitialEnd ?? end) + deltaVal
-                                end = max(start, min(newEnd, range.upperBound))
-                            }
-                            .onEnded { _ in
-                                dragInitialEnd = nil
-                            }
-                    )
-            }
-            .frame(height: 24)
-        }
-        .frame(height: 24)
     }
 }
