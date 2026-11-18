@@ -6,6 +6,9 @@ struct WordDetailView: View {
     var onDismiss: () -> Void
     
     @State private var currentIndex: Int = 0
+    #if os(macOS)
+    @State private var keyMonitor: Any?
+    #endif
     
     var body: some View {
         ZStack {
@@ -204,6 +207,7 @@ struct WordDetailView: View {
                     }
                     .buttonStyle(.plain)
                     .disabled(currentIndex <= 0)
+                    .keyboardShortcut(.leftArrow, modifiers: [])
                     
                     // Next Button
                     Button(action: nextCard) {
@@ -226,6 +230,7 @@ struct WordDetailView: View {
                     }
                     .buttonStyle(.plain)
                     .disabled(currentIndex >= wordsList.count - 1)
+                    .keyboardShortcut(.rightArrow, modifiers: [])
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
@@ -233,12 +238,43 @@ struct WordDetailView: View {
                 .background(AppTheme.background)
             }
         }
+        .focusable()
+        .focusEffectDisabled()
+        .onKeyPress(.leftArrow) {
+            prevCard()
+            return .handled
+        }
+        .onKeyPress(.rightArrow) {
+            nextCard()
+            return .handled
+        }
         .onAppear {
             if let idx = wordsList.firstIndex(where: { $0.id == currentWord.id }) {
                 currentIndex = idx
             }
             // Auto play voice on initial open
             AudioService.shared.speak(currentWord.kana)
+            
+            #if os(macOS)
+            keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+                if event.keyCode == 123 { // Left Arrow
+                    prevCard()
+                    return nil
+                } else if event.keyCode == 124 { // Right Arrow
+                    nextCard()
+                    return nil
+                }
+                return event
+            }
+            #endif
+        }
+        .onDisappear {
+            #if os(macOS)
+            if let monitor = keyMonitor {
+                NSEvent.removeMonitor(monitor)
+                keyMonitor = nil
+            }
+            #endif
         }
     }
     
