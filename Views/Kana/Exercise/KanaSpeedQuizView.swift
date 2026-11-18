@@ -40,59 +40,63 @@ struct KanaSpeedQuizView: View {
             
             if let question = currentQuestion {
                 VStack(spacing: 0) {
-                    // Header (Quit, Progress, Timer)
+                    // Header (Quit, Word Counter, Skip)
                     HStack {
+                        // Quit Button
                         Button(action: {
                             showQuitAlert = true
                         }) {
                             HStack(spacing: 4) {
                                 Image(systemName: "xmark")
-                                    .font(.system(size: 14, weight: .bold))
+                                    .font(.system(size: 13, weight: .bold))
                                 Text("Quit")
-                                    .font(.system(size: 14, weight: .bold))
+                                    .font(.system(size: 13, weight: .bold))
                             }
                             .foregroundColor(AppTheme.textSecondary)
                             .padding(.vertical, 6)
                             .padding(.horizontal, 10)
-                            .background(Color.white.opacity(0.8))
+                            .background(Color.white.opacity(0.85))
                             .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(AppTheme.buttonBorder, lineWidth: 1)
+                            )
                         }
                         .buttonStyle(.plain)
-                        .frame(minWidth: 120, alignment: .leading)
+                        .frame(minWidth: 76, alignment: .leading)
                         
                         Spacer()
                         
+                        // Word Counter
                         Text("Word \(currentIndex + 1) / \(questions.count)")
-                            .font(.system(size: 15, weight: .bold))
+                            .font(.system(size: 16, weight: .bold))
                             .foregroundColor(AppTheme.textPrimary)
                         
                         Spacer()
                         
-                        // Right Side: Skip Button & Stopwatch Timer
-                        HStack(spacing: 8) {
-                            Button(action: {
-                                submitAnswer(isSkip: true)
-                            }) {
-                                Text("Skip")
-                                    .font(.system(size: 13, weight: .semibold))
-                                    .foregroundColor(AppTheme.textTertiary)
-                                    .padding(.vertical, 6)
-                                    .padding(.horizontal, 10)
-                                    .background(Color.white.opacity(0.8))
-                                    .clipShape(Capsule())
-                            }
-                            .buttonStyle(.plain)
-                            .disabled(feedbackState != .none)
-                            
+                        // Skip Button
+                        Button(action: {
+                            submitAnswer(isSkip: true)
+                        }) {
                             HStack(spacing: 4) {
-                                Image(systemName: "stopwatch")
-                                    .font(.system(size: 12, weight: .semibold))
-                                Text(String(format: "%.1fs", questionElapsedTime))
-                                    .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                                Text("Skip")
+                                    .font(.system(size: 13, weight: .bold))
+                                Image(systemName: "arrow.right")
+                                    .font(.system(size: 11, weight: .bold))
                             }
-                            .foregroundColor(AppTheme.accent)
+                            .foregroundColor(AppTheme.textSecondary)
+                            .padding(.vertical, 6)
+                            .padding(.horizontal, 10)
+                            .background(Color.white.opacity(0.85))
+                            .clipShape(Capsule())
+                            .overlay(
+                                Capsule()
+                                    .stroke(AppTheme.buttonBorder, lineWidth: 1)
+                            )
                         }
-                        .frame(minWidth: 120, alignment: .trailing)
+                        .buttonStyle(.plain)
+                        .disabled(feedbackState != .none)
+                        .frame(minWidth: 76, alignment: .trailing)
                     }
                     .padding(.horizontal, 20)
                     #if os(macOS)
@@ -100,24 +104,38 @@ struct KanaSpeedQuizView: View {
                     #else
                     .padding(.top, 16)
                     #endif
-                    .padding(.bottom, 14)
+                    .padding(.bottom, 12)
+                    .background(AppTheme.background)
                     
-                    // Progress Bar
-                    GeometryReader { geo in
-                        let progress = CGFloat(currentIndex) / CGFloat(max(questions.count, 1))
-                        ZStack(alignment: .leading) {
-                            Capsule()
-                                .fill(AppTheme.inputBackground)
-                                .frame(height: 4)
-                            
-                            Capsule()
-                                .fill(AppTheme.accent)
-                                .frame(width: geo.size.width * progress, height: 4)
+                    // Progress Bar & Timer Row
+                    HStack(spacing: 12) {
+                        GeometryReader { geo in
+                            let progress = CGFloat(currentIndex + 1) / CGFloat(max(questions.count, 1))
+                            ZStack(alignment: .leading) {
+                                Capsule()
+                                    .fill(AppTheme.cardBorder.opacity(0.6))
+                                    .frame(height: 5)
+                                
+                                Capsule()
+                                    .fill(AppTheme.accent)
+                                    .frame(width: geo.size.width * progress, height: 5)
+                                    .animation(.easeInOut(duration: 0.25), value: currentIndex)
+                            }
                         }
+                        .frame(height: 5)
+                        
+                        HStack(spacing: 4) {
+                            Image(systemName: "stopwatch")
+                                .font(.system(size: 11, weight: .semibold))
+                            Text(formatTime(questionElapsedTime))
+                                .font(.system(size: 12, weight: .bold, design: .monospaced))
+                                .lineLimit(1)
+                                .fixedSize()
+                        }
+                        .foregroundColor(AppTheme.accent)
                     }
-                    .frame(height: 4)
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 24)
+                    .padding(.bottom, 16)
                     
                     ScrollView(showsIndicators: false) {
                         VStack(spacing: 28) {
@@ -401,6 +419,16 @@ struct KanaSpeedQuizView: View {
                 results: results
             )
             onFinish(summary)
+        }
+    }
+    
+    private func formatTime(_ seconds: TimeInterval) -> String {
+        if seconds < 60.0 {
+            return String(format: "%.1fs", seconds)
+        } else {
+            let mins = Int(seconds) / 60
+            let secs = Int(seconds) % 60
+            return String(format: "%d:%02d", mins, secs)
         }
     }
 }

@@ -247,7 +247,7 @@ struct ExerciseResultView: View {
             // If incorrect, show user choice vs correct answer
             if !res.isCorrect {
                 VStack(alignment: .leading, spacing: 3) {
-                    if res.selectedIndex < res.question.options.count {
+                    if res.selectedIndex >= 0 && res.selectedIndex < res.question.options.count {
                         let chosen = res.question.options[res.selectedIndex]
                         HStack(spacing: 4) {
                             Text("Your Answer:")
@@ -259,6 +259,15 @@ struct ExerciseResultView: View {
                             Text("(\(chosen.meaningEn))")
                                 .font(.system(size: 11))
                                 .foregroundColor(Color(hex: 0xDC3545).opacity(0.8))
+                        }
+                    } else {
+                        HStack(spacing: 4) {
+                            Text("Your Answer:")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(Color(hex: 0xDC3545))
+                            Text("Skipped")
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundColor(Color(hex: 0xDC3545))
                         }
                     }
                     

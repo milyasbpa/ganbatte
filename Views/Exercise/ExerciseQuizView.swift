@@ -40,19 +40,28 @@ struct ExerciseQuizView: View {
             VStack(spacing: 0) {
                 // Header (Pinned at top)
                 HStack {
+                    // Quit Button
                     Button(action: {
                         showQuitConfirmation = true
                     }) {
                         HStack(spacing: 4) {
                             Image(systemName: "xmark")
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(.system(size: 13, weight: .bold))
                             Text("Quit")
-                                .font(.system(size: 16, weight: .semibold))
+                                .font(.system(size: 13, weight: .bold))
                         }
                         .foregroundColor(AppTheme.textSecondary)
+                        .padding(.vertical, 6)
+                        .padding(.horizontal, 10)
+                        .background(Color.white.opacity(0.85))
+                        .clipShape(Capsule())
+                        .overlay(
+                            Capsule()
+                                .stroke(AppTheme.buttonBorder, lineWidth: 1)
+                        )
                     }
                     .buttonStyle(.plain)
-                    .frame(minWidth: 72, alignment: .leading)
+                    .frame(minWidth: 76, alignment: .leading)
                     
                     Spacer()
                     
@@ -63,15 +72,29 @@ struct ExerciseQuizView: View {
                     
                     Spacer()
                     
-                    // Timer in top-right corner
-                    HStack(spacing: 4) {
-                        Image(systemName: "stopwatch")
-                            .font(.system(size: 12, weight: .semibold))
-                        Text(String(format: "%.1fs", currentElapsed))
-                            .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                    // Skip Button
+                    Button(action: {
+                        skipQuestion()
+                    }) {
+                        HStack(spacing: 4) {
+                            Text("Skip")
+                                .font(.system(size: 13, weight: .bold))
+                            Image(systemName: "arrow.right")
+                                .font(.system(size: 11, weight: .bold))
+                        }
+                        .foregroundColor(AppTheme.textSecondary)
+                        .padding(.vertical, 6)
+                        .padding(.horizontal, 10)
+                        .background(Color.white.opacity(0.85))
+                        .clipShape(Capsule())
+                        .overlay(
+                            Capsule()
+                                .stroke(AppTheme.buttonBorder, lineWidth: 1)
+                        )
                     }
-                    .foregroundColor(AppTheme.accent)
-                    .frame(minWidth: 72, alignment: .trailing)
+                    .buttonStyle(.plain)
+                    .disabled(isShowingFeedback)
+                    .frame(minWidth: 76, alignment: .trailing)
                 }
                 .padding(.horizontal, 20)
                 #if os(macOS)
@@ -79,23 +102,35 @@ struct ExerciseQuizView: View {
                 #else
                 .padding(.top, 16)
                 #endif
-                .padding(.bottom, 14)
+                .padding(.bottom, 12)
                 .background(AppTheme.background)
                 
-                // Progress Bar
-                GeometryReader { geo in
-                    ZStack(alignment: .leading) {
-                        Capsule()
-                            .fill(AppTheme.cardBorder.opacity(0.6))
-                            .frame(height: 5)
-                        
-                        Capsule()
-                            .fill(AppTheme.accent)
-                            .frame(width: geo.size.width * CGFloat(currentIndex + 1) / CGFloat(max(questions.count, 1)), height: 5)
-                            .animation(.easeInOut(duration: 0.25), value: currentIndex)
+                // Progress Bar & Timer Row
+                HStack(spacing: 12) {
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(AppTheme.cardBorder.opacity(0.6))
+                                .frame(height: 5)
+                            
+                            Capsule()
+                                .fill(AppTheme.accent)
+                                .frame(width: geo.size.width * CGFloat(currentIndex + 1) / CGFloat(max(questions.count, 1)), height: 5)
+                                .animation(.easeInOut(duration: 0.25), value: currentIndex)
+                        }
                     }
+                    .frame(height: 5)
+                    
+                    HStack(spacing: 4) {
+                        Image(systemName: "stopwatch")
+                            .font(.system(size: 11, weight: .semibold))
+                        Text(formatTime(currentElapsed))
+                            .font(.system(size: 12, weight: .bold, design: .monospaced))
+                            .lineLimit(1)
+                            .fixedSize()
+                    }
+                    .foregroundColor(AppTheme.accent)
                 }
-                .frame(height: 5)
                 .padding(.horizontal, 20)
                 .padding(.bottom, 12)
                 
@@ -402,6 +437,27 @@ struct ExerciseQuizView: View {
         }
     }
     
+    private func skipQuestion() {
+        guard !isShowingFeedback else { return }
+        
+        let responseTime = Date().timeIntervalSince(questionStartTime)
+        stopTimer()
+        
+        // Record skipped question (selectedIndex: -1, isCorrect: false)
+        let result = QuestionResult(
+            question: currentQuestion,
+            selectedIndex: -1,
+            isCorrect: false,
+            timeSpent: responseTime
+        )
+        recordedResults.append(result)
+        
+        isShowingFeedback = true
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            advanceToNextQuestion()
+        }
+    }
+    
     private func advanceToNextQuestion() {
         if currentIndex < questions.count - 1 {
             withAnimation(.easeInOut(duration: 0.2)) {
@@ -428,16 +484,33 @@ struct ExerciseQuizView: View {
         timer = nil
     }
     
+    private func formatTime(_ seconds: TimeInterval) -> String {
+        if seconds < 60.0 {
+            return String(format: "%.1fs", seconds)
+        } else {
+            let mins = Int(seconds) / 60
+            let secs = Int(seconds) % 60
+            return String(format: "%d:%02d", mins, secs)
+        }
+    }
+    
     // MARK: - Keyboard Monitor (macOS)
     private func setupKeyMonitor() {
         #if os(macOS)
         keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
             guard !isShowingFeedback else { return event }
             
-            // Number keys 1, 2, 3, 4
-            if let chars = event.characters, let num = Int(chars), num >= 1 && num <= 4 {
-                selectOption(num - 1)
-                return nil
+            if let chars = event.characters {
+                // Number keys 1, 2, 3, 4
+                if let num = Int(chars), num >= 1 && num <= 4 {
+                    selectOption(num - 1)
+                    return nil
+                }
+                // 's' or 'S' to skip
+                if chars.lowercased() == "s" {
+                    skipQuestion()
+                    return nil
+                }
             }
             return event
         }
