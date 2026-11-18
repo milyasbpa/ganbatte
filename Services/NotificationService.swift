@@ -69,7 +69,7 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
         for time in settings.times {
             let content = UNMutableNotificationContent()
             content.title = "⚡ Kana Speed Practice"
-            content.body = "Waktunya melatih kecepatan baca \(scriptTitle)! Selesaikan 10 kata dalam 1 menit."
+            content.body = "Time to practice your \(scriptTitle) reading speed! Complete 10 words in 1 minute."
             content.sound = .default
             content.attachments = makeNotificationAttachments()
             content.userInfo = [
@@ -101,10 +101,10 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
             let content = UNMutableNotificationContent()
             if settings.filter == .verbsOnly {
                 content.title = "⚔️ Morning Verb Drill"
-                content.body = "Waktunya latihan 20 kata kerja! Kuasai pola arti dan kanjinya."
+                content.body = "Time to practice 20 verbs! Master meanings and kanji patterns."
             } else {
                 content.title = "📖 Daily Vocab Drill"
-                content.body = "Waktunya latihan 20 kosakata harian! Jaga konsistensi belajarmu."
+                content.body = "Time for your daily 20-word drill! Keep your learning streak strong."
             }
             content.sound = .default
             content.attachments = makeNotificationAttachments()
@@ -144,16 +144,16 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
             case .kana(let script):
                 content.title = "⚡ Kana Speed Practice (Test)"
                 let title = script == .katakana ? "Katakana" : "Hiragana"
-                content.body = "Tap untuk langsung latihan kecepatan baca \(title)!"
+                content.body = "Tap to practice \(title) reading speed now!"
                 content.userInfo = ["type": "kana", "script": script.rawValue]
                 
             case .words(let filter):
                 if filter == .verbsOnly {
                     content.title = "⚔️ Verb Drill (Test)"
-                    content.body = "Tap untuk langsung latihan 20 kata kerja N5!"
+                    content.body = "Tap to practice 20 N5 verbs now!"
                 } else {
                     content.title = "📖 Vocab Drill (Test)"
-                    content.body = "Tap untuk langsung latihan kosakata harian!"
+                    content.body = "Tap to practice daily vocabulary now!"
                 }
                 content.userInfo = ["type": "words", "filter": filter.rawValue]
             }

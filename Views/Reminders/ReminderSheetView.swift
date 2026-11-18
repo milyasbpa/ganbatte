@@ -91,7 +91,7 @@ struct ReminderSheetView: View {
                                 .font(.system(size: 14))
                                 .foregroundColor(AppTheme.accent)
                             
-                            Text("Notifikasi berjalan 100% offline. Saat notifikasi di-klik, aplikasi akan otomatis membuka kuis yang sesuai.")
+                            Text("Notifications run 100% offline. Tapping an alert automatically opens the corresponding practice drill.")
                                 .font(.system(size: 11, weight: .regular))
                                 .foregroundColor(AppTheme.textSecondary)
                                 .fixedSize(horizontal: false, vertical: true)
@@ -526,7 +526,7 @@ struct ReminderSheetView: View {
     }
     
     private func triggerTest(target: ReminderDeepLink) {
-        testSentFeedback = "Notifikasi akan muncul dalam 3 detik..."
+        testSentFeedback = "Notification will appear in 3 seconds..."
         notifService.sendTestNotification(target: target, delay: 3) { success in
             DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) {
                 if testSentFeedback != nil {

@@ -378,7 +378,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "/usr/libexec/PlistBuddy -c \"Delete :CFBundleIconName\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n/usr/libexec/PlistBuddy -c \"Set :CFBundleIconFile AppIcon.icns\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Add :CFBundleIconFile string AppIcon.icns\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\ncodesign --force --sign - \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\"\n";
+			shellScript = "/usr/libexec/PlistBuddy -c \"Delete :CFBundleIconName\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || true\n/usr/libexec/PlistBuddy -c \"Set :CFBundleIconFile AppIcon.icns\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\" 2>/dev/null || /usr/libexec/PlistBuddy -c \"Add :CFBundleIconFile string AppIcon.icns\" \"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}\"\ncodesign --force --deep --sign - \"${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}\"\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
