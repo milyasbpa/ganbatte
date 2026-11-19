@@ -36,7 +36,7 @@ struct WordDetailView: View {
                         HStack(spacing: 6) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 18, weight: .semibold))
-                            Text("Words")
+                            Text("Back")
                                 .font(.system(size: 18, weight: .semibold))
                         }
                         .foregroundColor(AppTheme.accent)
@@ -55,7 +55,7 @@ struct WordDetailView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 18, weight: .semibold))
-                        Text("Words")
+                        Text("Back")
                             .font(.system(size: 18, weight: .semibold))
                     }
                     .opacity(0)

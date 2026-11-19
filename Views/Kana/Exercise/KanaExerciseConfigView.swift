@@ -19,7 +19,7 @@ struct KanaExerciseConfigView: View {
                         HStack(spacing: 6) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 18, weight: .semibold))
-                            Text("Kana")
+                            Text("Back")
                                 .font(.system(size: 18, weight: .semibold))
                         }
                         .foregroundColor(AppTheme.accent)
@@ -38,7 +38,7 @@ struct KanaExerciseConfigView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 18))
-                        Text("Kana")
+                        Text("Back")
                             .font(.system(size: 18))
                     }
                     .opacity(0)

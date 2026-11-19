@@ -44,21 +44,16 @@ struct KanaChartView: View {
                     .overlay(alignment: .leading) {
                         if let onBack = onBack {
                             Button(action: onBack) {
-                                HStack(spacing: 4) {
+                                HStack(spacing: 6) {
                                     Image(systemName: "chevron.left")
-                                        .font(.system(size: 14, weight: .bold))
+                                        .font(.system(size: 18, weight: .semibold))
                                     Text("Back")
-                                        .font(.system(size: 14, weight: .semibold))
+                                        .font(.system(size: 18, weight: .semibold))
                                 }
                                 .foregroundColor(AppTheme.accent)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(Color.white)
-                                .clipShape(Capsule())
-                                .overlay(Capsule().stroke(AppTheme.buttonBorder, lineWidth: 1))
-                                .shadow(color: Color.black.opacity(0.04), radius: 3, x: 0, y: 1)
                             }
                             .buttonStyle(.plain)
+                            .padding(.leading, 16)
                         }
                     }
                     .overlay(alignment: .trailing) {

@@ -33,7 +33,7 @@ struct ExerciseConfigView: View {
                         HStack(spacing: 6) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 18, weight: .semibold))
-                            Text("Words")
+                            Text("Back")
                                 .font(.system(size: 18, weight: .semibold))
                         }
                         .foregroundColor(AppTheme.accent)
@@ -52,7 +52,7 @@ struct ExerciseConfigView: View {
                     HStack(spacing: 6) {
                         Image(systemName: "chevron.left")
                             .font(.system(size: 18))
-                        Text("Words")
+                        Text("Back")
                             .font(.system(size: 18))
                     }
                     .opacity(0)
