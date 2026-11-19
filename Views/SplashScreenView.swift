@@ -38,27 +38,27 @@ struct SplashScreenView: View {
                 Image("OnigiriMascot")
                     .resizable()
                     .scaledToFit()
-                    .frame(width: 190, height: 190)
+                    .frame(width: 215, height: 215)
                     .offset(y: mascotFloatingOffset)
-                    .shadow(color: Color.black.opacity(0.08), radius: 18, x: 0, y: 10)
+                    .shadow(color: Color.black.opacity(0.09), radius: 20, x: 0, y: 12)
                     .scaleEffect(mascotScale)
                     .opacity(mascotOpacity)
                 
                 // Brand Title & Tagline
-                VStack(spacing: 6) {
+                VStack(spacing: 8) {
                     Text("がんばって")
-                        .font(.system(size: 34, weight: .bold, design: .rounded))
+                        .font(.system(size: 36, weight: .bold, design: .rounded))
                         .foregroundColor(AppTheme.textPrimary)
                     
                     Text("G A N B A T T E")
-                        .font(.system(size: 13, weight: .bold, design: .rounded))
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundColor(AppTheme.accent)
-                        .tracking(3)
+                        .tracking(3.5)
                     
                     Text("Belajar Bahasa Jepang Menyenangkan")
                         .font(.system(size: 14, weight: .medium, design: .rounded))
                         .foregroundColor(AppTheme.textSecondary)
-                        .padding(.top, 4)
+                        .padding(.top, 2)
                 }
                 .opacity(textOpacity)
                 .offset(y: textOffset)
@@ -95,8 +95,8 @@ struct SplashScreenView: View {
             mascotFloatingOffset = -6
         }
         
-        // 4. Auto transition after ~1.8 seconds
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.85) {
+        // 4. Auto transition after ~2.2 seconds
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
             dismissSplash()
         }
     }
