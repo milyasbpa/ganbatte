@@ -8,7 +8,6 @@ enum LearnSubView {
 
 struct LearnHubView: View {
     @Binding var hideBottomBar: Bool
-    var onOpenReminders: (() -> Void)?
     
     @State private var activeSubView: LearnSubView = .hub
     @ObservedObject private var activityService = ActivityService.shared
@@ -25,7 +24,6 @@ struct LearnHubView: View {
             case .wordList:
                 WordListView(
                     hideBottomBar: $hideBottomBar,
-                    onOpenReminders: onOpenReminders,
                     onBack: {
                         withAnimation(.easeInOut(duration: 0.22)) {
                             activeSubView = .hub
@@ -36,7 +34,6 @@ struct LearnHubView: View {
             case .kanaChart:
                 KanaChartView(
                     hideBottomBar: $hideBottomBar,
-                    onOpenReminders: onOpenReminders,
                     onBack: {
                         withAnimation(.easeInOut(duration: 0.22)) {
                             activeSubView = .hub
@@ -80,21 +77,6 @@ struct LearnHubView: View {
                 }
                 
                 Spacer()
-                
-                // Reminders bell button
-                if let onOpenReminders = onOpenReminders {
-                    Button(action: onOpenReminders) {
-                        Image(systemName: "bell.fill")
-                            .font(.system(size: 14))
-                            .foregroundColor(AppTheme.textSecondary)
-                            .frame(width: 36, height: 36)
-                            .background(Color.white)
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(AppTheme.buttonBorder, lineWidth: 1))
-                            .shadow(color: Color.black.opacity(0.04), radius: 3, x: 0, y: 1)
-                    }
-                    .buttonStyle(.plain)
-                }
             }
             .padding(.horizontal, 20)
             .padding(.top, 20)

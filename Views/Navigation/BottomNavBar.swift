@@ -4,6 +4,7 @@ enum AppTab: String, CaseIterable, Identifiable {
     case learn = "learn"
     case exercise = "exercise"
     case activity = "activity"
+    case reminders = "reminders"
     
     var id: String { rawValue }
     
@@ -12,6 +13,7 @@ enum AppTab: String, CaseIterable, Identifiable {
         case .learn: return "Learn"
         case .exercise: return "Exercise"
         case .activity: return "Activity"
+        case .reminders: return "Reminders"
         }
     }
     
@@ -20,6 +22,7 @@ enum AppTab: String, CaseIterable, Identifiable {
         case .learn: return "books.vertical.fill"
         case .exercise: return "bolt.fill"
         case .activity: return "flame.fill"
+        case .reminders: return "bell.fill"
         }
     }
     
@@ -31,6 +34,8 @@ enum AppTab: String, CaseIterable, Identifiable {
             self = .exercise
         case "activity":
             self = .activity
+        case "reminders":
+            self = .reminders
         default:
             return nil
         }

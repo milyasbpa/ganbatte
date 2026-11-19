@@ -2,7 +2,7 @@ import SwiftUI
 import UserNotifications
 
 struct ReminderSheetView: View {
-    var onDismiss: () -> Void
+    var onDismiss: (() -> Void)? = nil
     
     @ObservedObject private var notifService = NotificationService.shared
     @State private var kanaSettings = KanaReminderSettings.load()
@@ -27,34 +27,32 @@ struct ReminderSheetView: View {
             
             VStack(spacing: 0) {
                 // Header
-                HStack {
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Study Reminders")
-                            .font(.system(size: 20, weight: .bold))
+                HStack(alignment: .center) {
+                    VStack(alignment: .leading, spacing: 3) {
+                        Text("Reminders")
+                            .font(.system(size: 24, weight: .bold))
                             .foregroundColor(AppTheme.textPrimary)
                         Text("Daily training schedules & alerts")
-                            .font(.system(size: 12, weight: .medium))
+                            .font(.system(size: 13, weight: .medium))
                             .foregroundColor(AppTheme.textSecondary)
                     }
                     
                     Spacer()
                     
-                    Button(action: onDismiss) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 24))
-                            .foregroundColor(AppTheme.textTertiary)
-                            .frame(width: 36, height: 36)
-                            .contentShape(Rectangle())
+                    if let onDismiss = onDismiss {
+                        Button(action: onDismiss) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 24))
+                                .foregroundColor(AppTheme.textTertiary)
+                                .frame(width: 36, height: 36)
+                                .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
                 .padding(.horizontal, 20)
-                #if os(macOS)
-                .padding(.top, 16)
-                #else
-                .padding(.top, 16)
-                #endif
-                .padding(.bottom, 14)
+                .padding(.top, 20)
+                .padding(.bottom, 16)
                 .background(AppTheme.background)
                 
                 ScrollView(showsIndicators: false) {
@@ -106,7 +104,7 @@ struct ReminderSheetView: View {
                         )
                     }
                     .padding(.horizontal, 20)
-                    .padding(.bottom, 30)
+                    .padding(.bottom, 90)
                 }
             }
         }

@@ -3,7 +3,6 @@ import SwiftUI
 struct MainContainerView: View {
     @AppStorage("ganbatte_active_main_tab") private var activeTabRaw: String = AppTab.learn.rawValue
     @State private var hideBottomBar: Bool = false
-    @State private var showReminderSheet: Bool = false
     @State private var isShowingSplash: Bool = true
     @ObservedObject private var notifService = NotificationService.shared
     
@@ -21,12 +20,7 @@ struct MainContainerView: View {
                 switch selectedTab.wrappedValue {
                 case .learn:
                     LearnHubView(
-                        hideBottomBar: $hideBottomBar,
-                        onOpenReminders: {
-                            withAnimation(.easeInOut(duration: 0.25)) {
-                                showReminderSheet = true
-                            }
-                        }
+                        hideBottomBar: $hideBottomBar
                     )
                 case .exercise:
                     ExerciseHubView(
@@ -34,34 +28,20 @@ struct MainContainerView: View {
                     )
                 case .activity:
                     ActivityDashboardView()
-                }
-                
-                if showReminderSheet {
-                    ReminderSheetView(onDismiss: {
-                        withAnimation(.easeInOut(duration: 0.25)) {
-                            showReminderSheet = false
-                        }
-                    })
-                    .transition(.move(edge: .bottom))
-                    .zIndex(300)
+                case .reminders:
+                    ReminderSheetView(onDismiss: nil)
                 }
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
             
-            if !hideBottomBar && !showReminderSheet {
+            if !hideBottomBar {
                 BottomNavBar(selectedTab: selectedTab)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-            }
-        }
-        .onChange(of: showReminderSheet) { val in
-            withAnimation(.easeInOut(duration: 0.2)) {
-                hideBottomBar = val
             }
         }
         .onReceive(notifService.$pendingDeepLink) { link in
             guard let link = link else { return }
             withAnimation(.easeInOut(duration: 0.25)) {
-                showReminderSheet = false
                 switch link {
                 case .kana(let script):
                     activeTabRaw = AppTab.learn.rawValue
