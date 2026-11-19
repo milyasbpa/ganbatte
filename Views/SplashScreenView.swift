@@ -55,7 +55,7 @@ struct SplashScreenView: View {
                         .foregroundColor(AppTheme.accent)
                         .tracking(3.5)
                     
-                    Text("Belajar Bahasa Jepang Menyenangkan")
+                    Text("Learn Japanese with Joy")
                         .font(.system(size: 14, weight: .medium, design: .rounded))
                         .foregroundColor(AppTheme.textSecondary)
                         .padding(.top, 2)
