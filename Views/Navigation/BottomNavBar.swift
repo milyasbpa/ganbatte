@@ -1,22 +1,38 @@
 import SwiftUI
 
 enum AppTab: String, CaseIterable, Identifiable {
-    case words = "words"
-    case kana = "kana"
+    case learn = "learn"
+    case exercise = "exercise"
+    case activity = "activity"
     
     var id: String { rawValue }
     
     var title: String {
         switch self {
-        case .words: return "Words"
-        case .kana: return "Kana"
+        case .learn: return "Learn"
+        case .exercise: return "Exercise"
+        case .activity: return "Activity"
         }
     }
     
     var iconName: String {
         switch self {
-        case .words: return "book.closed.fill"
-        case .kana: return "character.bubble.fill"
+        case .learn: return "books.vertical.fill"
+        case .exercise: return "bolt.fill"
+        case .activity: return "flame.fill"
+        }
+    }
+    
+    init?(rawValue: String) {
+        switch rawValue {
+        case "learn", "words", "kana":
+            self = .learn
+        case "exercise":
+            self = .exercise
+        case "activity":
+            self = .activity
+        default:
+            return nil
         }
     }
 }

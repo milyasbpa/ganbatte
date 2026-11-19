@@ -14,6 +14,7 @@
 		16A63CA57A7ABD601AEEBCF4 /* MainContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AFB82848FC89296628C886C /* MainContainerView.swift */; };
 		19ACFD9FA31000754A9145BA /* WordRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144576BC51639397EE639740 /* WordRowView.swift */; };
 		1EB9AA90F6A66FBA7244A2D5 /* FuriganaText.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E8321309796EB901B7360F /* FuriganaText.swift */; };
+		202E8110D650661BC0931896 /* ActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41D75190FCAE261A875796B4 /* ActivityService.swift */; };
 		206F171197561180A4AC81A4 /* CardImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A788E58A61081DF1B779F771 /* CardImageView.swift */; };
 		2530E69A9B871EA9BB9F6512 /* ReminderModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A93236321B5A4F96679183 /* ReminderModels.swift */; };
 		26E93AB26DF0DF28A071B07B /* NotificationIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = A79D4BC0306CCFF83B0CC042 /* NotificationIcon.png */; };
@@ -34,9 +35,11 @@
 		59441881177B760EDEE0DB7C /* KanaExerciseCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CECE15EBC7D9388C5E6919F /* KanaExerciseCoordinatorView.swift */; };
 		5B16A539C4F56F4A31AD6283 /* Cards in Resources */ = {isa = PBXBuildFile; fileRef = 046D34CC71FDD248D11EF2E7 /* Cards */; };
 		600E8C52D3B035ABD66EB315 /* WordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F1CE9BBB4EC0D93EB81E5 /* WordDetailView.swift */; };
+		6332E96AFB2652AC16A589A5 /* ActivityModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D430915D7F01CE0A5BB924D8 /* ActivityModels.swift */; };
 		63DFC242CA7698A082BFB38A /* KanaExerciseConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06660EB1BBDA22DA062A9F4 /* KanaExerciseConfigView.swift */; };
 		6742DA109063470CC06544D7 /* GanbatteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7278B79F1189F1D22D8E122 /* GanbatteApp.swift */; };
 		6D5DDBBEDD513BFCFE00122A /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9961EF6D6E227C6CCB50DF /* SplashScreenView.swift */; };
+		6F44A6CC5438BF3AC1E67140 /* ActivityDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB24F3D36ED9F796A4ACB218 /* ActivityDashboardView.swift */; };
 		6F6613F0DF62F33C65192AF8 /* ExerciseQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5DF2C45218D0A42A3BA7700 /* ExerciseQuizView.swift */; };
 		784AD848B4DB94E070CE9AC7 /* ExerciseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D372E70E1D793985196EADB4 /* ExerciseService.swift */; };
 		7F45217260E8DA088655CA77 /* KanaExerciseResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D50C38D8467934BAB90EEC9 /* KanaExerciseResultView.swift */; };
@@ -49,17 +52,23 @@
 		9112FD7957B838F542B6D0ED /* WordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F1CE9BBB4EC0D93EB81E5 /* WordDetailView.swift */; };
 		939DAC6EC89021CC8E40062F /* FilterSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = B7DB4A0F2FF382ECE83C7B18 /* FilterSheet.swift */; };
 		945FBBFC96ABE4FE94AEE99F /* ExerciseConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C09D2F9529A0EE00FA7CF4A /* ExerciseConfigView.swift */; };
+		947BA385508649178DD7C7ED /* ActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41D75190FCAE261A875796B4 /* ActivityService.swift */; };
 		9D048E2EBC2E5A4D9A7FBEC1 /* MainContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2AFB82848FC89296628C886C /* MainContainerView.swift */; };
 		A2C1838210F3FB14D0B0251C /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A49D41154CDF6CE8F2404F3 /* AudioService.swift */; };
+		A3B02B46C910F386FB62FE23 /* ExerciseHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCA0E3E6C71CC92F2625C220 /* ExerciseHubView.swift */; };
 		A3C716A004C8810D61A6BC5E /* KanaDataService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2143423B830186B9963AC001 /* KanaDataService.swift */; };
+		A8E174E818BF4794B9C85036 /* ActivityDashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DB24F3D36ED9F796A4ACB218 /* ActivityDashboardView.swift */; };
 		AEE7708452D4DB9DF11DCFD3 /* WordListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC05B9E38A8EACC834E6C5E6 /* WordListView.swift */; };
 		B0CA810729F029F5778F5720 /* KanaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739E90950CAF7311AEB1B5D5 /* KanaModels.swift */; };
 		B3BE986C6325F593C70640AA /* Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF8C54701C78CA7183E5DDB /* Word.swift */; };
 		B6209754D9422091332969CC /* BottomNavBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1D1A9AD21EEA21FCDDEA0B75 /* BottomNavBar.swift */; };
 		B797A6616CB73735A35997F4 /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9961EF6D6E227C6CCB50DF /* SplashScreenView.swift */; };
+		B849CF457753F1E0CCECBC8A /* ExerciseHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCA0E3E6C71CC92F2625C220 /* ExerciseHubView.swift */; };
+		B919A5962832E805D514AF24 /* LearnHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82726FDD892ABA3AC20C4DEF /* LearnHubView.swift */; };
 		BB66A6D79D631EAFE936CF44 /* KanaExerciseCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CECE15EBC7D9388C5E6919F /* KanaExerciseCoordinatorView.swift */; };
 		BD424F4AB6A0C984FD82AC6B /* KanaModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 739E90950CAF7311AEB1B5D5 /* KanaModels.swift */; };
 		C1719E586D40000F4A1569F4 /* Word.swift in Sources */ = {isa = PBXBuildFile; fileRef = DEF8C54701C78CA7183E5DDB /* Word.swift */; };
+		C41112803E406C872C7579FF /* ActivityModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D430915D7F01CE0A5BB924D8 /* ActivityModels.swift */; };
 		CF2504D30AA33A6AC8E9A8E9 /* ganbatte.db in Resources */ = {isa = PBXBuildFile; fileRef = BD8DC8FA002AD63403D12718 /* ganbatte.db */; };
 		D16D810C110D63EDF386A90D /* ExerciseQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5DF2C45218D0A42A3BA7700 /* ExerciseQuizView.swift */; };
 		D3819A92A58E0657085D7E70 /* KanaSpeedQuizView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4ABF935638840541B213EC5 /* KanaSpeedQuizView.swift */; };
@@ -70,6 +79,7 @@
 		DA88C117846ADBB9AE288511 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D3977DB41E13529DEC0564E /* AppTheme.swift */; };
 		DDDE0C7DD032D02D96115D76 /* ExerciseConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C09D2F9529A0EE00FA7CF4A /* ExerciseConfigView.swift */; };
 		DF23D6CC87D6BE3B1539F014 /* WordListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC05B9E38A8EACC834E6C5E6 /* WordListView.swift */; };
+		DFE5298A69568AE919F81AC7 /* LearnHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82726FDD892ABA3AC20C4DEF /* LearnHubView.swift */; };
 		E4893DAD946EC677C88734F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 23B563651401CBDC0C463839 /* Assets.xcassets */; };
 		E595B5AB0FED5AEB4AE24E67 /* ExerciseCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5177098E3202B280565751D5 /* ExerciseCoordinatorView.swift */; };
 		EBC76540AC645E58CCEB5EC1 /* ExerciseService.swift in Sources */ = {isa = PBXBuildFile; fileRef = D372E70E1D793985196EADB4 /* ExerciseService.swift */; };
@@ -93,11 +103,13 @@
 		2729E67E02F93FDAA4D7E9B4 /* DatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseService.swift; sourceTree = "<group>"; };
 		2AFB82848FC89296628C886C /* MainContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContainerView.swift; sourceTree = "<group>"; };
 		2C09D2F9529A0EE00FA7CF4A /* ExerciseConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseConfigView.swift; sourceTree = "<group>"; };
+		41D75190FCAE261A875796B4 /* ActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityService.swift; sourceTree = "<group>"; };
 		5177098E3202B280565751D5 /* ExerciseCoordinatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCoordinatorView.swift; sourceTree = "<group>"; };
 		565E1A4E37218CB720AE6061 /* ReminderSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderSheetView.swift; sourceTree = "<group>"; };
 		739E90950CAF7311AEB1B5D5 /* KanaModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanaModels.swift; sourceTree = "<group>"; };
 		7A49D41154CDF6CE8F2404F3 /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		7CECE15EBC7D9388C5E6919F /* KanaExerciseCoordinatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanaExerciseCoordinatorView.swift; sourceTree = "<group>"; };
+		82726FDD892ABA3AC20C4DEF /* LearnHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnHubView.swift; sourceTree = "<group>"; };
 		8D50C38D8467934BAB90EEC9 /* KanaExerciseResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanaExerciseResultView.swift; sourceTree = "<group>"; };
 		90BE7E0BBA16730D28BC42E7 /* FuriganaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuriganaService.swift; sourceTree = "<group>"; };
 		9E2C26F8542E2E7F6513E9CF /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
@@ -113,11 +125,14 @@
 		D1122E0CB817C39085B8EA01 /* ganbatte-iOS.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = "ganbatte-iOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		D234FA525F395C02D05BB53D /* ExerciseModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseModels.swift; sourceTree = "<group>"; };
 		D372E70E1D793985196EADB4 /* ExerciseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseService.swift; sourceTree = "<group>"; };
+		D430915D7F01CE0A5BB924D8 /* ActivityModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityModels.swift; sourceTree = "<group>"; };
+		DB24F3D36ED9F796A4ACB218 /* ActivityDashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityDashboardView.swift; sourceTree = "<group>"; };
 		DEF8C54701C78CA7183E5DDB /* Word.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Word.swift; sourceTree = "<group>"; };
 		E5DF2C45218D0A42A3BA7700 /* ExerciseQuizView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseQuizView.swift; sourceTree = "<group>"; };
 		E95F1CE9BBB4EC0D93EB81E5 /* WordDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordDetailView.swift; sourceTree = "<group>"; };
 		EC05B9E38A8EACC834E6C5E6 /* WordListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WordListView.swift; sourceTree = "<group>"; };
 		F5E8321309796EB901B7360F /* FuriganaText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuriganaText.swift; sourceTree = "<group>"; };
+		FCA0E3E6C71CC92F2625C220 /* ExerciseHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseHubView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXGroup section */
@@ -128,6 +143,14 @@
 				86552D3AA6A965D803032328 /* Exercise */,
 			);
 			path = Kana;
+			sourceTree = "<group>";
+		};
+		3C4B2B11078B81E46D02BEDD /* Activity */ = {
+			isa = PBXGroup;
+			children = (
+				DB24F3D36ED9F796A4ACB218 /* ActivityDashboardView.swift */,
+			);
+			path = Activity;
 			sourceTree = "<group>";
 		};
 		4991E7994D2A69191E016F3D /* Navigation */ = {
@@ -141,6 +164,7 @@
 		61C0335FF68460087A2808EE /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				D430915D7F01CE0A5BB924D8 /* ActivityModels.swift */,
 				D234FA525F395C02D05BB53D /* ExerciseModels.swift */,
 				739E90950CAF7311AEB1B5D5 /* KanaModels.swift */,
 				18A93236321B5A4F96679183 /* ReminderModels.swift */,
@@ -163,6 +187,7 @@
 			children = (
 				2C09D2F9529A0EE00FA7CF4A /* ExerciseConfigView.swift */,
 				5177098E3202B280565751D5 /* ExerciseCoordinatorView.swift */,
+				FCA0E3E6C71CC92F2625C220 /* ExerciseHubView.swift */,
 				E5DF2C45218D0A42A3BA7700 /* ExerciseQuizView.swift */,
 				0000A77C6170EDC644FB6FF8 /* ExerciseResultView.swift */,
 			);
@@ -204,6 +229,7 @@
 		8E707814C5DE751783A9F489 /* Services */ = {
 			isa = PBXGroup;
 			children = (
+				41D75190FCAE261A875796B4 /* ActivityService.swift */,
 				7A49D41154CDF6CE8F2404F3 /* AudioService.swift */,
 				2729E67E02F93FDAA4D7E9B4 /* DatabaseService.swift */,
 				D372E70E1D793985196EADB4 /* ExerciseService.swift */,
@@ -212,6 +238,14 @@
 				0AA255949CABFDDD732CCEC7 /* NotificationService.swift */,
 			);
 			path = Services;
+			sourceTree = "<group>";
+		};
+		A544661C4072791A40D3E87E /* Learn */ = {
+			isa = PBXGroup;
+			children = (
+				82726FDD892ABA3AC20C4DEF /* LearnHubView.swift */,
+			);
+			path = Learn;
 			sourceTree = "<group>";
 		};
 		C5562371E94CCDA68FE50216 /* Reminders */ = {
@@ -252,9 +286,11 @@
 				E95F1CE9BBB4EC0D93EB81E5 /* WordDetailView.swift */,
 				EC05B9E38A8EACC834E6C5E6 /* WordListView.swift */,
 				144576BC51639397EE639740 /* WordRowView.swift */,
+				3C4B2B11078B81E46D02BEDD /* Activity */,
 				86C120236AE35BC306AAB58E /* Components */,
 				7EF0CD483DEA327B2F81D202 /* Exercise */,
 				20D3484ED2187DC9700C836E /* Kana */,
+				A544661C4072791A40D3E87E /* Learn */,
 				4991E7994D2A69191E016F3D /* Navigation */,
 				C5562371E94CCDA68FE50216 /* Reminders */,
 			);
@@ -391,6 +427,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A8E174E818BF4794B9C85036 /* ActivityDashboardView.swift in Sources */,
+				6332E96AFB2652AC16A589A5 /* ActivityModels.swift in Sources */,
+				202E8110D650661BC0931896 /* ActivityService.swift in Sources */,
 				D75C55403673DB0F475CE862 /* AppTheme.swift in Sources */,
 				D7E6E825287E7981F721DF1E /* AudioService.swift in Sources */,
 				B6209754D9422091332969CC /* BottomNavBar.swift in Sources */,
@@ -398,6 +437,7 @@
 				D48506FEA385908BE9B89618 /* DatabaseService.swift in Sources */,
 				945FBBFC96ABE4FE94AEE99F /* ExerciseConfigView.swift in Sources */,
 				E595B5AB0FED5AEB4AE24E67 /* ExerciseCoordinatorView.swift in Sources */,
+				B849CF457753F1E0CCECBC8A /* ExerciseHubView.swift in Sources */,
 				2B567F370C5BF3B6A6789A14 /* ExerciseModels.swift in Sources */,
 				6F6613F0DF62F33C65192AF8 /* ExerciseQuizView.swift in Sources */,
 				84E9BC487A7D0A5E86635743 /* ExerciseResultView.swift in Sources */,
@@ -413,6 +453,7 @@
 				887CC46A477973B56D28E46C /* KanaExerciseResultView.swift in Sources */,
 				B0CA810729F029F5778F5720 /* KanaModels.swift in Sources */,
 				276EBD130544A84134DAD584 /* KanaSpeedQuizView.swift in Sources */,
+				DFE5298A69568AE919F81AC7 /* LearnHubView.swift in Sources */,
 				16A63CA57A7ABD601AEEBCF4 /* MainContainerView.swift in Sources */,
 				906B99EBC8A3F6A358D0DF0B /* NotificationService.swift in Sources */,
 				26F2B088F9E61ECF7AA4576E /* ReminderModels.swift in Sources */,
@@ -429,6 +470,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6F44A6CC5438BF3AC1E67140 /* ActivityDashboardView.swift in Sources */,
+				C41112803E406C872C7579FF /* ActivityModels.swift in Sources */,
+				947BA385508649178DD7C7ED /* ActivityService.swift in Sources */,
 				DA88C117846ADBB9AE288511 /* AppTheme.swift in Sources */,
 				A2C1838210F3FB14D0B0251C /* AudioService.swift in Sources */,
 				07354EB432894E96617FEECF /* BottomNavBar.swift in Sources */,
@@ -436,6 +480,7 @@
 				2AE3D4EBF30B222F79B836BF /* DatabaseService.swift in Sources */,
 				DDDE0C7DD032D02D96115D76 /* ExerciseConfigView.swift in Sources */,
 				4548B49A13BBC8800193DE18 /* ExerciseCoordinatorView.swift in Sources */,
+				A3B02B46C910F386FB62FE23 /* ExerciseHubView.swift in Sources */,
 				D618561E8E05A9B0D96011A9 /* ExerciseModels.swift in Sources */,
 				D16D810C110D63EDF386A90D /* ExerciseQuizView.swift in Sources */,
 				2DE2836BBB0400703D4C7099 /* ExerciseResultView.swift in Sources */,
@@ -451,6 +496,7 @@
 				7F45217260E8DA088655CA77 /* KanaExerciseResultView.swift in Sources */,
 				BD424F4AB6A0C984FD82AC6B /* KanaModels.swift in Sources */,
 				D3819A92A58E0657085D7E70 /* KanaSpeedQuizView.swift in Sources */,
+				B919A5962832E805D514AF24 /* LearnHubView.swift in Sources */,
 				9D048E2EBC2E5A4D9A7FBEC1 /* MainContainerView.swift in Sources */,
 				0A69CCC26457970E09A5172A /* NotificationService.swift in Sources */,
 				2530E69A9B871EA9BB9F6512 /* ReminderModels.swift in Sources */,

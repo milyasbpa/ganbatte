@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MainContainerView: View {
-    @AppStorage("ganbatte_active_main_tab") private var activeTabRaw: String = AppTab.words.rawValue
+    @AppStorage("ganbatte_active_main_tab") private var activeTabRaw: String = AppTab.learn.rawValue
     @State private var hideBottomBar: Bool = false
     @State private var showReminderSheet: Bool = false
     @State private var isShowingSplash: Bool = true
@@ -9,7 +9,7 @@ struct MainContainerView: View {
     
     private var selectedTab: Binding<AppTab> {
         Binding(
-            get: { AppTab(rawValue: activeTabRaw) ?? .words },
+            get: { AppTab(rawValue: activeTabRaw) ?? .learn },
             set: { activeTabRaw = $0.rawValue }
         )
     }
@@ -19,8 +19,8 @@ struct MainContainerView: View {
         VStack(spacing: 0) {
             ZStack {
                 switch selectedTab.wrappedValue {
-                case .words:
-                    WordListView(
+                case .learn:
+                    LearnHubView(
                         hideBottomBar: $hideBottomBar,
                         onOpenReminders: {
                             withAnimation(.easeInOut(duration: 0.25)) {
@@ -28,15 +28,12 @@ struct MainContainerView: View {
                             }
                         }
                     )
-                case .kana:
-                    KanaChartView(
-                        hideBottomBar: $hideBottomBar,
-                        onOpenReminders: {
-                            withAnimation(.easeInOut(duration: 0.25)) {
-                                showReminderSheet = true
-                            }
-                        }
+                case .exercise:
+                    ExerciseHubView(
+                        hideBottomBar: $hideBottomBar
                     )
+                case .activity:
+                    ActivityDashboardView()
                 }
                 
                 if showReminderSheet {
@@ -67,15 +64,17 @@ struct MainContainerView: View {
                 showReminderSheet = false
                 switch link {
                 case .kana(let script):
-                    activeTabRaw = AppTab.kana.rawValue
+                    activeTabRaw = AppTab.learn.rawValue
                     UserDefaults.standard.set(script.rawValue, forKey: "ganbatte_active_kana_subtab")
+                    NotificationCenter.default.post(name: NSNotification.Name("ganbatte_navigate_to_kana"), object: nil)
                 case .words(let level, let type):
-                    activeTabRaw = AppTab.words.rawValue
+                    activeTabRaw = AppTab.learn.rawValue
                     NotificationCenter.default.post(
                         name: NSNotification.Name("ganbatte_apply_word_filter"),
                         object: nil,
                         userInfo: ["level": level.rawValue, "type": type.rawValue]
                     )
+                    NotificationCenter.default.post(name: NSNotification.Name("ganbatte_navigate_to_words"), object: nil)
                 }
             }
             notifService.pendingDeepLink = nil

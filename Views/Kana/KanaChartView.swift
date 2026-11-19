@@ -3,10 +3,19 @@ import SwiftUI
 struct KanaChartView: View {
     @Binding var hideBottomBar: Bool
     var onOpenReminders: (() -> Void)?
+    var onBack: (() -> Void)? = nil
+    var showFAB: Bool = false
     
-    init(hideBottomBar: Binding<Bool> = .constant(false), onOpenReminders: (() -> Void)? = nil) {
+    init(
+        hideBottomBar: Binding<Bool> = .constant(false),
+        onOpenReminders: (() -> Void)? = nil,
+        onBack: (() -> Void)? = nil,
+        showFAB: Bool = false
+    ) {
         self._hideBottomBar = hideBottomBar
         self.onOpenReminders = onOpenReminders
+        self.onBack = onBack
+        self.showFAB = showFAB
     }
     
     @AppStorage("ganbatte_active_kana_subtab") private var activeSubTabRaw: String = KanaType.hiragana.rawValue
@@ -31,6 +40,26 @@ struct KanaChartView: View {
                             .font(.system(size: 20, weight: .bold))
                             .foregroundColor(AppTheme.textPrimary)
                         Spacer()
+                    }
+                    .overlay(alignment: .leading) {
+                        if let onBack = onBack {
+                            Button(action: onBack) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "chevron.left")
+                                        .font(.system(size: 14, weight: .bold))
+                                    Text("Hub")
+                                        .font(.system(size: 14, weight: .semibold))
+                                }
+                                .foregroundColor(AppTheme.accent)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(Color.white)
+                                .clipShape(Capsule())
+                                .overlay(Capsule().stroke(AppTheme.buttonBorder, lineWidth: 1))
+                                .shadow(color: Color.black.opacity(0.04), radius: 3, x: 0, y: 1)
+                            }
+                            .buttonStyle(.plain)
+                        }
                     }
                     .overlay(alignment: .trailing) {
                         if let onOpenReminders = onOpenReminders {
@@ -179,30 +208,32 @@ struct KanaChartView: View {
                 }
             }
             
-            // Floating Action Button (Exercise Practice)
-            VStack {
-                Spacer()
-                HStack {
+            // Floating Action Button (Exercise Practice - Optional)
+            if showFAB {
+                VStack {
                     Spacer()
-                    Button(action: {
-                        withAnimation(.easeInOut(duration: 0.25)) {
-                            showExerciseFlow = true
+                    HStack {
+                        Spacer()
+                        Button(action: {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                showExerciseFlow = true
+                            }
+                        }) {
+                            ZStack {
+                                Circle()
+                                    .fill(AppTheme.accent)
+                                    .frame(width: 56, height: 56)
+                                    .shadow(color: AppTheme.accent.opacity(0.35), radius: 10, x: 0, y: 5)
+                                
+                                Image(systemName: "pencil")
+                                    .font(.system(size: 22, weight: .bold))
+                                    .foregroundColor(.white)
+                            }
                         }
-                    }) {
-                        ZStack {
-                            Circle()
-                                .fill(AppTheme.accent)
-                                .frame(width: 56, height: 56)
-                                .shadow(color: AppTheme.accent.opacity(0.35), radius: 10, x: 0, y: 5)
-                            
-                            Image(systemName: "pencil")
-                                .font(.system(size: 22, weight: .bold))
-                                .foregroundColor(.white)
-                        }
+                        .buttonStyle(.plain)
+                        .padding(.trailing, 20)
+                        .padding(.bottom, 24)
                     }
-                    .buttonStyle(.plain)
-                    .padding(.trailing, 20)
-                    .padding(.bottom, 24)
                 }
             }
             

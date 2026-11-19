@@ -44,6 +44,7 @@ struct KanaExerciseCoordinatorView: View {
                     config: config,
                     onFinish: { summary in
                         self.sessionSummary = summary
+                        ActivityService.shared.recordKanaSession(summary)
                         withAnimation(.easeInOut(duration: 0.25)) {
                             self.flowState = .result
                         }

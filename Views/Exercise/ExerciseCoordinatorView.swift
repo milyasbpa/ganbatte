@@ -43,6 +43,7 @@ struct ExerciseCoordinatorView: View {
                     config: config,
                     onFinish: { result in
                         self.sessionResult = result
+                        ActivityService.shared.recordWordSession(result)
                         withAnimation(.easeInOut(duration: 0.25)) {
                             self.flowState = .result
                         }
