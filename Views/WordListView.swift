@@ -8,6 +8,7 @@ struct WordListView: View {
     
     init(
         hideBottomBar: Binding<Bool> = .constant(false),
+        initialLevel: JLPTLevel = .all,
         onOpenReminders: (() -> Void)? = nil,
         onBack: (() -> Void)? = nil,
         showFAB: Bool = false
@@ -16,6 +17,7 @@ struct WordListView: View {
         self.onOpenReminders = onOpenReminders
         self.onBack = onBack
         self.showFAB = showFAB
+        self._selectedLevel = State(initialValue: initialLevel)
     }
     
     @State private var words: [Word] = []
