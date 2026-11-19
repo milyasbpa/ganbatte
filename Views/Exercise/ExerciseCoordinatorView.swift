@@ -7,12 +7,35 @@ enum ExerciseFlowState {
 }
 
 struct ExerciseCoordinatorView: View {
+    var initialConfig: QuizConfig? = nil
+    var startImmediately: Bool = false
     var onDismiss: () -> Void
     
-    @State private var flowState: ExerciseFlowState = .config
-    @State private var config = QuizConfig.load()
+    @State private var flowState: ExerciseFlowState
+    @State private var config: QuizConfig
     @State private var currentQuestions: [QuizQuestion] = []
     @State private var sessionResult: QuizSessionResult? = nil
+    
+    init(
+        initialConfig: QuizConfig? = nil,
+        startImmediately: Bool = false,
+        onDismiss: @escaping () -> Void
+    ) {
+        self.initialConfig = initialConfig
+        self.startImmediately = startImmediately
+        self.onDismiss = onDismiss
+        
+        let loadedConfig = initialConfig ?? QuizConfig.load()
+        self._config = State(initialValue: loadedConfig)
+        
+        if startImmediately {
+            self._flowState = State(initialValue: .quiz)
+            let questions = ExerciseService.shared.generateQuiz(config: loadedConfig)
+            self._currentQuestions = State(initialValue: questions)
+        } else {
+            self._flowState = State(initialValue: .config)
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -49,8 +72,12 @@ struct ExerciseCoordinatorView: View {
                         }
                     },
                     onQuit: {
-                        withAnimation(.easeInOut(duration: 0.25)) {
-                            self.flowState = .config
+                        if startImmediately {
+                            onDismiss()
+                        } else {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                self.flowState = .config
+                            }
                         }
                     }
                 )
@@ -61,14 +88,17 @@ struct ExerciseCoordinatorView: View {
                     ExerciseResultView(
                         summary: result,
                         onRetrySameQuestions: {
-                            // Restart quiz with the exact same questions
                             withAnimation(.easeInOut(duration: 0.25)) {
                                 self.flowState = .quiz
                             }
                         },
                         onChangeConfig: {
-                            withAnimation(.easeInOut(duration: 0.25)) {
-                                self.flowState = .config
+                            if startImmediately {
+                                onDismiss()
+                            } else {
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    self.flowState = .config
+                                }
                             }
                         },
                         onFinish: onDismiss

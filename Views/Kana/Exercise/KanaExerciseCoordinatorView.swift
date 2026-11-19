@@ -7,13 +7,41 @@ enum KanaExerciseFlowState {
 }
 
 struct KanaExerciseCoordinatorView: View {
+    var initialConfig: KanaQuizConfig? = nil
     var initialType: KanaType = .hiragana
+    var startImmediately: Bool = false
     var onDismiss: () -> Void
     
-    @State private var flowState: KanaExerciseFlowState = .config
-    @State private var config = KanaQuizConfig.load()
+    @State private var flowState: KanaExerciseFlowState
+    @State private var config: KanaQuizConfig
     @State private var currentQuestions: [KanaQuizQuestion] = []
     @State private var sessionSummary: KanaSessionSummary? = nil
+    
+    init(
+        initialConfig: KanaQuizConfig? = nil,
+        initialType: KanaType = .hiragana,
+        startImmediately: Bool = false,
+        onDismiss: @escaping () -> Void
+    ) {
+        self.initialConfig = initialConfig
+        self.initialType = initialType
+        self.startImmediately = startImmediately
+        self.onDismiss = onDismiss
+        
+        var loadedConfig = initialConfig ?? KanaQuizConfig.load()
+        if initialConfig == nil {
+            loadedConfig.kanaType = initialType
+        }
+        self._config = State(initialValue: loadedConfig)
+        
+        if startImmediately {
+            self._flowState = State(initialValue: .quiz)
+            let questions = KanaDataService.shared.generateQuiz(config: loadedConfig)
+            self._currentQuestions = State(initialValue: questions)
+        } else {
+            self._flowState = State(initialValue: .config)
+        }
+    }
     
     var body: some View {
         ZStack {
@@ -50,8 +78,12 @@ struct KanaExerciseCoordinatorView: View {
                         }
                     },
                     onQuit: {
-                        withAnimation(.easeInOut(duration: 0.25)) {
-                            self.flowState = .config
+                        if startImmediately {
+                            onDismiss()
+                        } else {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                self.flowState = .config
+                            }
                         }
                     }
                 )
@@ -67,8 +99,12 @@ struct KanaExerciseCoordinatorView: View {
                             }
                         },
                         onChangeConfig: {
-                            withAnimation(.easeInOut(duration: 0.25)) {
-                                self.flowState = .config
+                            if startImmediately {
+                                onDismiss()
+                            } else {
+                                withAnimation(.easeInOut(duration: 0.25)) {
+                                    self.flowState = .config
+                                }
                             }
                         },
                         onFinish: onDismiss
@@ -76,9 +112,6 @@ struct KanaExerciseCoordinatorView: View {
                     .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
                 }
             }
-        }
-        .onAppear {
-            config.kanaType = initialType
         }
     }
 }
