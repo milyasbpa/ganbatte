@@ -130,6 +130,9 @@ struct ExerciseHubView: View {
                     if let levelRaw = notif.userInfo?["level"] as? String, let level = JLPTLevel(rawValue: levelRaw) {
                         kotobaConfig.level = level
                     }
+                    if let typeRaw = notif.userInfo?["type"] as? String, let type = WordType(rawValue: typeRaw) {
+                        kotobaConfig.type = type
+                    }
                     if let start = notif.userInfo?["startWord"] as? Int {
                         kotobaConfig.startWord = start
                     }
@@ -273,6 +276,34 @@ struct ExerciseHubView: View {
                 
                 Divider()
                 
+                // TYPE (formerly PART OF SPEECH)
+                VStack(alignment: .leading, spacing: 7) {
+                    Text("TYPE")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(AppTheme.textSecondary)
+                        .tracking(0.5)
+                    
+                    HStack(spacing: 6) {
+                        ForEach(WordType.allCases) { wType in
+                            let isSelected = kotobaConfig.type == wType
+                            Button(action: {
+                                kotobaConfig.type = wType
+                            }) {
+                                Text(wType.rawValue)
+                                    .font(.system(size: 12, weight: .bold))
+                                    .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 7)
+                                    .background(isSelected ? AppTheme.accent : AppTheme.inputBackground)
+                                    .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+                
+                Divider()
+                
                 // WORD RANGE (10 Words Quick Jump)
                 VStack(alignment: .leading, spacing: 7) {
                     Text("WORD RANGE")
@@ -377,37 +408,6 @@ struct ExerciseHubView: View {
                             )
                         }
                         .buttonStyle(.plain)
-                    }
-                }
-                
-                Divider()
-                    .padding(.vertical, 1)
-                
-                // Part of Speech Filters (Inline compact chips)
-                VStack(alignment: .leading, spacing: 6) {
-                    Text("PART OF SPEECH")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(AppTheme.textSecondary)
-                        .tracking(0.5)
-                    
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 6) {
-                            ForEach(WordType.allCases) { wType in
-                                let isSelected = kotobaConfig.type == wType
-                                Button(action: {
-                                    kotobaConfig.type = wType
-                                }) {
-                                    Text(wType.rawValue)
-                                        .font(.system(size: 11, weight: .semibold))
-                                        .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
-                                        .padding(.horizontal, 11)
-                                        .padding(.vertical, 6)
-                                        .background(isSelected ? AppTheme.accent : AppTheme.inputBackground)
-                                        .clipShape(Capsule())
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
                     }
                 }
             }

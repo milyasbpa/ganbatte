@@ -225,6 +225,7 @@ struct WordListView: View {
                             let count = totalCount > 0 ? totalCount : 10
                             var cfg = QuizConfig.load()
                             cfg.level = selectedLevel
+                            cfg.type = selectedType
                             cfg.startWord = 1
                             cfg.endWord = min(10, count)
                             cfg.save()
@@ -235,6 +236,7 @@ struct WordListView: View {
                                 userInfo: [
                                     "category": "Kotoba",
                                     "level": selectedLevel.rawValue,
+                                    "type": selectedType.rawValue,
                                     "startWord": 1,
                                     "endWord": min(10, count)
                                 ]
@@ -285,6 +287,7 @@ struct WordListView: View {
                 WordDetailView(
                     initialIndex: idx,
                     wordsList: words,
+                    selectedType: selectedType,
                     onDismiss: {
                         withAnimation(.easeInOut(duration: 0.25)) {
                             selectedWordForDetail = nil

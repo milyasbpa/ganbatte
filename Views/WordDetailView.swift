@@ -3,6 +3,7 @@ import SwiftUI
 struct WordDetailView: View {
     let initialIndex: Int
     let wordsList: [Word]
+    let selectedType: WordType
     var onDismiss: () -> Void
     
     @State private var currentIndex: Int
@@ -10,9 +11,10 @@ struct WordDetailView: View {
     @State private var keyMonitor: Any?
     #endif
     
-    init(initialIndex: Int, wordsList: [Word], onDismiss: @escaping () -> Void) {
+    init(initialIndex: Int, wordsList: [Word], selectedType: WordType = .all, onDismiss: @escaping () -> Void) {
         self.initialIndex = initialIndex
         self.wordsList = wordsList
+        self.selectedType = selectedType
         self.onDismiss = onDismiss
         self._currentIndex = State(initialValue: initialIndex)
     }
@@ -335,9 +337,11 @@ struct WordDetailView: View {
     private func navigateToExercise() {
         let batchStart = (currentIndex / 10) * 10 + 1
         let batchEnd = min(batchStart + 9, wordsList.count)
+        let wordType = selectedType
         
         var cfg = QuizConfig.load()
         cfg.level = JLPTLevel(rawValue: currentWord.level) ?? .n5
+        cfg.type = wordType
         cfg.startWord = batchStart
         cfg.endWord = batchEnd
         cfg.save()
@@ -348,6 +352,7 @@ struct WordDetailView: View {
             userInfo: [
                 "category": "Kotoba",
                 "level": currentWord.level,
+                "type": wordType.rawValue,
                 "startWord": batchStart,
                 "endWord": batchEnd
             ]
