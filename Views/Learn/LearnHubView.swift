@@ -167,51 +167,6 @@ struct LearnHubView: View {
                             )
                         }
                     }
-                    
-                    // JLPT QUICK JUMP Section
-                    VStack(alignment: .leading, spacing: 12) {
-                        Text("JLPT QUICK JUMP")
-                            .font(.system(size: 11, weight: .bold))
-                            .foregroundColor(AppTheme.textSecondary)
-                            .padding(.horizontal, 4)
-                        
-                        VStack(spacing: 8) {
-                            HStack(spacing: 8) {
-                                jlptJumpChip(level: .n5, count: 966)
-                                jlptJumpChip(level: .n4, count: 982)
-                                jlptJumpChip(level: .n3, count: 1811)
-                            }
-                            HStack(spacing: 8) {
-                                jlptJumpChip(level: .n2, count: 1836)
-                                jlptJumpChip(level: .n1, count: 1232)
-                                
-                                // View all chip
-                                Button(action: {
-                                    NotificationCenter.default.post(
-                                        name: NSNotification.Name("ganbatte_apply_word_filter"),
-                                        object: nil,
-                                        userInfo: ["level": JLPTLevel.all.rawValue, "type": WordType.all.rawValue]
-                                    )
-                                    withAnimation(.easeInOut(duration: 0.22)) {
-                                        activeSubView = .wordList
-                                    }
-                                }) {
-                                    HStack(spacing: 4) {
-                                        Text("All Words")
-                                            .font(.system(size: 12, weight: .bold))
-                                        Image(systemName: "arrow.right")
-                                            .font(.system(size: 10, weight: .bold))
-                                    }
-                                    .foregroundColor(AppTheme.accent)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 10)
-                                    .background(AppTheme.accent.opacity(0.08))
-                                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 90)
@@ -341,39 +296,5 @@ struct LearnHubView: View {
         }
         .buttonStyle(.plain)
         .disabled(isComingSoon)
-    }
-    
-    // MARK: - JLPT Jump Chip
-    private func jlptJumpChip(level: JLPTLevel, count: Int) -> some View {
-        Button(action: {
-            NotificationCenter.default.post(
-                name: NSNotification.Name("ganbatte_apply_word_filter"),
-                object: nil,
-                userInfo: ["level": level.rawValue, "type": WordType.all.rawValue]
-            )
-            withAnimation(.easeInOut(duration: 0.22)) {
-                activeSubView = .wordList
-            }
-        }) {
-            VStack(spacing: 2) {
-                Text(level.rawValue)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundColor(AppTheme.textPrimary)
-                
-                Text("\(count)")
-                    .font(.system(size: 10, weight: .medium))
-                    .foregroundColor(AppTheme.textSecondary)
-            }
-            .frame(maxWidth: .infinity)
-            .padding(.vertical, 8)
-            .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .stroke(AppTheme.buttonBorder, lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.02), radius: 3, x: 0, y: 1)
-        }
-        .buttonStyle(.plain)
     }
 }
