@@ -4,6 +4,7 @@ struct MainContainerView: View {
     @AppStorage("ganbatte_active_main_tab") private var activeTabRaw: String = AppTab.words.rawValue
     @State private var hideBottomBar: Bool = false
     @State private var showReminderSheet: Bool = false
+    @State private var isShowingSplash: Bool = true
     @ObservedObject private var notifService = NotificationService.shared
     
     private var selectedTab: Binding<AppTab> {
@@ -83,8 +84,16 @@ struct MainContainerView: View {
     
     var body: some View {
         #if os(iOS)
-        mainContent
-            .ignoresSafeArea(.keyboard)
+        ZStack {
+            mainContent
+                .ignoresSafeArea(.keyboard)
+            
+            if isShowingSplash {
+                SplashScreenView(isShowing: $isShowingSplash)
+                    .transition(.opacity.combined(with: .scale(scale: 1.03)))
+                    .zIndex(999)
+            }
+        }
         #elseif os(macOS)
         ZStack {
             // Glassy macOS Ambient Frosted Background
@@ -95,16 +104,24 @@ struct MainContainerView: View {
                 .ignoresSafeArea()
             
             // Centered Mobile Canvas with iPhone Dimensions
-            mainContent
-                .frame(width: 410)
-                .frame(maxHeight: .infinity)
-                .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 30, style: .continuous)
-                        .stroke(Color.black.opacity(0.08), lineWidth: 1)
-                )
-                .shadow(color: Color.black.opacity(0.18), radius: 24, x: 0, y: 12)
-                .padding(.vertical, 14)
+            ZStack {
+                mainContent
+                
+                if isShowingSplash {
+                    SplashScreenView(isShowing: $isShowingSplash)
+                        .transition(.opacity.combined(with: .scale(scale: 1.03)))
+                        .zIndex(999)
+                }
+            }
+            .frame(width: 410)
+            .frame(maxHeight: .infinity)
+            .clipShape(RoundedRectangle(cornerRadius: 30, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 30, style: .continuous)
+                    .stroke(Color.black.opacity(0.08), lineWidth: 1)
+            )
+            .shadow(color: Color.black.opacity(0.18), radius: 24, x: 0, y: 12)
+            .padding(.vertical, 14)
         }
         .frame(minWidth: 440, idealWidth: 460, maxWidth: 500, minHeight: 780, idealHeight: 840, maxHeight: 920)
         .onAppear {
