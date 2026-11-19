@@ -40,7 +40,8 @@ struct LearnHubView: View {
                         withAnimation(.easeInOut(duration: 0.22)) {
                             activeSubView = .hub
                         }
-                    }
+                    },
+                    showFAB: true
                 )
                 .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
             case .kanaChart:
@@ -50,7 +51,8 @@ struct LearnHubView: View {
                         withAnimation(.easeInOut(duration: 0.22)) {
                             activeSubView = .hub
                         }
-                    }
+                    },
+                    showFAB: true
                 )
                 .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .opacity))
             }

@@ -253,6 +253,29 @@ struct WordDetailView: View {
                 .background(AppTheme.background)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
+            
+            // Floating Exercise Action Button (Shortcut to Exercise)
+            VStack {
+                Spacer()
+                HStack {
+                    Spacer()
+                    Button(action: navigateToExercise) {
+                        ZStack {
+                            Circle()
+                                .fill(AppTheme.accent)
+                                .frame(width: 52, height: 52)
+                                .shadow(color: AppTheme.accent.opacity(0.4), radius: 8, x: 0, y: 4)
+                            
+                            Image(systemName: "pencil")
+                                .font(.system(size: 20, weight: .bold))
+                                .foregroundColor(.white)
+                        }
+                    }
+                    .buttonStyle(BubbleScaleButtonStyle())
+                    .padding(.trailing, 20)
+                    .padding(.bottom, 74)
+                }
+            }
         }
         .focusable()
         .focusEffectDisabled()
@@ -307,5 +330,29 @@ struct WordDetailView: View {
         }
         // Auto play voice on previous
         AudioService.shared.speak(currentWord.kana)
+    }
+    
+    private func navigateToExercise() {
+        let batchStart = (currentIndex / 10) * 10 + 1
+        let batchEnd = min(batchStart + 9, wordsList.count)
+        
+        var cfg = QuizConfig.load()
+        cfg.level = JLPTLevel(rawValue: currentWord.level) ?? .n5
+        cfg.startWord = batchStart
+        cfg.endWord = batchEnd
+        cfg.save()
+        
+        NotificationCenter.default.post(
+            name: NSNotification.Name("ganbatte_shortcut_to_exercise"),
+            object: nil,
+            userInfo: [
+                "category": "Kotoba",
+                "level": currentWord.level,
+                "startWord": batchStart,
+                "endWord": batchEnd
+            ]
+        )
+        UserDefaults.standard.set(AppTab.exercise.rawValue, forKey: "ganbatte_active_main_tab")
+        onDismiss()
     }
 }

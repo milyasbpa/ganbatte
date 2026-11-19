@@ -215,30 +215,44 @@ struct WordListView: View {
                 }
             }
             
-            // Floating Action Button (Exercise - Optional)
+            // Floating Action Button (Exercise Shortcut)
             if showFAB {
                 VStack {
                     Spacer()
                     HStack {
                         Spacer()
                         Button(action: {
-                            withAnimation(.easeInOut(duration: 0.25)) {
-                                showExerciseFlow = true
-                                hideBottomBar = true
-                            }
+                            let count = totalCount > 0 ? totalCount : 10
+                            var cfg = QuizConfig.load()
+                            cfg.level = selectedLevel
+                            cfg.startWord = 1
+                            cfg.endWord = min(10, count)
+                            cfg.save()
+                            
+                            NotificationCenter.default.post(
+                                name: NSNotification.Name("ganbatte_shortcut_to_exercise"),
+                                object: nil,
+                                userInfo: [
+                                    "category": "Kotoba",
+                                    "level": selectedLevel.rawValue,
+                                    "startWord": 1,
+                                    "endWord": min(10, count)
+                                ]
+                            )
+                            UserDefaults.standard.set(AppTab.exercise.rawValue, forKey: "ganbatte_active_main_tab")
                         }) {
                             ZStack {
                                 Circle()
                                     .fill(AppTheme.accent)
-                                    .frame(width: 56, height: 56)
-                                    .shadow(color: AppTheme.accent.opacity(0.35), radius: 10, x: 0, y: 5)
+                                    .frame(width: 52, height: 52)
+                                    .shadow(color: AppTheme.accent.opacity(0.35), radius: 8, x: 0, y: 4)
                                 
                                 Image(systemName: "pencil")
-                                    .font(.system(size: 22, weight: .bold))
+                                    .font(.system(size: 20, weight: .bold))
                                     .foregroundColor(.white)
                             }
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(BubbleScaleButtonStyle())
                         .padding(.trailing, 20)
                         .padding(.bottom, 24)
                     }

@@ -110,6 +110,8 @@ struct ExerciseHubView: View {
             }
         }
         .onAppear {
+            kotobaConfig = QuizConfig.load()
+            kanaConfig = KanaQuizConfig.load()
             updateKotobaTotalWords()
         }
         .onChange(of: kotobaConfig.level) { _ in
@@ -120,6 +122,28 @@ struct ExerciseHubView: View {
         }
         .onChange(of: activeWorkout) { workout in
             hideBottomBar = (workout != nil)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ganbatte_shortcut_to_exercise"))) { notif in
+            if let catStr = notif.userInfo?["category"] as? String {
+                if catStr == "Kotoba" {
+                    selectedCategory = .kotoba
+                    if let levelRaw = notif.userInfo?["level"] as? String, let level = JLPTLevel(rawValue: levelRaw) {
+                        kotobaConfig.level = level
+                    }
+                    if let start = notif.userInfo?["startWord"] as? Int {
+                        kotobaConfig.startWord = start
+                    }
+                    if let end = notif.userInfo?["endWord"] as? Int {
+                        kotobaConfig.endWord = end
+                    }
+                    updateKotobaTotalWords()
+                } else if catStr == "Kana" {
+                    selectedCategory = .kana
+                    if let typeRaw = notif.userInfo?["kanaType"] as? String, let type = KanaType(rawValue: typeRaw) {
+                        kanaConfig.kanaType = type
+                    }
+                }
+            }
         }
     }
     
@@ -511,7 +535,7 @@ struct ExerciseHubView: View {
         }
     }
     
-    // MARK: - Bottom Action Button (Space-Between Aligned)
+    // MARK: - Bottom Action Button (Unified Color and Clean Text)
     private var bottomActionButton: some View {
         Group {
             if selectedCategory == .kotoba {
@@ -525,7 +549,7 @@ struct ExerciseHubView: View {
                     HStack(spacing: 8) {
                         Image(systemName: "play.fill")
                             .font(.system(size: 15, weight: .bold))
-                        Text("Start Kotoba Quiz (\(kotobaConfig.questionCount) Questions)")
+                        Text("Start Quiz (\(kotobaConfig.questionCount) Questions)")
                             .font(.system(size: 15, weight: .bold))
                     }
                     .foregroundColor(.white)
@@ -545,23 +569,17 @@ struct ExerciseHubView: View {
                     }
                 }) {
                     HStack(spacing: 8) {
-                        Image(systemName: "bolt.fill")
+                        Image(systemName: "play.fill")
                             .font(.system(size: 15, weight: .bold))
-                        Text("Start Kana Speed Quiz (\(kanaConfig.questionCount) Words)")
+                        Text("Start Quiz (\(kanaConfig.questionCount) Questions)")
                             .font(.system(size: 15, weight: .bold))
                     }
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity)
                     .frame(height: 50)
-                    .background(
-                        LinearGradient(
-                            colors: [Color(red: 0.35, green: 0.40, blue: 0.85), Color(red: 0.55, green: 0.35, blue: 0.90)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
+                    .background(AppTheme.accent)
                     .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .shadow(color: Color(red: 0.35, green: 0.40, blue: 0.85).opacity(0.3), radius: 8, x: 0, y: 4)
+                    .shadow(color: AppTheme.accent.opacity(0.3), radius: 8, x: 0, y: 4)
                 }
                 .buttonStyle(BubbleScaleButtonStyle())
             }

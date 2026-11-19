@@ -203,29 +203,39 @@ struct KanaChartView: View {
                 }
             }
             
-            // Floating Action Button (Exercise Practice - Optional)
+            // Floating Action Button (Exercise Practice Shortcut)
             if showFAB {
                 VStack {
                     Spacer()
                     HStack {
                         Spacer()
                         Button(action: {
-                            withAnimation(.easeInOut(duration: 0.25)) {
-                                showExerciseFlow = true
-                            }
+                            var kCfg = KanaQuizConfig.load()
+                            kCfg.kanaType = activeSubTab
+                            kCfg.save()
+                            
+                            NotificationCenter.default.post(
+                                name: NSNotification.Name("ganbatte_shortcut_to_exercise"),
+                                object: nil,
+                                userInfo: [
+                                    "category": "Kana",
+                                    "kanaType": activeSubTab.rawValue
+                                ]
+                            )
+                            UserDefaults.standard.set(AppTab.exercise.rawValue, forKey: "ganbatte_active_main_tab")
                         }) {
                             ZStack {
                                 Circle()
                                     .fill(AppTheme.accent)
-                                    .frame(width: 56, height: 56)
-                                    .shadow(color: AppTheme.accent.opacity(0.35), radius: 10, x: 0, y: 5)
+                                    .frame(width: 52, height: 52)
+                                    .shadow(color: AppTheme.accent.opacity(0.35), radius: 8, x: 0, y: 4)
                                 
                                 Image(systemName: "pencil")
-                                    .font(.system(size: 22, weight: .bold))
+                                    .font(.system(size: 20, weight: .bold))
                                     .foregroundColor(.white)
                             }
                         }
-                        .buttonStyle(.plain)
+                        .buttonStyle(BubbleScaleButtonStyle())
                         .padding(.trailing, 20)
                         .padding(.bottom, 24)
                     }
