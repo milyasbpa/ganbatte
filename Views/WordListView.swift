@@ -54,7 +54,7 @@ struct WordListView: View {
                             HStack(spacing: 4) {
                                 Image(systemName: "chevron.left")
                                     .font(.system(size: 14, weight: .bold))
-                                Text("Hub")
+                                Text("Back")
                                     .font(.system(size: 14, weight: .semibold))
                             }
                             .foregroundColor(AppTheme.accent)
