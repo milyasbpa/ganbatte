@@ -103,14 +103,16 @@ flowchart TD
     DiagnosticCard["3. Weakness Spotlight & Diagnostic Radar"]
     LevelCarousel["4. Level Mastery Carousel (N5 - N1 Horizontal Swipe Cards)"]
     VolumeCard["5. Weekly Practice Volume (Mon–Sun Active Time)"]
-    TrophyCabinet["6. Dual-Axis Trophy Cabinet (Filterable Pills)"]
+    TrophyHighlights["6. Trophy Highlights (Dashboard Showcase)"]
+    TrophyCabinet["7. Dedicated Trophy Cabinet (Full Interactive Room)"]
 
     Header --> StreakHero
     StreakHero --> PaceCard
     PaceCard --> DiagnosticCard
     DiagnosticCard --> LevelCarousel
     LevelCarousel --> VolumeCard
-    VolumeCard --> TrophyCabinet
+    VolumeCard --> TrophyHighlights
+    TrophyHighlights -.->|"Tap 'View All >'"| TrophyCabinet
 
     subgraph DiagnosticCard["3. Weakness Spotlight & Diagnostic Radar"]
         CategoryTabs["Category Switcher: Kotoba | Kana"]
@@ -119,8 +121,16 @@ flowchart TD
         FocusAction["⚠️ Automated Weakness Tag + 1-Tap Direct Practice Launcher"]
     end
 
-    subgraph TrophyCabinet["6. Dual-Axis Trophy Cabinet"]
+    subgraph TrophyHighlights["6. Trophy Highlights (Dashboard Showcase)"]
+        HighlightHeader["Header: 'X of 57 Unlocked' + 'View All >' Button"]
+        RecentUnlocks["Recently Earned (Top 3 Badges)"]
+        NextToUnlock["Next to Unlock (Live Progress Bars)"]
+    end
+
+    subgraph TrophyCabinet["7. Dedicated Trophy Cabinet (Full Interactive Room)"]
+        CabinetHero["Catalog Meter: Total Unlocked (X%) + 5-Tier Chip Matrix"]
         CabinetFilters["Filter Pills: All | N5 | N4 | N3 | N2 | N1 | Kana | Habits"]
+        StatusToggle["Status Filter: All | Unlocked | Locked"]
         MedalGrid["Coupled Badges (Bronze, Silver, Gold, Platinum, Diamond)"]
     end
 ```
@@ -167,6 +177,22 @@ flowchart TD
 ### 6. Post-Quiz Victory Banner
 - On `ExerciseResultView` & `KanaExerciseResultView`:
   - When a session triggers new medal unlocks, displays a celebratory modal banner with the medal icon, title, tier badge, and haptic feedback before the user returns to the main screens.
+
+### 7. Trophy Highlights Card (Dashboard Showcase)
+- **Compact Footprint:** Prevents page bloat by replacing the 57-item vertical list with a punchy $\approx 220\text{pt}$ executive showcase.
+- **Components:**
+  - Header with Trophy badge, `X of 57 Unlocked`, and a `View All ›` capsule button.
+  - **Recently Earned:** Displays the latest unlocked trophies or a cheerful onboarding prompt if none are unlocked yet.
+  - **Next to Unlock (In Progress):** Dynamically calculates and displays the user's top 2 closest goals (e.g. `N5 First Strides 18/25 words (72%)` or `7-Day Iron Will 3/7 days (43%)`) with live progress bars.
+
+### 8. Dedicated Trophy Cabinet (The Trophy Room)
+- **Full-Screen Interactive Room:** Accessible via `View All ›` from the dashboard.
+- **Components:**
+  - Header with `< Activity` back button and total unlocked stats.
+  - **Hero Progress Card:** Progress bar for the overall 57-trophy catalog + 5-tier chip matrix (Bronze, Silver, Gold, Platinum, Diamond).
+  - **Category Filter Bar:** `All (57)`, `N5 (9)`, `N4 (9)`, `N3 (9)`, `N2 (9)`, `N1 (9)`, `Kana (5)`, `Habits (7)`.
+  - **Status Filter Bar:** `All`, `Unlocked`, `Locked`.
+  - **3-Column Medal Grid:** Displays rich cards with tier color halos, live progress bars, unlock dates, and 1-tap detail modal inspectors.
 
 ---
 

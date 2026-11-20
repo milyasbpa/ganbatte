@@ -4,7 +4,7 @@ struct ActivityDashboardView: View {
     @ObservedObject private var activityService = ActivityService.shared
     @State private var selectedMedal: Medal? = nil
     @State private var selectedDiagnosticCategory: ExerciseCategory = .kotoba
-    @State private var selectedMedalFilter: MedalCategory = .all
+    @State private var isShowingTrophyCabinet: Bool = false
     
     var body: some View {
         ZStack {
@@ -32,12 +32,19 @@ struct ActivityDashboardView: View {
                         // 5. Weekly Practice Volume Bar Chart
                         weeklyVolumeCard
                         
-                        // 6. Dual-Axis Trophy Cabinet (45+ Medals with Level Filters)
-                        trophyCabinetSection
+                        // 6. Trophy Highlights (Dashboard Showcase)
+                        trophyHighlightsCard
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 90)
                 }
+            }
+            
+            // Dedicated Full Trophy Cabinet
+            if isShowingTrophyCabinet {
+                TrophyCabinetView(isPresented: $isShowingTrophyCabinet)
+                    .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .trailing)))
+                    .zIndex(200)
             }
             
             // Medal Detail Overlay
@@ -686,104 +693,200 @@ struct ActivityDashboardView: View {
         .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 3)
     }
     
-    // MARK: - 6. Dual-Axis Trophy Cabinet
-    private var filteredMedals: [Medal] {
-        if selectedMedalFilter == .all {
-            return activityService.medals
-        }
-        return activityService.medals.filter { $0.category == selectedMedalFilter }
-    }
-    
-    private var trophyCabinetSection: some View {
-        let currentFiltered = filteredMedals
-        let unlockedCount = currentFiltered.filter(\.isUnlocked).count
-        let totalCount = currentFiltered.count
+    // MARK: - 6. Trophy Highlights (Dashboard Showcase)
+    private var trophyHighlightsCard: some View {
+        let unlockedCount = activityService.medals.filter(\.isUnlocked).count
+        let totalCount = activityService.medals.count
+        let recentUnlocked = Array(activityService.recentUnlockedMedals.prefix(3))
+        let nextToUnlock = activityService.nextToUnlockMedals
         
         return VStack(alignment: .leading, spacing: 14) {
+            // Card Header
             HStack {
-                HStack(spacing: 6) {
-                    Image(systemName: "trophy.fill")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(Color(red: 0.95, green: 0.73, blue: 0.15))
+                HStack(spacing: 8) {
+                    ZStack {
+                        Circle()
+                            .fill(Color(red: 0.95, green: 0.73, blue: 0.15).opacity(0.18))
+                            .frame(width: 28, height: 28)
+                        
+                        Image(systemName: "trophy.fill")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(Color(red: 0.95, green: 0.73, blue: 0.15))
+                    }
                     
-                    Text("TROPHY CABINET")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(AppTheme.textSecondary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("TROPHY CABINET")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(AppTheme.textSecondary)
+                        
+                        Text("\(unlockedCount) of \(totalCount) Unlocked")
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(AppTheme.textPrimary)
+                    }
                 }
                 
                 Spacer()
                 
-                Text("\(unlockedCount) of \(totalCount) Unlocked")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundColor(AppTheme.textPrimary)
+                // View All Button
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        isShowingTrophyCabinet = true
+                    }
+                }) {
+                    HStack(spacing: 4) {
+                        Text("View All")
+                            .font(.system(size: 12, weight: .bold))
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 10, weight: .bold))
+                    }
+                    .foregroundColor(AppTheme.accent)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 5)
+                    .background(AppTheme.accentLight.opacity(0.35))
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
             }
             
-            // Category Filter Pills
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: 6) {
-                    ForEach(MedalCategory.allCases, id: \.self) { cat in
-                        let isSelected = selectedMedalFilter == cat
-                        Button(action: {
-                            withAnimation(.easeInOut(duration: 0.2)) {
-                                selectedMedalFilter = cat
+            // Sub-section A: Recently Earned
+            VStack(alignment: .leading, spacing: 8) {
+                Text("RECENTLY EARNED")
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(AppTheme.textTertiary)
+                
+                if !recentUnlocked.isEmpty {
+                    HStack(spacing: 8) {
+                        ForEach(recentUnlocked) { medal in
+                            Button(action: {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                    selectedMedal = medal
+                                }
+                            }) {
+                                HStack(spacing: 8) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(medal.tier.color.opacity(0.18))
+                                            .frame(width: 34, height: 34)
+                                        
+                                        Image(systemName: medal.icon)
+                                            .font(.system(size: 15, weight: .bold))
+                                            .foregroundColor(medal.tier.color)
+                                    }
+                                    
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(medal.title)
+                                            .font(.system(size: 11, weight: .bold))
+                                            .foregroundColor(AppTheme.textPrimary)
+                                            .lineLimit(1)
+                                        
+                                        Text(medal.tier.title)
+                                            .font(.system(size: 9, weight: .bold))
+                                            .foregroundColor(medal.tier.color)
+                                    }
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(8)
+                                .background(AppTheme.background)
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                             }
-                        }) {
-                            Text(cat.rawValue)
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
-                                .padding(.horizontal, 12)
-                                .padding(.vertical, 6)
-                                .background(isSelected ? AppTheme.accent : AppTheme.inputBackground)
-                                .clipShape(Capsule())
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
+                } else {
+                    HStack(spacing: 10) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 16, weight: .bold))
+                            .foregroundColor(Color(red: 0.95, green: 0.73, blue: 0.15))
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Start your collection!")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(AppTheme.textPrimary)
+                            Text("Earn medals by scoring ≥90%, keeping streaks & mastering levels.")
+                                .font(.system(size: 10))
+                                .foregroundColor(AppTheme.textSecondary)
+                        }
+                        
+                        Spacer()
+                    }
+                    .padding(10)
+                    .background(AppTheme.background)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
             }
             
-            // 3-Column Medal Grid
-            LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                ForEach(currentFiltered) { medal in
-                    Button(action: {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-                            selectedMedal = medal
-                        }
-                    }) {
-                        VStack(spacing: 8) {
-                            ZStack {
-                                Circle()
-                                    .fill(medal.isUnlocked ? medal.tier.color.opacity(0.18) : Color.black.opacity(0.04))
-                                    .frame(width: 52, height: 52)
-                                
-                                if medal.isUnlocked {
-                                    Image(systemName: medal.icon)
-                                        .font(.system(size: 22, weight: .bold))
-                                        .foregroundColor(medal.tier.color)
-                                } else {
-                                    Image(systemName: "lock.fill")
-                                        .font(.system(size: 16))
-                                        .foregroundColor(AppTheme.textTertiary)
-                                }
-                            }
-                            
-                            Text(medal.title)
-                                .font(.system(size: 11, weight: .bold))
-                                .foregroundColor(medal.isUnlocked ? AppTheme.textPrimary : AppTheme.textTertiary)
-                                .multilineTextAlignment(.center)
-                                .lineLimit(2)
-                                .frame(height: 28)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .padding(.vertical, 12)
-                        .padding(.horizontal, 6)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                                .stroke(medal.isUnlocked ? medal.tier.color.opacity(0.3) : AppTheme.buttonBorder, lineWidth: 1)
-                        )
+            // Sub-section B: Next to Unlock (Gamified Progress)
+            if !nextToUnlock.isEmpty {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("NEXT TO UNLOCK")
+                            .font(.system(size: 10, weight: .bold))
+                            .foregroundColor(AppTheme.textTertiary)
+                        Spacer()
                     }
-                    .buttonStyle(.plain)
+                    
+                    VStack(spacing: 8) {
+                        ForEach(nextToUnlock) { info in
+                            Button(action: {
+                                withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
+                                    selectedMedal = info.medal
+                                }
+                            }) {
+                                HStack(spacing: 10) {
+                                    ZStack {
+                                        Circle()
+                                            .fill(info.medal.tier.color.opacity(0.12))
+                                            .frame(width: 36, height: 36)
+                                        
+                                        Image(systemName: info.medal.icon)
+                                            .font(.system(size: 16, weight: .bold))
+                                            .foregroundColor(info.medal.tier.color)
+                                    }
+                                    
+                                    VStack(alignment: .leading, spacing: 4) {
+                                        HStack {
+                                            Text(info.medal.title)
+                                                .font(.system(size: 11, weight: .bold))
+                                                .foregroundColor(AppTheme.textPrimary)
+                                            
+                                            Text("• \(info.medal.tier.title)")
+                                                .font(.system(size: 10, weight: .bold))
+                                                .foregroundColor(info.medal.tier.color)
+                                            
+                                            Spacer()
+                                            
+                                            Text("\(info.currentFormatted) / \(info.targetFormatted)")
+                                                .font(.system(size: 10, weight: .bold))
+                                                .foregroundColor(AppTheme.accent)
+                                        }
+                                        
+                                        GeometryReader { geo in
+                                            ZStack(alignment: .leading) {
+                                                RoundedRectangle(cornerRadius: 3, style: .continuous)
+                                                    .fill(Color.black.opacity(0.06))
+                                                    .frame(height: 5)
+                                                
+                                                RoundedRectangle(cornerRadius: 3, style: .continuous)
+                                                    .fill(
+                                                        LinearGradient(
+                                                            colors: [info.medal.tier.color, AppTheme.accent],
+                                                            startPoint: .leading,
+                                                            endPoint: .trailing
+                                                        )
+                                                    )
+                                                    .frame(width: max(3.0, geo.size.width * CGFloat(info.progressRatio)), height: 5)
+                                            }
+                                        }
+                                        .frame(height: 5)
+                                    }
+                                }
+                                .padding(10)
+                                .background(AppTheme.background)
+                                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
                 }
             }
         }

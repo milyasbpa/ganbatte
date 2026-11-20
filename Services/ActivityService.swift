@@ -683,4 +683,138 @@ class ActivityService: ObservableObject {
             return "\(Int(seconds))s"
         }
     }
+    
+    // MARK: - Gamified Highlights & Progress Engine
+    
+    var recentUnlockedMedals: [Medal] {
+        medals.filter(\.isUnlocked)
+            .sorted(by: { ($0.unlockedDate ?? Date.distantPast) > ($1.unlockedDate ?? Date.distantPast) })
+    }
+    
+    func medalProgress(for medal: Medal) -> MedalProgressInfo {
+        if medal.isUnlocked {
+            return MedalProgressInfo(
+                medal: medal,
+                progressRatio: 1.0,
+                currentFormatted: "Done",
+                targetFormatted: "Unlocked"
+            )
+        }
+        
+        let id = medal.id
+        
+        // 1. Coverage Medals
+        if id.hasPrefix("n5_cov_") {
+            let current = countUniqueCorrect(level: .n5)
+            let target = coverageTarget(for: id, defaultTotal: 530)
+            return MedalProgressInfo(medal: medal, progressRatio: min(1.0, Double(current) / Double(target)), currentFormatted: "\(current)", targetFormatted: "\(target) words")
+        } else if id.hasPrefix("n4_cov_") {
+            let current = countUniqueCorrect(level: .n4)
+            let target = coverageTarget(for: id, defaultTotal: 521)
+            return MedalProgressInfo(medal: medal, progressRatio: min(1.0, Double(current) / Double(target)), currentFormatted: "\(current)", targetFormatted: "\(target) words")
+        } else if id.hasPrefix("n3_cov_") {
+            let current = countUniqueCorrect(level: .n3)
+            let target = coverageTarget(for: id, defaultTotal: 1818)
+            return MedalProgressInfo(medal: medal, progressRatio: min(1.0, Double(current) / Double(target)), currentFormatted: "\(current)", targetFormatted: "\(target) words")
+        } else if id.hasPrefix("n2_cov_") {
+            let current = countUniqueCorrect(level: .n2)
+            let target = coverageTarget(for: id, defaultTotal: 1398)
+            return MedalProgressInfo(medal: medal, progressRatio: min(1.0, Double(current) / Double(target)), currentFormatted: "\(current)", targetFormatted: "\(target) words")
+        } else if id.hasPrefix("n1_cov_") {
+            let current = countUniqueCorrect(level: .n1)
+            let target = coverageTarget(for: id, defaultTotal: 2435)
+            return MedalProgressInfo(medal: medal, progressRatio: min(1.0, Double(current) / Double(target)), currentFormatted: "\(current)", targetFormatted: "\(target) words")
+        }
+        
+        // 2. Habit & Volume Medals
+        switch id {
+        case "streak_7":
+            return MedalProgressInfo(medal: medal, progressRatio: min(1.0, Double(currentStreak) / 7.0), currentFormatted: "\(currentStreak)", targetFormatted: "7 days")
+        case "streak_14":
+            return MedalProgressInfo(medal: medal, progressRatio: min(1.0, Double(currentStreak) / 14.0), currentFormatted: "\(currentStreak)", targetFormatted: "14 days")
+        case "streak_30":
+            return MedalProgressInfo(medal: medal, progressRatio: min(1.0, Double(currentStreak) / 30.0), currentFormatted: "\(currentStreak)", targetFormatted: "30 days")
+        case "streak_100":
+            return MedalProgressInfo(medal: medal, progressRatio: min(1.0, Double(currentStreak) / 100.0), currentFormatted: "\(currentStreak)", targetFormatted: "100 days")
+        case "vol_500":
+            return MedalProgressInfo(medal: medal, progressRatio: min(1.0, Double(totalQuestionsAnswered) / 500.0), currentFormatted: "\(totalQuestionsAnswered)", targetFormatted: "500 Qs")
+        case "vol_1000":
+            return MedalProgressInfo(medal: medal, progressRatio: min(1.0, Double(totalQuestionsAnswered) / 1000.0), currentFormatted: "\(totalQuestionsAnswered)", targetFormatted: "1000 Qs")
+        default:
+            break
+        }
+        
+        // 3. Kana Medals
+        let kanaDiags = kanaScriptDiagnostics()
+        if id.hasPrefix("kana_hira") {
+            let current = min(20, kanaDiags.hiragana.totalQuestions)
+            let target = id == "kana_hira_rapid" ? 20 : 10
+            return MedalProgressInfo(medal: medal, progressRatio: min(1.0, Double(current) / Double(target)), currentFormatted: "\(current)", targetFormatted: "\(target) Qs")
+        } else if id.hasPrefix("kana_kata") {
+            let current = min(20, kanaDiags.katakana.totalQuestions)
+            let target = id == "kana_kata_master" ? 20 : 10
+            return MedalProgressInfo(medal: medal, progressRatio: min(1.0, Double(current) / Double(target)), currentFormatted: "\(current)", targetFormatted: "\(target) Qs")
+        }
+        
+        // 4. Default Skill/Fallback
+        return MedalProgressInfo(medal: medal, progressRatio: 0.0, currentFormatted: "0", targetFormatted: "Goal")
+    }
+    
+    private func coverageTarget(for id: String, defaultTotal: Int) -> Int {
+        if id.hasSuffix("_25") { return 25 }
+        if id.hasSuffix("_50") { return 50 }
+        if id.hasSuffix("_100") { return 100 }
+        if id.hasSuffix("_250") { return 250 }
+        if id.hasSuffix("_500") { return 500 }
+        if id.hasSuffix("_full") { return defaultTotal }
+        return defaultTotal
+    }
+    
+    /// Top next medals closest to being unlocked
+    var nextToUnlockMedals: [MedalProgressInfo] {
+        let locked = medals.filter { !$0.isUnlocked }
+        guard !locked.isEmpty else { return [] }
+        
+        let calculated = locked.map { medalProgress(for: $0) }
+        
+        // Medals with progress > 0 sorted highest first
+        let inProgress = calculated
+            .filter { $0.progressRatio > 0.0 }
+            .sorted(by: { $0.progressRatio > $1.progressRatio })
+        
+        if inProgress.count >= 2 {
+            return Array(inProgress.prefix(2))
+        }
+        
+        // If not enough in-progress, pad with beginner milestones (e.g. n5_cov_25, streak_7, kana_hira_elem, vol_500)
+        var results = inProgress
+        let priorityOrder = ["n5_cov_25", "streak_7", "kana_hira_elem", "n5_noun_ace", "vol_500", "n4_cov_25"]
+        for pId in priorityOrder {
+            if results.count >= 2 { break }
+            if !results.contains(where: { $0.medal.id == pId }),
+               let found = calculated.first(where: { $0.medal.id == pId }) {
+                results.append(found)
+            }
+        }
+        
+        // If still under 2, add any locked medals
+        for item in calculated {
+            if results.count >= 2 { break }
+            if !results.contains(where: { $0.medal.id == item.medal.id }) {
+                results.append(item)
+            }
+        }
+        
+        return results
+    }
+    
+    /// Breakdown of medals by tier
+    var medalTierBreakdown: [(tier: MedalTier, unlocked: Int, total: Int)] {
+        let tiers: [MedalTier] = [.bronze, .silver, .gold, .platinum, .diamond]
+        return tiers.map { tier in
+            let matching = medals.filter { $0.tier == tier }
+            let unlocked = matching.filter(\.isUnlocked).count
+            return (tier: tier, unlocked: unlocked, total: matching.count)
+        }
+    }
 }

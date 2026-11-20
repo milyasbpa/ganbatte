@@ -166,3 +166,17 @@ struct LevelMasteryInfo: Identifiable {
         return min(100.0, (Double(uniqueCorrectWords) / Double(totalWords)) * 100.0)
     }
 }
+
+// MARK: - Medal Progress Info (Gamified Next-to-Unlock)
+struct MedalProgressInfo: Identifiable {
+    var id: String { medal.id }
+    let medal: Medal
+    let progressRatio: Double // 0.0 to 1.0
+    let currentFormatted: String
+    let targetFormatted: String
+    
+    var progressPercentageText: String {
+        "\(Int(round(progressRatio * 100.0)))%"
+    }
+}
+

@@ -36,6 +36,7 @@
 		5B16A539C4F56F4A31AD6283 /* Cards in Resources */ = {isa = PBXBuildFile; fileRef = 046D34CC71FDD248D11EF2E7 /* Cards */; };
 		600E8C52D3B035ABD66EB315 /* WordDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E95F1CE9BBB4EC0D93EB81E5 /* WordDetailView.swift */; };
 		6332E96AFB2652AC16A589A5 /* ActivityModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = D430915D7F01CE0A5BB924D8 /* ActivityModels.swift */; };
+		6355D263B005678AAEC1E656 /* TrophyCabinetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8967947830D16388AE6536DA /* TrophyCabinetView.swift */; };
 		63DFC242CA7698A082BFB38A /* KanaExerciseConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06660EB1BBDA22DA062A9F4 /* KanaExerciseConfigView.swift */; };
 		6742DA109063470CC06544D7 /* GanbatteApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7278B79F1189F1D22D8E122 /* GanbatteApp.swift */; };
 		6D5DDBBEDD513BFCFE00122A /* SplashScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC9961EF6D6E227C6CCB50DF /* SplashScreenView.swift */; };
@@ -78,6 +79,7 @@
 		D7E6E825287E7981F721DF1E /* AudioService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A49D41154CDF6CE8F2404F3 /* AudioService.swift */; };
 		DA88C117846ADBB9AE288511 /* AppTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D3977DB41E13529DEC0564E /* AppTheme.swift */; };
 		DDDE0C7DD032D02D96115D76 /* ExerciseConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C09D2F9529A0EE00FA7CF4A /* ExerciseConfigView.swift */; };
+		DE4F68AD62E866702E21483D /* TrophyCabinetView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8967947830D16388AE6536DA /* TrophyCabinetView.swift */; };
 		DF23D6CC87D6BE3B1539F014 /* WordListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EC05B9E38A8EACC834E6C5E6 /* WordListView.swift */; };
 		DFE5298A69568AE919F81AC7 /* LearnHubView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82726FDD892ABA3AC20C4DEF /* LearnHubView.swift */; };
 		E4893DAD946EC677C88734F0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 23B563651401CBDC0C463839 /* Assets.xcassets */; };
@@ -110,6 +112,7 @@
 		7A49D41154CDF6CE8F2404F3 /* AudioService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AudioService.swift; sourceTree = "<group>"; };
 		7CECE15EBC7D9388C5E6919F /* KanaExerciseCoordinatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanaExerciseCoordinatorView.swift; sourceTree = "<group>"; };
 		82726FDD892ABA3AC20C4DEF /* LearnHubView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LearnHubView.swift; sourceTree = "<group>"; };
+		8967947830D16388AE6536DA /* TrophyCabinetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrophyCabinetView.swift; sourceTree = "<group>"; };
 		8D50C38D8467934BAB90EEC9 /* KanaExerciseResultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KanaExerciseResultView.swift; sourceTree = "<group>"; };
 		90BE7E0BBA16730D28BC42E7 /* FuriganaService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FuriganaService.swift; sourceTree = "<group>"; };
 		9E2C26F8542E2E7F6513E9CF /* AppIcon.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = AppIcon.icns; sourceTree = "<group>"; };
@@ -149,6 +152,7 @@
 			isa = PBXGroup;
 			children = (
 				DB24F3D36ED9F796A4ACB218 /* ActivityDashboardView.swift */,
+				8967947830D16388AE6536DA /* TrophyCabinetView.swift */,
 			);
 			path = Activity;
 			sourceTree = "<group>";
@@ -459,6 +463,7 @@
 				26F2B088F9E61ECF7AA4576E /* ReminderModels.swift in Sources */,
 				EDEA2ED9E748D233D0E91B42 /* ReminderSheetView.swift in Sources */,
 				B797A6616CB73735A35997F4 /* SplashScreenView.swift in Sources */,
+				DE4F68AD62E866702E21483D /* TrophyCabinetView.swift in Sources */,
 				C1719E586D40000F4A1569F4 /* Word.swift in Sources */,
 				600E8C52D3B035ABD66EB315 /* WordDetailView.swift in Sources */,
 				DF23D6CC87D6BE3B1539F014 /* WordListView.swift in Sources */,
@@ -502,6 +507,7 @@
 				2530E69A9B871EA9BB9F6512 /* ReminderModels.swift in Sources */,
 				512F3DEDAEF2CA960D459DAD /* ReminderSheetView.swift in Sources */,
 				6D5DDBBEDD513BFCFE00122A /* SplashScreenView.swift in Sources */,
+				6355D263B005678AAEC1E656 /* TrophyCabinetView.swift in Sources */,
 				B3BE986C6325F593C70640AA /* Word.swift in Sources */,
 				9112FD7957B838F542B6D0ED /* WordDetailView.swift in Sources */,
 				AEE7708452D4DB9DF11DCFD3 /* WordListView.swift in Sources */,
