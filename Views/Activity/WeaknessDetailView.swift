@@ -232,10 +232,11 @@ struct WeaknessDetailView: View {
             }
             
             // Dual-Key Rule Guidance Tag
-            HStack(spacing: 6) {
+            HStack(alignment: .top, spacing: 6) {
                 Image(systemName: "shield.lefthalf.filled")
                     .font(.system(size: 12))
                     .foregroundColor(AppTheme.accent)
+                    .padding(.top, 1.5)
                 Text("Dual-Key Rule: 2 consecutive clean answers in ≤ 2.5s removes each item.")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(AppTheme.textSecondary)

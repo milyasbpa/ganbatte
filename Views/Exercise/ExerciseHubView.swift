@@ -341,10 +341,11 @@ struct ExerciseHubView: View {
             
             Divider()
             
-            HStack(spacing: 6) {
+            HStack(alignment: .top, spacing: 6) {
                 Image(systemName: "shield.lefthalf.filled")
                     .font(.system(size: 12))
                     .foregroundColor(AppTheme.accent)
+                    .padding(.top, 1.5)
                 Text("Dual-Key Graduation: 2 consecutive clean answers in ≤ 2.5s clears each word.")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(AppTheme.textSecondary)
@@ -621,10 +622,11 @@ struct ExerciseHubView: View {
             
             Divider()
             
-            HStack(spacing: 6) {
+            HStack(alignment: .top, spacing: 6) {
                 Image(systemName: "shield.lefthalf.filled")
                     .font(.system(size: 12))
                     .foregroundColor(Color(hex: 0x1565C0))
+                    .padding(.top, 1.5)
                 Text("Words filtered exclusively to ones containing: \(characters.joined(separator: ", "))")
                     .font(.system(size: 11, weight: .medium))
                     .foregroundColor(AppTheme.textSecondary)
@@ -738,10 +740,11 @@ struct ExerciseHubView: View {
             .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
             
             // Instructions Banner
-            HStack(spacing: 10) {
+            HStack(alignment: .top, spacing: 10) {
                 Image(systemName: "bolt.fill")
                     .font(.system(size: 13, weight: .bold))
                     .foregroundColor(AppTheme.accent)
+                    .padding(.top, 1.5)
                 
                 Text("Type the Romaji spelling as fast as you can. It advances instantly upon the correct answer!")
                     .font(.system(size: 11))
@@ -772,21 +775,15 @@ struct ExerciseHubView: View {
                         }
                     }) {
                         HStack(spacing: 8) {
-                            Image(systemName: "bolt.fill")
+                            Image(systemName: "play.fill")
                                 .font(.system(size: 15, weight: .bold))
-                            Text("Start Mistake Workout (\(mistakeIds.count) Questions)")
+                            Text("Start Quiz (\(mistakeIds.count) Questions)")
                                 .font(.system(size: 15, weight: .bold))
                         }
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(hex: 0xE65100), AppTheme.accent],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
+                        .background(AppTheme.accent)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
                         .shadow(color: AppTheme.accent.opacity(0.3), radius: 8, x: 0, y: 4)
                     }
@@ -830,23 +827,17 @@ struct ExerciseHubView: View {
                         }
                     }) {
                         HStack(spacing: 8) {
-                            Image(systemName: "bolt.fill")
+                            Image(systemName: "play.fill")
                                 .font(.system(size: 15, weight: .bold))
-                            Text("Start Kana Mistake Workout (\(kanaConfig.questionCount) Questions)")
+                            Text("Start Quiz (\(kanaConfig.questionCount) Questions)")
                                 .font(.system(size: 15, weight: .bold))
                         }
                         .foregroundColor(.white)
                         .frame(maxWidth: .infinity)
                         .frame(height: 50)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(hex: 0x1565C0), Color(hex: 0x1E88E5)],
-                                startPoint: .leading,
-                                endPoint: .trailing
-                            )
-                        )
+                        .background(AppTheme.accent)
                         .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                        .shadow(color: Color(hex: 0x1565C0).opacity(0.3), radius: 8, x: 0, y: 4)
+                        .shadow(color: AppTheme.accent.opacity(0.3), radius: 8, x: 0, y: 4)
                     }
                     .buttonStyle(BubbleScaleButtonStyle())
                 } else {

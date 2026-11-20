@@ -295,7 +295,7 @@ struct ActivityDashboardView: View {
             HStack {
                 HStack(spacing: 6) {
                     Image(systemName: "cross.circle.fill")
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.system(size: 12.5, weight: .bold))
                         .foregroundColor(AppTheme.accent)
                     
                     Text("WEAKNESS SPOTLIGHT & RADAR")
@@ -398,10 +398,11 @@ struct ActivityDashboardView: View {
                         isShowingWeaknessDetail = true
                     }
                 }) {
-                    HStack(spacing: 8) {
+                    HStack(alignment: .top, spacing: 8) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.system(size: 13, weight: .bold))
                             .foregroundColor(Color(hex: 0xE65100))
+                            .padding(.top, 1.5)
                         
                         VStack(alignment: .leading, spacing: 2) {
                             Text("\(mistakeCount) Troublesome Words Recorded")
@@ -437,10 +438,11 @@ struct ActivityDashboardView: View {
             
             // Automated Recommendation Strip with 1-Tap Practice Launcher
             if let weakType = activityService.identifiedWeakWordType {
-                HStack(spacing: 8) {
+                HStack(alignment: .top, spacing: 8) {
                     Image(systemName: "exclamationmark.triangle.fill")
                         .font(.system(size: 13, weight: .bold))
                         .foregroundColor(Color(hex: 0xE65100))
+                        .padding(.top, 1.5)
                     
                     Text("Focus Area: \(weakType.rawValue) needs practice.")
                         .font(.system(size: 11, weight: .semibold))
@@ -553,10 +555,11 @@ struct ActivityDashboardView: View {
                         isShowingWeaknessDetail = true
                     }
                 }) {
-                    HStack(spacing: 8) {
+                    HStack(alignment: .top, spacing: 8) {
                         Image(systemName: "exclamationmark.triangle.fill")
                             .font(.system(size: 13, weight: .bold))
                             .foregroundColor(Color(hex: 0xE65100))
+                            .padding(.top, 1.5)
                         
                         VStack(alignment: .leading, spacing: 2) {
                             Text("\(kanaMistakeCount) Troublesome Kana Recorded")
