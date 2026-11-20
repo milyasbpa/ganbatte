@@ -1,5 +1,9 @@
 import SwiftUI
 
+enum SlideDirection {
+    case forward, backward
+}
+
 struct WordDetailView: View {
     let initialIndex: Int
     let wordsList: [Word]
@@ -7,6 +11,7 @@ struct WordDetailView: View {
     var onDismiss: () -> Void
     
     @State private var currentIndex: Int
+    @State private var slideDirection: SlideDirection = .forward
     #if os(macOS)
     @State private var keyMonitor: Any?
     #endif
@@ -71,135 +76,37 @@ struct WordDetailView: View {
                 .padding(.bottom, 24)
                 .background(AppTheme.background)
                 
-                // 2. SCROLLABLE MIDDLE CONTENT AREA
-                ScrollView(showsIndicators: false) {
-                    VStack(alignment: .leading, spacing: 14) {
-                        // Hero Cropped Image Banner (Full Width within container margins)
-                        CardImageView(imageName: currentWord.imageName, contentMode: .fill)
-                            .aspectRatio(1.0, contentMode: .fill)
-                            .frame(maxWidth: .infinity)
-                            .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
-                        
-                        // Word Details Section
-                        VStack(alignment: .leading, spacing: 8) {
-                            // Main Word Header & Audio Button Row (Perfect alignment)
-                            HStack(alignment: .center) {
-                                // Main Kana (36pt bold)
-                                Text(currentWord.kana)
-                                    .font(.system(size: 36, weight: .bold))
-                                    .foregroundColor(AppTheme.textPrimary)
-                                
-                                Spacer()
-                                
-                                // Volume Button (Circle with border matching card_001.png)
-                                Button(action: {
-                                    AudioService.shared.speak(currentWord.kana)
-                                }) {
-                                    ZStack {
-                                        Circle()
-                                            .fill(AppTheme.audioButtonBg)
-                                            .frame(width: 44, height: 44)
-                                            .overlay(
-                                                Circle()
-                                                    .stroke(AppTheme.audioButtonBorder, lineWidth: 1.2)
-                                            )
-                                            .shadow(color: Color.black.opacity(0.04), radius: 3, x: 0, y: 1.5)
-                                        
-                                        Image(systemName: "speaker.wave.2.fill")
-                                            .font(.system(size: 17))
-                                            .foregroundColor(AppTheme.audioIcon)
-                                    }
-                                }
-                                .buttonStyle(.plain)
-                            }
-                            
-                            // Kanji & Romaji (Side by side)
-                            HStack(alignment: .bottom, spacing: 8) {
-                                if !currentWord.kanji.isEmpty && currentWord.kanji != currentWord.kana {
-                                    FuriganaText(
-                                        text: currentWord.kanji,
-                                        fontSize: 20,
-                                        furiganaSize: 11,
-                                        textColor: AppTheme.textPrimary,
-                                        furiganaColor: AppTheme.textSecondary,
-                                        boldKanji: true
-                                    )
-                                    .fixedSize(horizontal: true, vertical: false)
-                                }
-                                
-                                Text(currentWord.romaji)
-                                    .font(.system(size: 16, weight: .regular))
-                                    .foregroundColor(AppTheme.textSecondary)
-                                    .fixedSize(horizontal: true, vertical: false)
-                            }
-                            
-                            // Type with Terracotta Bullet
-                            HStack(spacing: 5) {
-                                Text("•")
-                                    .font(.system(size: 14, weight: .bold))
-                                    .foregroundColor(AppTheme.accent)
-                                
-                                Text(currentWord.type)
-                                    .font(.system(size: 14, weight: .medium))
-                                    .foregroundColor(AppTheme.textSecondary)
-                            }
-                            .padding(.top, 2)
-                            
-                            // Example Section
-                            VStack(alignment: .leading, spacing: 6) {
-                                // Example Header with Space Between Audio Icon (No circle background)
-                                HStack {
-                                    Text("Example")
-                                        .font(.system(size: 14, weight: .regular))
-                                        .foregroundColor(AppTheme.textSecondary)
-                                    
-                                    Spacer()
-                                    
-                                    Button(action: {
-                                        AudioService.shared.speak(currentWord.exampleJa, rate: 0.42)
-                                    }) {
-                                        Image(systemName: "speaker.wave.2.fill")
-                                            .font(.system(size: 15))
-                                            .foregroundColor(AppTheme.audioIcon)
-                                            .padding(4)
-                                    }
-                                    .buttonStyle(.plain)
-                                }
-                                
-                                // Japanese sentence with furigana (Font size 18pt)
-                                FuriganaText(
-                                    text: currentWord.exampleJa,
-                                    fontSize: 18,
-                                    furiganaSize: 10.5,
-                                    textColor: AppTheme.textPrimary,
-                                    furiganaColor: AppTheme.textSecondary
-                                )
-                                
-                                // English sentence translation (Font size 15pt)
-                                Text(currentWord.exampleEn)
-                                    .font(.system(size: 15, weight: .regular))
-                                    .foregroundColor(AppTheme.textSecondary)
-                                    .padding(.top, 2)
-                            }
-                            .padding(.top, 8)
-                        }
-                        .padding(.horizontal, 4)
+                // 2. MIDDLE CONTENT AREA (SWIPEABLE PAGING)
+                #if os(iOS)
+                TabView(selection: $currentIndex) {
+                    ForEach(0..<wordsList.count, id: \.self) { idx in
+                        wordDetailCard(for: wordsList[idx])
+                            .tag(idx)
                     }
-                    .padding(.horizontal, 16)
-                    .padding(.bottom, 8)
+                }
+                .tabViewStyle(.page(indexDisplayMode: .never))
+                .frame(maxHeight: .infinity)
+                #else
+                ZStack {
+                    wordDetailCard(for: currentWord)
+                        .id(currentIndex)
+                        .transition(.asymmetric(
+                            insertion: .move(edge: slideDirection == .forward ? .trailing : .leading),
+                            removal: .move(edge: slideDirection == .forward ? .leading : .trailing)
+                        ))
                 }
                 .frame(maxHeight: .infinity)
-                .contentShape(Rectangle())
-                .gesture(
+                .highPriorityGesture(
                     DragGesture(minimumDistance: 30)
                         .onEnded { value in
-                            if value.translation.width < -50 {
+                            if value.translation.width < -40 {
                                 nextCard()
-                            } else if value.translation.width > 50 {
+                            } else if value.translation.width > 40 {
                                 prevCard()
                             }
                         }
                 )
+                #endif
                 
                 // 3. BOTTOM NAVIGATION BUTTONS (PINNED AT BOTTOM, ALWAYS VISIBLE!)
                 HStack(spacing: 12) {
@@ -289,6 +196,10 @@ struct WordDetailView: View {
             nextCard()
             return .handled
         }
+        .onChange(of: currentIndex) { newIndex in
+            guard newIndex >= 0 && newIndex < wordsList.count else { return }
+            AudioService.shared.speak(wordsList[newIndex].kana)
+        }
         .onAppear {
             // Auto play voice on initial open
             AudioService.shared.speak(currentWord.kana)
@@ -316,22 +227,145 @@ struct WordDetailView: View {
         }
     }
     
+    // MARK: - Word Detail Card (Scrollable Content)
+    private func wordDetailCard(for word: Word) -> some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 14) {
+                // Hero Cropped Image Banner (Full Width within container margins)
+                CardImageView(imageName: word.imageName, contentMode: .fill)
+                    .aspectRatio(1.0, contentMode: .fill)
+                    .frame(maxWidth: .infinity)
+                    .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+                
+                // Word Details Section
+                VStack(alignment: .leading, spacing: 8) {
+                    // Main Word Header & Audio Button Row (Perfect alignment)
+                    HStack(alignment: .center) {
+                        // Main Kana (36pt bold)
+                        Text(word.kana)
+                            .font(.system(size: 36, weight: .bold))
+                            .foregroundColor(AppTheme.textPrimary)
+                        
+                        Spacer()
+                        
+                        // Volume Button (Circle with border matching card_001.png)
+                        Button(action: {
+                            AudioService.shared.speak(word.kana)
+                        }) {
+                            ZStack {
+                                Circle()
+                                    .fill(AppTheme.audioButtonBg)
+                                    .frame(width: 44, height: 44)
+                                    .overlay(
+                                        Circle()
+                                            .stroke(AppTheme.audioButtonBorder, lineWidth: 1.2)
+                                    )
+                                    .shadow(color: Color.black.opacity(0.04), radius: 3, x: 0, y: 1.5)
+                                
+                                Image(systemName: "speaker.wave.2.fill")
+                                    .font(.system(size: 17))
+                                    .foregroundColor(AppTheme.audioIcon)
+                            }
+                        }
+                        .buttonStyle(.plain)
+                    }
+                    
+                    // Kanji & Romaji (Side by side)
+                    HStack(alignment: .bottom, spacing: 8) {
+                        if !word.kanji.isEmpty && word.kanji != word.kana {
+                            FuriganaText(
+                                text: word.kanji,
+                                fontSize: 20,
+                                furiganaSize: 11,
+                                textColor: AppTheme.textPrimary,
+                                furiganaColor: AppTheme.textSecondary,
+                                boldKanji: true
+                            )
+                            .fixedSize(horizontal: true, vertical: false)
+                        }
+                        
+                        Text(word.romaji)
+                            .font(.system(size: 16, weight: .regular))
+                            .foregroundColor(AppTheme.textSecondary)
+                            .fixedSize(horizontal: true, vertical: false)
+                    }
+                    
+                    // Type with Terracotta Bullet
+                    HStack(spacing: 5) {
+                        Text("•")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundColor(AppTheme.accent)
+                        
+                        Text(word.type)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(AppTheme.textSecondary)
+                    }
+                    .padding(.top, 2)
+                    
+                    // Example Section
+                    VStack(alignment: .leading, spacing: 6) {
+                        // Example Header with Space Between Audio Icon (No circle background)
+                        HStack {
+                            Text("Example")
+                                .font(.system(size: 14, weight: .regular))
+                                .foregroundColor(AppTheme.textSecondary)
+                            
+                            Spacer()
+                            
+                            Button(action: {
+                                AudioService.shared.speak(word.exampleJa, rate: 0.42)
+                            }) {
+                                Image(systemName: "speaker.wave.2.fill")
+                                    .font(.system(size: 15))
+                                    .foregroundColor(AppTheme.audioIcon)
+                                    .padding(4)
+                            }
+                            .buttonStyle(.plain)
+                        }
+                        
+                        // Japanese sentence with furigana (Font size 18pt)
+                        FuriganaText(
+                            text: word.exampleJa,
+                            fontSize: 18,
+                            furiganaSize: 10.5,
+                            textColor: AppTheme.textPrimary,
+                            furiganaColor: AppTheme.textSecondary
+                        )
+                        
+                        // English sentence translation (Font size 15pt)
+                        Text(word.exampleEn)
+                            .font(.system(size: 15, weight: .regular))
+                            .foregroundColor(AppTheme.textSecondary)
+                            .padding(.top, 2)
+                    }
+                    .padding(.top, 8)
+                }
+                .padding(.horizontal, 4)
+            }
+            .padding(.horizontal, 16)
+            .padding(.bottom, 8)
+        }
+        .frame(maxHeight: .infinity)
+    }
+    
     private func nextCard() {
         guard currentIndex < wordsList.count - 1 else { return }
-        withAnimation(.easeInOut(duration: 0.2)) {
+        #if os(macOS)
+        slideDirection = .forward
+        #endif
+        withAnimation(.easeInOut(duration: 0.25)) {
             currentIndex += 1
         }
-        // Auto play voice on next
-        AudioService.shared.speak(currentWord.kana)
     }
     
     private func prevCard() {
         guard currentIndex > 0 else { return }
-        withAnimation(.easeInOut(duration: 0.2)) {
+        #if os(macOS)
+        slideDirection = .backward
+        #endif
+        withAnimation(.easeInOut(duration: 0.25)) {
             currentIndex -= 1
         }
-        // Auto play voice on previous
-        AudioService.shared.speak(currentWord.kana)
     }
     
     private func navigateToExercise() {

@@ -68,9 +68,12 @@ struct WeaknessDetailView: View {
             
             // Full Word Detail Sheet Overlay
             if let word = selectedWordForDetail {
+                let mistakeWords = filteredWordMistakes.compactMap { wordsMap[$0.wordId] }
+                let currentList = mistakeWords.isEmpty ? [word] : mistakeWords
+                let initialIdx = currentList.firstIndex(where: { $0.id == word.id }) ?? 0
                 WordDetailView(
-                    initialIndex: 0,
-                    wordsList: [word],
+                    initialIndex: initialIdx,
+                    wordsList: currentList,
                     selectedType: .all,
                     onDismiss: {
                         withAnimation(.easeInOut(duration: 0.25)) {
@@ -78,6 +81,7 @@ struct WeaknessDetailView: View {
                         }
                     }
                 )
+                .id("mistake_word_detail_overlay")
                 .transition(.asymmetric(insertion: .move(edge: .bottom), removal: .move(edge: .bottom)))
                 .zIndex(200)
             }

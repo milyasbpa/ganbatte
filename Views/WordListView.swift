@@ -294,7 +294,7 @@ struct WordListView: View {
                         }
                     }
                 )
-                .id(word.id)
+                .id("word_detail_overlay")
                 .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .trailing)))
                 .zIndex(200)
             }
