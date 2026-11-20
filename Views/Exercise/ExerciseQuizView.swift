@@ -240,13 +240,17 @@ struct ExerciseQuizView: View {
                     .font(.system(size: 13, weight: .medium))
                     .foregroundColor(AppTheme.textSecondary)
                 
-                // Masked Japanese Sentence
-                Text(currentQuestion.maskedSentenceJa)
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundColor(AppTheme.textPrimary)
-                    .lineSpacing(5)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.vertical, 4)
+                // Masked Japanese Sentence with Furigana
+                FuriganaText(
+                    text: currentQuestion.maskedSentenceJa,
+                    fontSize: 18,
+                    furiganaSize: 10.5,
+                    textColor: AppTheme.textPrimary,
+                    furiganaColor: AppTheme.textSecondary,
+                    boldKanji: true
+                )
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.vertical, 4)
                 
                 // English Sentence Translation
                 HStack(alignment: .top, spacing: 6) {

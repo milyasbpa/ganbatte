@@ -20,6 +20,26 @@ final class FuriganaService {
             return cached
         }
         
+        // Preserve fill-in blank marker as an unbreakable segment
+        let blankMarker = "[ ______ ]"
+        if text.contains(blankMarker) {
+            let normalized = text.replacingOccurrences(of: " [ ______ ] ", with: "[ ______ ]")
+                                 .replacingOccurrences(of: " [ ______ ]", with: "[ ______ ]")
+                                 .replacingOccurrences(of: "[ ______ ] ", with: "[ ______ ]")
+            let parts = normalized.components(separatedBy: blankMarker)
+            var result: [FuriganaSegment] = []
+            for (i, part) in parts.enumerated() {
+                if !part.isEmpty {
+                    result.append(contentsOf: parse(part))
+                }
+                if i < parts.count - 1 {
+                    result.append(FuriganaSegment(text: blankMarker, reading: nil, isKanji: false))
+                }
+            }
+            cache.setObject(result as NSArray, forKey: text as NSString)
+            return result
+        }
+        
         let cfText = text as CFString
         let length = text.utf16.count
         guard length > 0 else { return [] }
