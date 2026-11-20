@@ -210,26 +210,24 @@ struct ReminderSheetView: View {
                             // Mode Menu (Learn vs Exercise)
                             Menu {
                                 ForEach(ReminderMode.allCases) { mode in
-                                    Button(action: { newKanaMode = mode }) {
-                                        Label(mode.rawValue, systemImage: mode.icon)
+                                    Button(mode.rawValue) {
+                                        newKanaMode = mode
                                     }
                                 }
                             } label: {
                                 HStack(spacing: 4) {
-                                    Image(systemName: newKanaMode.icon)
-                                        .font(.system(size: 11, weight: .bold))
                                     Text(newKanaMode.rawValue)
                                         .font(.system(size: 13, weight: .bold))
                                     Image(systemName: "chevron.up.chevron.down")
                                         .font(.system(size: 8, weight: .semibold))
                                 }
-                                .foregroundColor(newKanaMode == .learn ? Color(hex: 0x2E7D32) : AppTheme.accent)
+                                .foregroundColor(newKanaMode == .learn ? Color(hex: 0x2E7D32) : Color(hex: 0xD84315))
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 7)
                                 .background(
                                     newKanaMode == .learn 
                                         ? Color(hex: 0xE8F5E9) 
-                                        : AppTheme.accentLight.opacity(0.8)
+                                        : Color(hex: 0xFBE9E7)
                                 )
                                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                             }
@@ -320,17 +318,13 @@ struct ReminderSheetView: View {
                         VStack(spacing: 6) {
                             ForEach(kanaSettings.items) { item in
                                 HStack(spacing: 8) {
-                                    HStack(spacing: 4) {
-                                        Image(systemName: item.mode.icon)
-                                            .font(.system(size: 9, weight: .bold))
-                                        Text(item.mode.rawValue)
-                                            .font(.system(size: 11, weight: .bold))
-                                    }
-                                    .foregroundColor(item.mode == .learn ? Color(hex: 0x2E7D32) : AppTheme.accent)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(item.mode == .learn ? Color(hex: 0xE8F5E9) : AppTheme.accentLight.opacity(0.8))
-                                    .clipShape(Capsule())
+                                    Text(item.mode.rawValue)
+                                        .font(.system(size: 11, weight: .bold))
+                                        .foregroundColor(item.mode == .learn ? Color(hex: 0x2E7D32) : Color(hex: 0xD84315))
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(item.mode == .learn ? Color(hex: 0xE8F5E9) : Color(hex: 0xFBE9E7))
+                                        .clipShape(Capsule())
                                     
                                     Text(item.script.title)
                                         .font(.system(size: 12, weight: .bold))
@@ -463,26 +457,24 @@ struct ReminderSheetView: View {
                             // Mode Menu (Learn vs Exercise)
                             Menu {
                                 ForEach(ReminderMode.allCases) { mode in
-                                    Button(action: { newWordMode = mode }) {
-                                        Label(mode.rawValue, systemImage: mode.icon)
+                                    Button(mode.rawValue) {
+                                        newWordMode = mode
                                     }
                                 }
                             } label: {
                                 HStack(spacing: 4) {
-                                    Image(systemName: newWordMode.icon)
-                                        .font(.system(size: 10, weight: .bold))
                                     Text(newWordMode.rawValue)
                                         .font(.system(size: 12, weight: .bold))
                                     Image(systemName: "chevron.up.chevron.down")
                                         .font(.system(size: 7, weight: .semibold))
                                 }
-                                .foregroundColor(newWordMode == .learn ? Color(hex: 0x2E7D32) : Color(hex: 0xE65100))
+                                .foregroundColor(newWordMode == .learn ? Color(hex: 0x2E7D32) : Color(hex: 0xD84315))
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 7)
                                 .background(
                                     newWordMode == .learn 
                                         ? Color(hex: 0xE8F5E9) 
-                                        : Color.orange.opacity(0.15)
+                                        : Color(hex: 0xFBE9E7)
                                 )
                                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                             }
@@ -502,10 +494,10 @@ struct ReminderSheetView: View {
                                     Image(systemName: "chevron.up.chevron.down")
                                         .font(.system(size: 8, weight: .semibold))
                                 }
-                                .foregroundColor(Color(hex: 0xE65100))
+                                .foregroundColor(levelForegroundColor(newWordLevel))
                                 .padding(.horizontal, 10)
                                 .padding(.vertical, 7)
-                                .background(Color.orange.opacity(0.15))
+                                .background(levelBackgroundColor(newWordLevel))
                                 .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                             }
                             .buttonStyle(.plain)
@@ -594,27 +586,23 @@ struct ReminderSheetView: View {
                     } else {
                         VStack(spacing: 6) {
                             ForEach(wordSettings.items) { item in
-                                HStack(spacing: 6) {
-                                    // Mode pill
-                                    HStack(spacing: 3) {
-                                        Image(systemName: item.mode.icon)
-                                            .font(.system(size: 9, weight: .bold))
-                                        Text(item.mode.rawValue)
-                                            .font(.system(size: 11, weight: .bold))
-                                    }
-                                    .foregroundColor(item.mode == .learn ? Color(hex: 0x2E7D32) : Color(hex: 0xE65100))
-                                    .padding(.horizontal, 7)
-                                    .padding(.vertical, 4)
-                                    .background(item.mode == .learn ? Color(hex: 0xE8F5E9) : Color.orange.opacity(0.15))
-                                    .clipShape(Capsule())
+                                HStack(spacing: 7) {
+                                    // Mode pill (No icon)
+                                    Text(item.mode.rawValue)
+                                        .font(.system(size: 11, weight: .bold))
+                                        .foregroundColor(item.mode == .learn ? Color(hex: 0x2E7D32) : Color(hex: 0xD84315))
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(item.mode == .learn ? Color(hex: 0xE8F5E9) : Color(hex: 0xFBE9E7))
+                                        .clipShape(Capsule())
                                     
-                                    // Level pill
+                                    // Level pill (Distinct color, N4 is Royal Blue)
                                     Text(item.level.rawValue)
                                         .font(.system(size: 11, weight: .heavy))
-                                        .foregroundColor(Color(hex: 0xE65100))
-                                        .padding(.horizontal, 7)
+                                        .foregroundColor(levelForegroundColor(item.level))
+                                        .padding(.horizontal, 8)
                                         .padding(.vertical, 4)
-                                        .background(Color.orange.opacity(0.12))
+                                        .background(levelBackgroundColor(item.level))
                                         .clipShape(Capsule())
                                     
                                     // Type text
@@ -727,6 +715,41 @@ struct ReminderSheetView: View {
                     testSentFeedback = nil
                 }
             }
+        }
+    }
+    
+    // MARK: - Level Color Helpers
+    private func levelForegroundColor(_ level: JLPTLevel) -> Color {
+        switch level {
+        case .n5:
+            return Color(hex: 0x00838F) // Deep Teal
+        case .n4:
+            return Color(hex: 0x1565C0) // Deep Royal Blue (distinct from coral/orange Exercise)
+        case .n3:
+            return Color(hex: 0x6A1B9A) // Deep Purple
+        case .n2:
+            return Color(hex: 0xC2185B) // Deep Ruby
+        case .n1:
+            return Color(hex: 0x37474F) // Deep Slate
+        case .all:
+            return Color(hex: 0x4E342E) // Warm Brown
+        }
+    }
+    
+    private func levelBackgroundColor(_ level: JLPTLevel) -> Color {
+        switch level {
+        case .n5:
+            return Color(hex: 0xE0F7FA) // Soft Teal
+        case .n4:
+            return Color(hex: 0xE3F2FD) // Soft Blue
+        case .n3:
+            return Color(hex: 0xF3E5F5) // Soft Purple
+        case .n2:
+            return Color(hex: 0xFCE4EC) // Soft Rose
+        case .n1:
+            return Color(hex: 0xECEFF1) // Soft Slate
+        case .all:
+            return Color(hex: 0xEFEBE9) // Soft Gray-Brown
         }
     }
 }
