@@ -39,6 +39,11 @@ struct MainContainerView: View {
                     .transition(.move(edge: .bottom).combined(with: .opacity))
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ganbatte_shortcut_to_mistakes"))) { _ in
+            withAnimation(.easeInOut(duration: 0.25)) {
+                activeTabRaw = AppTab.exercise.rawValue
+            }
+        }
         .onReceive(notifService.$pendingDeepLink) { link in
             guard let link = link else { return }
             withAnimation(.easeInOut(duration: 0.25)) {

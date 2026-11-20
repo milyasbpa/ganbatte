@@ -57,4 +57,12 @@ struct Word: Identifiable, Hashable {
     let exampleJa: String
     let exampleEn: String
     let imageName: String
+    
+    var jlptLevel: JLPTLevel {
+        JLPTLevel(rawValue: level) ?? .n5
+    }
+    
+    var wordType: WordType {
+        WordType(rawValue: type) ?? .noun
+    }
 }

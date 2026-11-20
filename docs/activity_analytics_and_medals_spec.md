@@ -161,6 +161,7 @@ flowchart TD
     > `[ Train Verbs Now ➔ ]` *(1-tap button launches ExerciseHub with Kotoba pre-configured to Verbs)*
 - **When Kana is selected:**
   - Compares Hiragana and Katakana side-by-side. Highlights Katakana hesitation with `[ Practice Katakana ➔ ]`.
+- **Mistake Bank & Dual-Key Remediation:** See dedicated master specification in [weakness_spotlight_and_mistake_bank_spec.md](file:///Users/ilyasbashirah/Documents/kerja/bas.co/pictango/ganbatte/docs/weakness_spotlight_and_mistake_bank_spec.md) for full telemetry, mistake bank UI, and graduation rules.
 
 ### 4. Level Mastery Strip (Horizontal Carousel)
 - Horizontal snapping cards capped at $\approx 110\text{pt}$ vertical height:

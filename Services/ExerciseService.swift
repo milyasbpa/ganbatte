@@ -67,4 +67,46 @@ final class ExerciseService {
         
         return questions
     }
+    
+    // MARK: - Generate Focused Mistake Quiz
+    func generateMistakeQuiz(wordIds: [Int], questionType: QuestionType) -> [QuizQuestion] {
+        guard !wordIds.isEmpty else { return [] }
+        
+        let targetWords = DatabaseService.shared.fetchWords(by: wordIds).shuffled()
+        guard !targetWords.isEmpty else { return [] }
+        
+        // Distractor pool
+        var candidateWords = DatabaseService.shared.fetchWords(
+            level: .all,
+            type: .all,
+            searchQuery: "",
+            limit: 1000,
+            offset: 0
+        )
+        if candidateWords.count < 4 {
+            candidateWords = targetWords
+        }
+        
+        var questions: [QuizQuestion] = []
+        for (index, target) in targetWords.enumerated() {
+            var otherWords = candidateWords.filter { $0.id != target.id }
+            otherWords.shuffle()
+            let distractors = Array(otherWords.prefix(3))
+            
+            var options = [target] + distractors
+            options.shuffle()
+            
+            let correctIndex = options.firstIndex(where: { $0.id == target.id }) ?? 0
+            
+            let question = QuizQuestion(
+                questionNumber: index + 1,
+                targetWord: target,
+                options: options,
+                correctIndex: correctIndex,
+                questionType: questionType
+            )
+            questions.append(question)
+        }
+        return questions
+    }
 }

@@ -5,6 +5,8 @@ struct ActivityDashboardView: View {
     @State private var selectedMedal: Medal? = nil
     @State private var selectedDiagnosticCategory: ExerciseCategory = .kotoba
     @State private var isShowingTrophyCabinet: Bool = false
+    @State private var isShowingWeaknessDetail: Bool = false
+    @State private var weaknessDetailInitialTab: MistakeTab = .kotoba
     
     var body: some View {
         ZStack {
@@ -43,6 +45,13 @@ struct ActivityDashboardView: View {
             // Dedicated Full Trophy Cabinet
             if isShowingTrophyCabinet {
                 TrophyCabinetView(isPresented: $isShowingTrophyCabinet)
+                    .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .trailing)))
+                    .zIndex(200)
+            }
+            
+            // Dedicated Weakness Detail (Mistake Bank)
+            if isShowingWeaknessDetail {
+                WeaknessDetailView(isPresented: $isShowingWeaknessDetail, initialTab: weaknessDetailInitialTab)
                     .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .trailing)))
                     .zIndex(200)
             }
@@ -380,6 +389,52 @@ struct ActivityDashboardView: View {
                 }
             }
             
+            // Mistake Bank Callout Banner
+            let mistakeCount = activityService.unresolvedWordMistakesCount
+            if mistakeCount > 0 {
+                Button(action: {
+                    weaknessDetailInitialTab = .kotoba
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        isShowingWeaknessDetail = true
+                    }
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(Color(hex: 0xE65100))
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(mistakeCount) Troublesome Words Recorded")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(AppTheme.textPrimary)
+                            
+                            Text("Graduation requires 2 clean runs (≤ 2.5s)")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(AppTheme.textSecondary)
+                        }
+                        
+                        Spacer()
+                        
+                        HStack(spacing: 4) {
+                            Text("Review Mistakes")
+                                .font(.system(size: 11, weight: .bold))
+                            Image(systemName: "arrow.right")
+                                .font(.system(size: 10, weight: .bold))
+                        }
+                        .foregroundColor(AppTheme.accent)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.white)
+                        .clipShape(Capsule())
+                        .overlay(Capsule().stroke(AppTheme.accent.opacity(0.3), lineWidth: 1))
+                    }
+                    .padding(10)
+                    .background(Color(hex: 0xFFF3E0))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+                .buttonStyle(.plain)
+            }
+            
             // Automated Recommendation Strip with 1-Tap Practice Launcher
             if let weakType = activityService.identifiedWeakWordType {
                 HStack(spacing: 8) {
@@ -487,6 +542,52 @@ struct ActivityDashboardView: View {
                 .padding(12)
                 .background(AppTheme.background)
                 .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            
+            // Kana Mistake Bank Callout Banner
+            let kanaMistakeCount = activityService.unresolvedKanaMistakesCount
+            if kanaMistakeCount > 0 {
+                Button(action: {
+                    weaknessDetailInitialTab = .kana
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        isShowingWeaknessDetail = true
+                    }
+                }) {
+                    HStack(spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(Color(hex: 0xE65100))
+                        
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(kanaMistakeCount) Troublesome Kana Recorded")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(AppTheme.textPrimary)
+                            
+                            Text("Practice automatic recall")
+                                .font(.system(size: 10, weight: .medium))
+                                .foregroundColor(AppTheme.textSecondary)
+                        }
+                        
+                        Spacer()
+                        
+                        HStack(spacing: 4) {
+                            Text("Review Kana")
+                                .font(.system(size: 11, weight: .bold))
+                            Image(systemName: "arrow.right")
+                                .font(.system(size: 10, weight: .bold))
+                        }
+                        .foregroundColor(AppTheme.accent)
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 6)
+                        .background(Color.white)
+                        .clipShape(Capsule())
+                        .overlay(Capsule().stroke(AppTheme.accent.opacity(0.3), lineWidth: 1))
+                    }
+                    .padding(10)
+                    .background(Color(hex: 0xFFF3E0))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+                .buttonStyle(.plain)
             }
             
             if activityService.identifiedWeakKanaScript == .katakana {

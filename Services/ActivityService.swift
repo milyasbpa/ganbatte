@@ -8,6 +8,8 @@ class ActivityService: ObservableObject {
     private let sessionsStorageKey = "ganbatte_activity_sessions_v1"
     private let unlockedMedalsStorageKey = "ganbatte_unlocked_medals_v1"
     private let uniqueWordsStorageKey = "ganbatte_unique_correct_words_v1"
+    private let activeWordMistakesKey = "ganbatte_active_word_mistakes_v1"
+    private let activeKanaMistakesKey = "ganbatte_active_kana_mistakes_v1"
     
     static let totalWordsPerLevel: [JLPTLevel: Int] = [
         .n5: 530,
@@ -22,10 +24,14 @@ class ActivityService: ObservableObject {
     @Published var medals: [Medal] = []
     @Published var newlyUnlockedMedal: Medal? = nil
     @Published var uniqueCorrectWordsByLevel: [String: Set<Int>] = [:]
+    @Published var activeWordMistakes: [WordMistakeEntry] = []
+    @Published var activeKanaMistakes: [KanaMistakeEntry] = []
+    @Published var pendingMistakeWorkoutWordIds: [Int]? = nil
     
     private init() {
         loadSessions()
         loadUniqueCorrectWords()
+        loadMistakes()
         initMedals()
     }
     
@@ -172,6 +178,82 @@ class ActivityService: ObservableObject {
         UserDefaults.standard.set(toSave, forKey: uniqueWordsStorageKey)
     }
     
+    // MARK: - Mistake Bank Persistence & Helpers
+    private func loadMistakes() {
+        if let data = UserDefaults.standard.data(forKey: activeWordMistakesKey),
+           let decoded = try? JSONDecoder().decode([WordMistakeEntry].self, from: data) {
+            self.activeWordMistakes = decoded
+        }
+        if let data = UserDefaults.standard.data(forKey: activeKanaMistakesKey),
+           let decoded = try? JSONDecoder().decode([KanaMistakeEntry].self, from: data) {
+            self.activeKanaMistakes = decoded
+        }
+    }
+    
+    func saveWordMistakes() {
+        if let data = try? JSONEncoder().encode(activeWordMistakes) {
+            UserDefaults.standard.set(data, forKey: activeWordMistakesKey)
+        }
+    }
+    
+    func saveKanaMistakes() {
+        if let data = try? JSONEncoder().encode(activeKanaMistakes) {
+            UserDefaults.standard.set(data, forKey: activeKanaMistakesKey)
+        }
+    }
+    
+    var unresolvedWordMistakes: [WordMistakeEntry] {
+        activeWordMistakes.filter { !$0.isResolved }
+    }
+    
+    var unresolvedWordMistakesCount: Int {
+        unresolvedWordMistakes.count
+    }
+    
+    var unresolvedKanaMistakes: [KanaMistakeEntry] {
+        activeKanaMistakes.filter { !$0.isResolved }
+    }
+    
+    var unresolvedKanaMistakesCount: Int {
+        unresolvedKanaMistakes.count
+    }
+    
+    func clearWordMistake(wordId: Int) {
+        if let index = activeWordMistakes.firstIndex(where: { $0.wordId == wordId }) {
+            activeWordMistakes[index].isResolved = true
+            saveWordMistakes()
+        }
+    }
+    
+    func clearKanaMistake(character: String, script: KanaType) {
+        if let index = activeKanaMistakes.firstIndex(where: { $0.character == character && $0.script == script }) {
+            activeKanaMistakes[index].isResolved = true
+            saveKanaMistakes()
+        }
+    }
+    
+    func resetAllMistakes() {
+        activeWordMistakes.removeAll()
+        activeKanaMistakes.removeAll()
+        pendingMistakeWorkoutWordIds = nil
+        saveWordMistakes()
+        saveKanaMistakes()
+    }
+    
+    // MARK: - Mistake Workout Navigation
+    func triggerMistakeWorkout(wordIds: [Int]) {
+        self.pendingMistakeWorkoutWordIds = wordIds
+        NotificationCenter.default.post(
+            name: NSNotification.Name("ganbatte_shortcut_to_mistakes"),
+            object: nil,
+            userInfo: ["wordIds": wordIds]
+        )
+    }
+    
+    func clearPendingMistakeWorkout() {
+        self.pendingMistakeWorkoutWordIds = nil
+    }
+    
     // MARK: - Unique Correct Word Tracking
     func recordCorrectWords(level: JLPTLevel, wordIds: [Int]) {
         guard level != .all, !wordIds.isEmpty else { return }
@@ -232,8 +314,50 @@ class ActivityService: ObservableObject {
     func recordWordSession(_ result: QuizSessionResult) {
         guard result.totalQuestions > 0 else { return }
         
-        // Extract word IDs that were answered CORRECTLY
+        // Extract word IDs that were answered CORRECTLY and INCORRECTLY
         let correctIds = result.results.filter { $0.isCorrect }.map { $0.question.targetWord.id }
+        let incorrectIds = result.results.filter { !$0.isCorrect }.map { $0.question.targetWord.id }
+        
+        // Update Mistake Bank with Dual-Key Graduation rule (Option 1)
+        for item in result.results {
+            let word = item.question.targetWord
+            let isCorrect = item.isCorrect
+            let pace = item.timeSpent
+            
+            if !isCorrect {
+                // Incorrect answer: record or reset clean streak
+                if let index = activeWordMistakes.firstIndex(where: { $0.wordId == word.id }) {
+                    activeWordMistakes[index].failCount += 1
+                    activeWordMistakes[index].consecutiveCleanCount = 0
+                    activeWordMistakes[index].lastFailedAt = Date()
+                    activeWordMistakes[index].isResolved = false
+                } else {
+                    let entry = WordMistakeEntry(
+                        wordId: word.id,
+                        level: word.jlptLevel,
+                        wordType: word.wordType,
+                        failCount: 1,
+                        consecutiveCleanCount: 0,
+                        lastFailedAt: Date(),
+                        isResolved: false
+                    )
+                    activeWordMistakes.append(entry)
+                }
+            } else {
+                // Correct answer: check if it's an active mistake
+                if let index = activeWordMistakes.firstIndex(where: { $0.wordId == word.id && !$0.isResolved }) {
+                    if pace <= 2.5 {
+                        // Clean automatic recall under 2.5 seconds
+                        activeWordMistakes[index].consecutiveCleanCount += 1
+                        if activeWordMistakes[index].consecutiveCleanCount >= 2 {
+                            activeWordMistakes[index].isResolved = true // Dual-Key graduation!
+                        }
+                    }
+                    // If pace > 2.5s, clean streak is preserved without incrementing (hesitation)
+                }
+            }
+        }
+        saveWordMistakes()
         
         let record = SessionRecord(
             date: Date(),
@@ -245,7 +369,8 @@ class ActivityService: ObservableObject {
             level: result.config.level,
             wordType: result.config.type,
             kanaType: nil,
-            correctWordIds: correctIds
+            correctWordIds: correctIds,
+            incorrectWordIds: incorrectIds
         )
         
         if result.config.level != .all {
@@ -261,6 +386,48 @@ class ActivityService: ObservableObject {
         
         let kanaType = summary.results.first?.question.word.type ?? .hiragana
         
+        // Update Kana Mistake Bank with Dual-Key rule
+        for res in summary.results {
+            let char = res.question.word.kana
+            let romaji = res.question.word.romaji
+            let script = res.question.word.type
+            let isCorrect = res.isCorrect
+            let pace = res.timeSeconds
+            
+            if !isCorrect {
+                if let index = activeKanaMistakes.firstIndex(where: { $0.character == char && $0.script == script }) {
+                    activeKanaMistakes[index].failCount += 1
+                    activeKanaMistakes[index].consecutiveCleanCount = 0
+                    activeKanaMistakes[index].lastFailedAt = Date()
+                    activeKanaMistakes[index].isResolved = false
+                } else {
+                    let entry = KanaMistakeEntry(
+                        character: char,
+                        romaji: romaji,
+                        script: script,
+                        failCount: 1,
+                        slowCount: 0,
+                        consecutiveCleanCount: 0,
+                        lastFailedAt: Date(),
+                        isResolved: false
+                    )
+                    activeKanaMistakes.append(entry)
+                }
+            } else {
+                if let index = activeKanaMistakes.firstIndex(where: { $0.character == char && $0.script == script && !$0.isResolved }) {
+                    if pace <= 2.5 {
+                        activeKanaMistakes[index].consecutiveCleanCount += 1
+                        if activeKanaMistakes[index].consecutiveCleanCount >= 2 {
+                            activeKanaMistakes[index].isResolved = true
+                        }
+                    } else {
+                        activeKanaMistakes[index].slowCount += 1
+                    }
+                }
+            }
+        }
+        saveKanaMistakes()
+        
         let record = SessionRecord(
             date: Date(),
             practiceType: .kana,
@@ -271,7 +438,8 @@ class ActivityService: ObservableObject {
             level: nil,
             wordType: nil,
             kanaType: kanaType,
-            correctWordIds: nil
+            correctWordIds: nil,
+            incorrectWordIds: nil
         )
         
         addSession(record)

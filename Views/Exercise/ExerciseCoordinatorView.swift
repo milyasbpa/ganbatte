@@ -8,6 +8,7 @@ enum ExerciseFlowState {
 
 struct ExerciseCoordinatorView: View {
     var initialConfig: QuizConfig? = nil
+    var customQuestions: [QuizQuestion]? = nil
     var startImmediately: Bool = false
     var onDismiss: () -> Void
     
@@ -18,10 +19,12 @@ struct ExerciseCoordinatorView: View {
     
     init(
         initialConfig: QuizConfig? = nil,
+        customQuestions: [QuizQuestion]? = nil,
         startImmediately: Bool = false,
         onDismiss: @escaping () -> Void
     ) {
         self.initialConfig = initialConfig
+        self.customQuestions = customQuestions
         self.startImmediately = startImmediately
         self.onDismiss = onDismiss
         
@@ -30,7 +33,7 @@ struct ExerciseCoordinatorView: View {
         
         if startImmediately {
             self._flowState = State(initialValue: .quiz)
-            let questions = ExerciseService.shared.generateQuiz(config: loadedConfig)
+            let questions = customQuestions ?? ExerciseService.shared.generateQuiz(config: loadedConfig)
             self._currentQuestions = State(initialValue: questions)
         } else {
             self._flowState = State(initialValue: .config)

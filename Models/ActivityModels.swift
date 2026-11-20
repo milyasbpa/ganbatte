@@ -29,6 +29,7 @@ struct SessionRecord: Identifiable, Codable {
     var wordType: WordType?
     var kanaType: KanaType?
     var correctWordIds: [Int]?
+    var incorrectWordIds: [Int]?
     
     var accuracyPercentage: Double {
         guard questionCount > 0 else { return 0 }
@@ -46,7 +47,8 @@ struct SessionRecord: Identifiable, Codable {
         level: JLPTLevel? = nil,
         wordType: WordType? = nil,
         kanaType: KanaType? = nil,
-        correctWordIds: [Int]? = nil
+        correctWordIds: [Int]? = nil,
+        incorrectWordIds: [Int]? = nil
     ) {
         self.id = id
         self.date = date
@@ -59,6 +61,7 @@ struct SessionRecord: Identifiable, Codable {
         self.wordType = wordType
         self.kanaType = kanaType
         self.correctWordIds = correctWordIds
+        self.incorrectWordIds = incorrectWordIds
     }
 }
 
@@ -177,6 +180,76 @@ struct MedalProgressInfo: Identifiable {
     
     var progressPercentageText: String {
         "\(Int(round(progressRatio * 100.0)))%"
+    }
+}
+
+// MARK: - Mistake Bank Models
+struct WordMistakeEntry: Codable, Identifiable, Equatable {
+    var id: Int { wordId }
+    let wordId: Int
+    let level: JLPTLevel
+    let wordType: WordType
+    var failCount: Int
+    var consecutiveCleanCount: Int // Needs 2 consecutive correct answers <= 2.5s to graduate
+    var lastFailedAt: Date
+    var isResolved: Bool
+    
+    var graduationProgress: Double {
+        min(1.0, Double(consecutiveCleanCount) / 2.0)
+    }
+    
+    init(
+        wordId: Int,
+        level: JLPTLevel,
+        wordType: WordType,
+        failCount: Int = 1,
+        consecutiveCleanCount: Int = 0,
+        lastFailedAt: Date = Date(),
+        isResolved: Bool = false
+    ) {
+        self.wordId = wordId
+        self.level = level
+        self.wordType = wordType
+        self.failCount = failCount
+        self.consecutiveCleanCount = consecutiveCleanCount
+        self.lastFailedAt = lastFailedAt
+        self.isResolved = isResolved
+    }
+}
+
+struct KanaMistakeEntry: Codable, Identifiable, Equatable {
+    var id: String { "\(script.rawValue)_\(character)" }
+    let character: String
+    let romaji: String
+    let script: KanaType
+    var failCount: Int
+    var slowCount: Int // Hesitation > 2.5s
+    var consecutiveCleanCount: Int
+    var lastFailedAt: Date
+    var isResolved: Bool
+    
+    var graduationProgress: Double {
+        min(1.0, Double(consecutiveCleanCount) / 2.0)
+    }
+    
+    init(
+        character: String,
+        romaji: String,
+        script: KanaType,
+        failCount: Int = 1,
+        slowCount: Int = 0,
+        consecutiveCleanCount: Int = 0,
+        lastFailedAt: Date = Date(),
+        isResolved: Bool = false
+    ) {
+        self.character = character
+        self.romaji = romaji
+        self.script = script
+        self.failCount = failCount
+        self.slowCount = slowCount
+        self.consecutiveCleanCount = consecutiveCleanCount
+        self.lastFailedAt = lastFailedAt
+        self.isResolved = isResolved
     }
 }
 

@@ -251,4 +251,64 @@ final class DatabaseService {
             return results
         }
     }
+    
+    // MARK: - Fetch Words by IDs
+    func fetchWords(by ids: [Int]) -> [Word] {
+        guard !ids.isEmpty else { return [] }
+        return queue.sync {
+            guard let db = db else { return [] }
+            
+            let placeholders = Array(repeating: "?", count: ids.count).joined(separator: ",")
+            let query = "SELECT id, level, type, card_number, kanji, kana, romaji, meaning_en, meaning_ja, example_ja, example_en, image_name FROM words WHERE id IN (\(placeholders))"
+            
+            var statement: OpaquePointer?
+            defer { sqlite3_finalize(statement) }
+            
+            guard sqlite3_prepare_v2(db, query, -1, &statement, nil) == SQLITE_OK else {
+                return []
+            }
+            
+            for (index, id) in ids.enumerated() {
+                sqlite3_bind_int(statement, Int32(index + 1), Int32(id))
+            }
+            
+            var results: [Word] = []
+            while sqlite3_step(statement) == SQLITE_ROW {
+                let id = Int(sqlite3_column_int(statement, 0))
+                let level = String(cString: sqlite3_column_text(statement, 1))
+                let type = String(cString: sqlite3_column_text(statement, 2))
+                let cardNumber = Int(sqlite3_column_int(statement, 3))
+                let kanji = String(cString: sqlite3_column_text(statement, 4))
+                let kana = String(cString: sqlite3_column_text(statement, 5))
+                let romaji = String(cString: sqlite3_column_text(statement, 6))
+                let meaningEn = String(cString: sqlite3_column_text(statement, 7))
+                let meaningJa = String(cString: sqlite3_column_text(statement, 8))
+                let exampleJa = String(cString: sqlite3_column_text(statement, 9))
+                let exampleEn = String(cString: sqlite3_column_text(statement, 10))
+                let imageName = String(cString: sqlite3_column_text(statement, 11))
+                
+                let word = Word(
+                    id: id,
+                    level: level,
+                    type: type,
+                    cardNumber: cardNumber,
+                    kanji: kanji,
+                    kana: kana,
+                    romaji: romaji,
+                    meaningEn: meaningEn,
+                    meaningJa: meaningJa,
+                    exampleJa: exampleJa,
+                    exampleEn: exampleEn,
+                    imageName: imageName
+                )
+                results.append(word)
+            }
+            
+            return results
+        }
+    }
+    
+    func fetchWord(id: Int) -> Word? {
+        fetchWords(by: [id]).first
+    }
 }

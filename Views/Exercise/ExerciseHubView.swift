@@ -22,6 +22,10 @@ struct ExerciseHubView: View {
     @State private var selectedCategory: ExerciseCategory = .kotoba
     @State private var activeWorkout: ActiveWorkout? = nil
     
+    // Mistake Drill Mode State
+    @State private var mistakeDrillWordIds: [Int]? = nil
+    @State private var customMistakeQuestions: [QuizQuestion]? = nil
+    
     // Kotoba Configuration State
     @State private var kotobaConfig = QuizConfig.load()
     @State private var totalWords: Int = 966
@@ -84,10 +88,14 @@ struct ExerciseHubView: View {
             if activeWorkout == .vocab {
                 ExerciseCoordinatorView(
                     initialConfig: kotobaConfig,
+                    customQuestions: customMistakeQuestions,
                     startImmediately: true,
                     onDismiss: {
                         withAnimation(.easeInOut(duration: 0.25)) {
                             activeWorkout = nil
+                            customMistakeQuestions = nil
+                            mistakeDrillWordIds = nil
+                            activityService.clearPendingMistakeWorkout()
                             hideBottomBar = false
                         }
                     }
@@ -113,6 +121,9 @@ struct ExerciseHubView: View {
             kotobaConfig = QuizConfig.load()
             kanaConfig = KanaQuizConfig.load()
             updateKotobaTotalWords()
+            if let pending = activityService.pendingMistakeWorkoutWordIds {
+                self.mistakeDrillWordIds = pending
+            }
         }
         .onChange(of: kotobaConfig.level) { _ in
             updateKotobaTotalWords()
@@ -122,6 +133,16 @@ struct ExerciseHubView: View {
         }
         .onChange(of: activeWorkout) { workout in
             hideBottomBar = (workout != nil)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ganbatte_shortcut_to_mistakes"))) { notif in
+            selectedCategory = .kotoba
+            if let ids = notif.userInfo?["wordIds"] as? [Int] {
+                mistakeDrillWordIds = ids
+            } else if let pending = activityService.pendingMistakeWorkoutWordIds {
+                mistakeDrillWordIds = pending
+            } else {
+                mistakeDrillWordIds = activityService.unresolvedWordMistakes.map { $0.wordId }
+            }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ganbatte_shortcut_to_exercise"))) { notif in
             if let catStr = notif.userInfo?["category"] as? String {
@@ -238,197 +259,279 @@ struct ExerciseHubView: View {
     // MARK: - Kotoba Live Console
     private var kotobaConsoleView: some View {
         VStack(spacing: 12) {
-            // Card 1: JLPT Level & Word Range
-            VStack(alignment: .leading, spacing: 12) {
-                // JLPT Level Selection
-                VStack(alignment: .leading, spacing: 7) {
-                    HStack {
-                        Text("JLPT LEVEL")
+            if let mistakeIds = mistakeDrillWordIds, !mistakeIds.isEmpty {
+                mistakeWorkoutBannerCard(mistakeIds: mistakeIds)
+            } else {
+                kotobaLevelAndRangeCard
+            }
+            
+            kotobaQuestionStyleCard
+        }
+    }
+    
+    // MARK: - Focused Mistake Workout Card
+    private func mistakeWorkoutBannerCard(mistakeIds: [Int]) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .center, spacing: 10) {
+                ZStack {
+                    Circle()
+                        .fill(Color.orange.opacity(0.15))
+                        .frame(width: 38, height: 38)
+                    
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(.orange)
+                }
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("MISTAKE WORKOUT")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.orange)
+                        .tracking(0.5)
+                    
+                    Text("\(mistakeIds.count) Target Words Loaded")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundColor(AppTheme.textPrimary)
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        mistakeDrillWordIds = nil
+                        customMistakeQuestions = nil
+                        activityService.clearPendingMistakeWorkout()
+                    }
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "xmark")
                             .font(.system(size: 11, weight: .bold))
-                            .foregroundColor(AppTheme.textSecondary)
-                            .tracking(0.5)
-                        
-                        Spacer()
-                        
-                        let covPct = activityService.coveragePercentage(level: kotobaConfig.level)
-                        HStack(spacing: 4) {
-                            Text("\(totalWords) Words Available")
-                            if kotobaConfig.level != .all && covPct > 0 {
-                                Text("•")
-                                    .foregroundColor(AppTheme.textTertiary)
-                                Text("\(Int(round(covPct)))% Cleared")
-                                    .foregroundColor(Color(red: 0.20, green: 0.70, blue: 0.45))
-                            }
-                        }
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundColor(AppTheme.accent)
+                        Text("Exit")
+                            .font(.system(size: 11, weight: .bold))
                     }
-                    
-                    HStack(spacing: 6) {
-                        ForEach([JLPTLevel.n5, .n4, .n3, .n2, .n1, .all], id: \.self) { level in
-                            let isLevelSelected = kotobaConfig.level == level
-                            Button(action: {
-                                kotobaConfig.level = level
-                            }) {
-                                Text(level.rawValue)
-                                    .font(.system(size: 13, weight: .bold))
-                                    .foregroundColor(isLevelSelected ? .white : AppTheme.textPrimary)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 7)
-                                    .background(isLevelSelected ? AppTheme.accent : AppTheme.inputBackground)
-                                    .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
+                    .foregroundColor(AppTheme.textSecondary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(AppTheme.inputBackground)
+                    .clipShape(Capsule())
                 }
-                
-                Divider()
-                
-                // TYPE (formerly PART OF SPEECH)
-                VStack(alignment: .leading, spacing: 7) {
-                    Text("TYPE")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(AppTheme.textSecondary)
-                        .tracking(0.5)
-                    
-                    HStack(spacing: 6) {
-                        ForEach(WordType.allCases) { wType in
-                            let isSelected = kotobaConfig.type == wType
-                            Button(action: {
-                                kotobaConfig.type = wType
-                            }) {
-                                Text(wType.rawValue)
-                                    .font(.system(size: 12, weight: .bold))
-                                    .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
-                                    .frame(maxWidth: .infinity)
-                                    .padding(.vertical, 7)
-                                    .background(isSelected ? AppTheme.accent : AppTheme.inputBackground)
-                                    .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
-                            }
-                            .buttonStyle(.plain)
-                        }
-                    }
-                }
-                
-                Divider()
-                
-                // WORD RANGE (10 Words Quick Jump)
-                VStack(alignment: .leading, spacing: 7) {
-                    Text("WORD RANGE")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(AppTheme.textSecondary)
-                        .tracking(0.5)
-                    
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 7) {
-                            ForEach(batchRanges, id: \.start) { batch in
-                                let isBatchSelected = kotobaConfig.startWord == batch.start && kotobaConfig.endWord == batch.end
-                                Button(action: {
-                                    kotobaConfig.startWord = batch.start
-                                    kotobaConfig.endWord = batch.end
-                                }) {
-                                    Text("\(batch.start) – \(batch.end)")
-                                        .font(.system(size: 12, weight: .bold, design: .rounded))
-                                        .foregroundColor(isBatchSelected ? .white : AppTheme.textPrimary)
-                                        .padding(.horizontal, 13)
-                                        .padding(.vertical, 7)
-                                        .background(isBatchSelected ? AppTheme.accent : AppTheme.inputBackground)
-                                        .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
-                                        .overlay(
-                                            RoundedRectangle(cornerRadius: 9, style: .continuous)
-                                                .stroke(isBatchSelected ? Color.clear : AppTheme.buttonBorder.opacity(0.5), lineWidth: 1)
-                                        )
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-                    }
-                }
-                
-                // Custom Range Stepper (Compact inline)
+                .buttonStyle(.plain)
+            }
+            
+            Divider()
+            
+            HStack(spacing: 6) {
+                Image(systemName: "shield.lefthalf.filled")
+                    .font(.system(size: 12))
+                    .foregroundColor(AppTheme.accent)
+                Text("Dual-Key Graduation: 2 consecutive clean answers in ≤ 2.5s clears each word.")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(AppTheme.textSecondary)
+            }
+        }
+        .padding(14)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(Color.orange.opacity(0.4), lineWidth: 1.5)
+        )
+        .shadow(color: Color.orange.opacity(0.06), radius: 6, x: 0, y: 2)
+    }
+    
+    // MARK: - Kotoba Level and Range Card
+    private var kotobaLevelAndRangeCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // JLPT Level Selection
+            VStack(alignment: .leading, spacing: 7) {
                 HStack {
-                    Text("Custom Range:")
-                        .font(.system(size: 12, weight: .medium))
+                    Text("JLPT LEVEL")
+                        .font(.system(size: 11, weight: .bold))
                         .foregroundColor(AppTheme.textSecondary)
+                        .tracking(0.5)
                     
                     Spacer()
                     
-                    HStack(spacing: 6) {
-                        // Start stepper
-                        stepperControl(
-                            value: $kotobaConfig.startWord,
-                            range: 1...kotobaConfig.endWord
-                        )
-                        
-                        Text("to")
-                            .font(.system(size: 11, weight: .medium))
-                            .foregroundColor(AppTheme.textSecondary)
-                        
-                        // End stepper
-                        stepperControl(
-                            value: $kotobaConfig.endWord,
-                            range: kotobaConfig.startWord...totalWords
-                        )
+                    let covPct = activityService.coveragePercentage(level: kotobaConfig.level)
+                    HStack(spacing: 4) {
+                        Text("\(totalWords) Words Available")
+                        if kotobaConfig.level != .all && covPct > 0 {
+                            Text("•")
+                                .foregroundColor(AppTheme.textTertiary)
+                            Text("\(Int(round(covPct)))% Cleared")
+                                .foregroundColor(Color(red: 0.20, green: 0.70, blue: 0.45))
+                        }
                     }
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundColor(AppTheme.accent)
                 }
-            }
-            .padding(14)
-            .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(AppTheme.buttonBorder, lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
-            
-            // Card 2: Question Style (Horizontal 3-Column) + Part of Speech
-            VStack(alignment: .leading, spacing: 12) {
-                // Header
-                Text("QUESTION STYLE")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(AppTheme.textSecondary)
-                    .tracking(0.5)
                 
-                // Horizontal 3-Column Selector
-                HStack(spacing: 8) {
-                    ForEach(QuestionType.allCases) { qType in
-                        let isSelected = kotobaConfig.questionType == qType
+                HStack(spacing: 6) {
+                    ForEach([JLPTLevel.n5, .n4, .n3, .n2, .n1, .all], id: \.self) { level in
+                        let isLevelSelected = kotobaConfig.level == level
                         Button(action: {
-                            kotobaConfig.questionType = qType
+                            kotobaConfig.level = level
                         }) {
-                            VStack(spacing: 5) {
-                                Image(systemName: qType.iconName)
-                                    .font(.system(size: 17, weight: .semibold))
-                                    .foregroundColor(isSelected ? AppTheme.accent : AppTheme.textPrimary)
-                                
-                                Text(qTypeTitle(qType))
-                                    .font(.system(size: 12, weight: .bold))
-                                    .foregroundColor(isSelected ? AppTheme.accent : AppTheme.textPrimary)
-                                    .lineLimit(1)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(isSelected ? AppTheme.accentLight.opacity(0.4) : AppTheme.inputBackground)
-                            .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 11, style: .continuous)
-                                    .stroke(isSelected ? AppTheme.accent : Color.clear, lineWidth: 1.5)
-                            )
+                            Text(level.rawValue)
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(isLevelSelected ? .white : AppTheme.textPrimary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 7)
+                                .background(isLevelSelected ? AppTheme.accent : AppTheme.inputBackground)
+                                .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
                         }
                         .buttonStyle(.plain)
                     }
                 }
             }
-            .padding(14)
-            .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(AppTheme.buttonBorder, lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
+            
+            Divider()
+            
+            // TYPE (formerly PART OF SPEECH)
+            VStack(alignment: .leading, spacing: 7) {
+                Text("TYPE")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(AppTheme.textSecondary)
+                    .tracking(0.5)
+                
+                HStack(spacing: 6) {
+                    ForEach(WordType.allCases) { wType in
+                        let isSelected = kotobaConfig.type == wType
+                        Button(action: {
+                            kotobaConfig.type = wType
+                        }) {
+                            Text(wType.rawValue)
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 7)
+                                .background(isSelected ? AppTheme.accent : AppTheme.inputBackground)
+                                .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+            
+            Divider()
+            
+            // WORD RANGE (10 Words Quick Jump)
+            VStack(alignment: .leading, spacing: 7) {
+                Text("WORD RANGE")
+                    .font(.system(size: 11, weight: .bold))
+                    .foregroundColor(AppTheme.textSecondary)
+                    .tracking(0.5)
+                
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 7) {
+                        ForEach(batchRanges, id: \.start) { batch in
+                            let isBatchSelected = kotobaConfig.startWord == batch.start && kotobaConfig.endWord == batch.end
+                            Button(action: {
+                                kotobaConfig.startWord = batch.start
+                                kotobaConfig.endWord = batch.end
+                            }) {
+                                Text("\(batch.start) – \(batch.end)")
+                                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                                    .foregroundColor(isBatchSelected ? .white : AppTheme.textPrimary)
+                                    .padding(.horizontal, 13)
+                                    .padding(.vertical, 7)
+                                    .background(isBatchSelected ? AppTheme.accent : AppTheme.inputBackground)
+                                    .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 9, style: .continuous)
+                                            .stroke(isBatchSelected ? Color.clear : AppTheme.buttonBorder.opacity(0.5), lineWidth: 1)
+                                    )
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
+                }
+            }
+            
+            // Custom Range Stepper (Compact inline)
+            HStack {
+                Text("Custom Range:")
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(AppTheme.textSecondary)
+                
+                Spacer()
+                
+                HStack(spacing: 6) {
+                    // Start stepper
+                    stepperControl(
+                        value: $kotobaConfig.startWord,
+                        range: 1...kotobaConfig.endWord
+                    )
+                    
+                    Text("to")
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundColor(AppTheme.textSecondary)
+                    
+                    // End stepper
+                    stepperControl(
+                        value: $kotobaConfig.endWord,
+                        range: kotobaConfig.startWord...totalWords
+                    )
+                }
+            }
         }
+        .padding(14)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(AppTheme.buttonBorder, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
+    }
+    
+    // MARK: - Kotoba Question Style Card
+    private var kotobaQuestionStyleCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            // Header
+            Text("QUESTION STYLE")
+                .font(.system(size: 11, weight: .bold))
+                .foregroundColor(AppTheme.textSecondary)
+                .tracking(0.5)
+            
+            // Horizontal 3-Column Selector
+            HStack(spacing: 8) {
+                ForEach(QuestionType.allCases) { qType in
+                    let isSelected = kotobaConfig.questionType == qType
+                    Button(action: {
+                        kotobaConfig.questionType = qType
+                    }) {
+                        VStack(spacing: 5) {
+                            Image(systemName: qType.iconName)
+                                .font(.system(size: 17, weight: .semibold))
+                                .foregroundColor(isSelected ? AppTheme.accent : AppTheme.textPrimary)
+                            
+                            Text(qTypeTitle(qType))
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(isSelected ? AppTheme.accent : AppTheme.textPrimary)
+                                .lineLimit(1)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(isSelected ? AppTheme.accentLight.opacity(0.4) : AppTheme.inputBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 11, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 11, style: .continuous)
+                                .stroke(isSelected ? AppTheme.accent : Color.clear, lineWidth: 1.5)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+        }
+        .padding(14)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(AppTheme.buttonBorder, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
     }
     
     // MARK: - Kana Live Console
@@ -548,27 +651,62 @@ struct ExerciseHubView: View {
     private var bottomActionButton: some View {
         Group {
             if selectedCategory == .kotoba {
-                Button(action: {
-                    kotobaConfig.save()
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        activeWorkout = .vocab
-                        hideBottomBar = true
+                if let mistakeIds = mistakeDrillWordIds, !mistakeIds.isEmpty {
+                    Button(action: {
+                        kotobaConfig.save()
+                        customMistakeQuestions = ExerciseService.shared.generateMistakeQuiz(
+                            wordIds: mistakeIds,
+                            questionType: kotobaConfig.questionType
+                        )
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            activeWorkout = .vocab
+                            hideBottomBar = true
+                        }
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "bolt.fill")
+                                .font(.system(size: 15, weight: .bold))
+                            Text("Start Mistake Workout (\(mistakeIds.count) Questions)")
+                                .font(.system(size: 15, weight: .bold))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: 0xE65100), AppTheme.accent],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .shadow(color: AppTheme.accent.opacity(0.3), radius: 8, x: 0, y: 4)
                     }
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "play.fill")
-                            .font(.system(size: 15, weight: .bold))
-                        Text("Start Quiz (\(kotobaConfig.questionCount) Questions)")
-                            .font(.system(size: 15, weight: .bold))
+                    .buttonStyle(BubbleScaleButtonStyle())
+                } else {
+                    Button(action: {
+                        kotobaConfig.save()
+                        customMistakeQuestions = nil
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            activeWorkout = .vocab
+                            hideBottomBar = true
+                        }
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 15, weight: .bold))
+                            Text("Start Quiz (\(kotobaConfig.questionCount) Questions)")
+                                .font(.system(size: 15, weight: .bold))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(AppTheme.accent)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .shadow(color: AppTheme.accent.opacity(0.3), radius: 8, x: 0, y: 4)
                     }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(AppTheme.accent)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .shadow(color: AppTheme.accent.opacity(0.3), radius: 8, x: 0, y: 4)
+                    .buttonStyle(BubbleScaleButtonStyle())
                 }
-                .buttonStyle(BubbleScaleButtonStyle())
             } else if selectedCategory == .kana {
                 Button(action: {
                     kanaConfig.save()
