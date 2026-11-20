@@ -7,19 +7,34 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
     @Published var authorizationStatus: UNAuthorizationStatus = .notDetermined
     @Published var pendingDeepLink: ReminderDeepLink? = nil
     
+    private var center: UNUserNotificationCenter? {
+        guard Bundle.main.bundleIdentifier != nil else { return nil }
+        return UNUserNotificationCenter.current()
+    }
+    
     private override init() {
         super.init()
-        UNUserNotificationCenter.current().delegate = self
+        guard let center = center else {
+            authorizationStatus = .authorized
+            return
+        }
+        center.delegate = self
         checkAuthorization()
     }
     
     func setup() {
-        UNUserNotificationCenter.current().delegate = self
+        guard let center = center else { return }
+        center.delegate = self
         checkAuthorization()
     }
     
     func checkAuthorization(completion: ((UNAuthorizationStatus) -> Void)? = nil) {
-        UNUserNotificationCenter.current().getNotificationSettings { settings in
+        guard let center = center else {
+            self.authorizationStatus = .authorized
+            completion?(.authorized)
+            return
+        }
+        center.getNotificationSettings { settings in
             DispatchQueue.main.async {
                 self.authorizationStatus = settings.authorizationStatus
                 completion?(settings.authorizationStatus)
@@ -28,7 +43,10 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
     }
     
     func requestPermission(completion: ((Bool) -> Void)? = nil) {
-        let center = UNUserNotificationCenter.current()
+        guard let center = center else {
+            completion?(true)
+            return
+        }
         let options: UNAuthorizationOptions = [.alert, .sound, .badge]
         
         center.requestAuthorization(options: options) { granted, error in
@@ -45,7 +63,7 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
     
     // MARK: - Reschedule All
     func rescheduleAllReminders() {
-        let center = UNUserNotificationCenter.current()
+        guard let center = center else { return }
         
         center.getPendingNotificationRequests { existing in
             let toRemove = existing
@@ -61,20 +79,26 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
     
     private func scheduleKanaReminders() {
         let settings = KanaReminderSettings.load()
-        guard settings.isEnabled else { return }
-        
-        let center = UNUserNotificationCenter.current()
+        guard settings.isEnabled, let center = center else { return }
         
         for item in settings.items {
             let content = UNMutableNotificationContent()
-            content.title = "Kana Speed Practice"
             let scriptTitle = item.script == .katakana ? "Katakana" : "Hiragana"
-            content.body = "Time to practice your \(scriptTitle) reading speed! Complete 15 words in 60 seconds."
+            
+            if item.mode == .learn {
+                content.title = "📖 \(scriptTitle) Flashcards"
+                content.body = "Time to review \(scriptTitle) characters and stroke order!"
+            } else {
+                content.title = "⚡ \(scriptTitle) Speed Practice"
+                content.body = "Time to practice your \(scriptTitle) reading speed! 15 words in 60 seconds."
+            }
+            
             content.sound = .default
             content.attachments = makeNotificationAttachments()
             content.userInfo = [
                 "type": "kana",
-                "script": item.script.rawValue
+                "script": item.script.rawValue,
+                "mode": item.mode.rawValue
             ]
             
             var comps = DateComponents()
@@ -93,23 +117,28 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
     
     private func scheduleWordReminders() {
         let settings = WordReminderSettings.load()
-        guard settings.isEnabled else { return }
-        
-        let center = UNUserNotificationCenter.current()
+        guard settings.isEnabled, let center = center else { return }
         
         for item in settings.items {
             let content = UNMutableNotificationContent()
             let levelTitle = item.level == .all ? "All Levels" : item.level.rawValue
             let typeTitle = item.type == .all ? "Vocabulary" : "\(item.type.title)s"
             
-            content.title = "📖 \(levelTitle) \(typeTitle) Drill"
-            content.body = "Time to practice \(levelTitle) \(typeTitle.lowercased())! Keep your N2 streak strong."
+            if item.mode == .learn {
+                content.title = "📖 Learn \(levelTitle) \(typeTitle)"
+                content.body = "Time to explore new \(levelTitle) \(typeTitle.lowercased()) cards with native illustrations & audio."
+            } else {
+                content.title = "⚡ \(levelTitle) \(typeTitle) Drill"
+                content.body = "Ready for your \(levelTitle) \(typeTitle.lowercased()) speed test? Lock in your streak!"
+            }
+            
             content.sound = .default
             content.attachments = makeNotificationAttachments()
             content.userInfo = [
                 "type": "words",
                 "level": item.level.rawValue,
-                "wordType": item.type.rawValue
+                "wordType": item.type.rawValue,
+                "mode": item.mode.rawValue
             ]
             
             var comps = DateComponents()
@@ -129,32 +158,42 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
     // MARK: - Instant Test Notification
     func sendTestNotification(target: ReminderDeepLink, delay: TimeInterval = 3, completion: @escaping (Bool) -> Void) {
         requestPermission { granted in
-            guard granted else {
+            guard granted, let center = self.center else {
                 completion(false)
                 return
             }
             
-            let center = UNUserNotificationCenter.current()
             let content = UNMutableNotificationContent()
             content.sound = .default
             content.attachments = self.makeNotificationAttachments()
             
             switch target {
-            case .kana(let script):
-                content.title = "Kana Speed Practice (Test)"
+            case .kana(let script, let mode):
                 let title = script == .katakana ? "Katakana" : "Hiragana"
-                content.body = "Tap to practice \(title) reading speed now!"
-                content.userInfo = ["type": "kana", "script": script.rawValue]
+                if mode == .learn {
+                    content.title = "📖 \(title) Flashcards (Test)"
+                    content.body = "Tap to review \(title) characters and stroke order now!"
+                } else {
+                    content.title = "⚡ \(title) Speed Practice (Test)"
+                    content.body = "Tap to practice \(title) reading speed now!"
+                }
+                content.userInfo = ["type": "kana", "script": script.rawValue, "mode": mode.rawValue]
                 
-            case .words(let level, let type):
+            case .words(let level, let type, let mode):
                 let levelTitle = level == .all ? "All Levels" : level.rawValue
                 let typeTitle = type == .all ? "Vocabulary" : "\(type.title)s"
-                content.title = "📖 \(levelTitle) \(typeTitle) Drill (Test)"
-                content.body = "Tap to practice \(levelTitle) \(typeTitle.lowercased()) now!"
+                if mode == .learn {
+                    content.title = "📖 Learn \(levelTitle) \(typeTitle) (Test)"
+                    content.body = "Tap to explore \(levelTitle) \(typeTitle.lowercased()) cards now!"
+                } else {
+                    content.title = "⚡ \(levelTitle) \(typeTitle) Drill (Test)"
+                    content.body = "Tap to test your \(levelTitle) \(typeTitle.lowercased()) speed now!"
+                }
                 content.userInfo = [
                     "type": "words",
                     "level": level.rawValue,
-                    "wordType": type.rawValue
+                    "wordType": type.rawValue,
+                    "mode": mode.rawValue
                 ]
             }
             
@@ -209,13 +248,15 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
         withCompletionHandler completionHandler: @escaping () -> Void
     ) {
         let userInfo = response.notification.request.content.userInfo
+        let modeRaw = userInfo["mode"] as? String ?? ReminderMode.exercise.rawValue
+        let mode = ReminderMode(rawValue: modeRaw) ?? .exercise
         
         if let type = userInfo["type"] as? String {
             if type == "kana" {
                 let scriptRaw = userInfo["script"] as? String ?? ""
                 let script = KanaType(rawValue: scriptRaw) ?? .katakana
                 DispatchQueue.main.async {
-                    self.pendingDeepLink = .kana(script)
+                    self.pendingDeepLink = .kana(script, mode: mode)
                 }
             } else if type == "words" {
                 let levelRaw = userInfo["level"] as? String ?? "N5"
@@ -223,7 +264,7 @@ final class NotificationService: NSObject, ObservableObject, UNUserNotificationC
                 let level = JLPTLevel(rawValue: levelRaw) ?? .n5
                 let wordType = WordType(rawValue: wordTypeRaw) ?? .verb
                 DispatchQueue.main.async {
-                    self.pendingDeepLink = .words(level: level, type: wordType)
+                    self.pendingDeepLink = .words(level: level, type: wordType, mode: mode)
                 }
             }
         }

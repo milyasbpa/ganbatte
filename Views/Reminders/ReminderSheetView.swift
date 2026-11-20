@@ -11,12 +11,14 @@ struct ReminderSheetView: View {
     
     // Form state for adding Kana reminder
     @State private var newKanaScript: KanaType = .katakana
+    @State private var newKanaMode: ReminderMode = .exercise
     @State private var newKanaHour: Int = 7
     @State private var newKanaMinute: Int = 30
     
     // Form state for adding Vocabulary reminder
-    @State private var newWordLevel: JLPTLevel = .n5
+    @State private var newWordLevel: JLPTLevel = .n4
     @State private var newWordType: WordType = .verb
+    @State private var newWordMode: ReminderMode = .exercise
     @State private var newWordHour: Int = 8
     @State private var newWordMinute: Int = 0
     
@@ -203,53 +205,89 @@ struct ReminderSheetView: View {
                         .foregroundColor(AppTheme.textSecondary)
                         .tracking(0.5)
                     
-                    HStack(spacing: 8) {
-                        // Script Menu
-                        Menu {
-                            ForEach(KanaType.allCases) { script in
-                                Button(script.title) {
-                                    newKanaScript = script
+                    VStack(spacing: 8) {
+                        HStack(spacing: 8) {
+                            // Mode Menu (Learn vs Exercise)
+                            Menu {
+                                ForEach(ReminderMode.allCases) { mode in
+                                    Button(action: { newKanaMode = mode }) {
+                                        Label(mode.rawValue, systemImage: mode.icon)
+                                    }
                                 }
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: newKanaMode.icon)
+                                        .font(.system(size: 11, weight: .bold))
+                                    Text(newKanaMode.rawValue)
+                                        .font(.system(size: 13, weight: .bold))
+                                    Image(systemName: "chevron.up.chevron.down")
+                                        .font(.system(size: 8, weight: .semibold))
+                                }
+                                .foregroundColor(newKanaMode == .learn ? Color(hex: 0x2E7D32) : AppTheme.accent)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 7)
+                                .background(
+                                    newKanaMode == .learn 
+                                        ? Color(hex: 0xE8F5E9) 
+                                        : AppTheme.accentLight.opacity(0.8)
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                             }
-                        } label: {
-                            HStack(spacing: 4) {
-                                Text(newKanaScript.title)
-                                    .font(.system(size: 13, weight: .bold))
-                                Image(systemName: "chevron.up.chevron.down")
-                                    .font(.system(size: 9, weight: .semibold))
+                            .buttonStyle(.plain)
+                            
+                            // Script Menu
+                            Menu {
+                                ForEach(KanaType.allCases) { script in
+                                    Button(script.title) {
+                                        newKanaScript = script
+                                    }
+                                }
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Text(newKanaScript.title)
+                                        .font(.system(size: 13, weight: .bold))
+                                    Image(systemName: "chevron.up.chevron.down")
+                                        .font(.system(size: 8, weight: .semibold))
+                                }
+                                .foregroundColor(AppTheme.accent)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 7)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                        .stroke(AppTheme.buttonBorder, lineWidth: 1)
+                                )
                             }
-                            .foregroundColor(AppTheme.accent)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 7)
-                            .background(AppTheme.accentLight.opacity(0.7))
-                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .buttonStyle(.plain)
+                            
+                            Spacer()
                         }
-                        .buttonStyle(.plain)
                         
-                        Spacer()
-                        
-                        // Custom Styled Time Selector Pill
-                        TimeSelectorPill(hour: $newKanaHour, minute: $newKanaMinute)
-                        
-                        // Add Button
-                        Button(action: addKanaReminder) {
-                            HStack(spacing: 4) {
-                                Image(systemName: "plus")
-                                    .font(.system(size: 12, weight: .bold))
-                                Text("Add")
-                                    .font(.system(size: 13, weight: .bold))
+                        HStack(spacing: 8) {
+                            TimeSelectorPill(hour: $newKanaHour, minute: $newKanaMinute)
+                            
+                            Spacer()
+                            
+                            Button(action: addKanaReminder) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 12, weight: .bold))
+                                    Text("Add Reminder")
+                                        .font(.system(size: 12, weight: .bold))
+                                }
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(AppTheme.accent)
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                             }
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 14)
-                            .padding(.vertical, 7)
-                            .background(AppTheme.accent)
-                            .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
                     .padding(10)
                     .background(AppTheme.inputBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
                 
                 // Scheduled List
@@ -281,14 +319,22 @@ struct ReminderSheetView: View {
                     } else {
                         VStack(spacing: 6) {
                             ForEach(kanaSettings.items) { item in
-                                HStack(spacing: 10) {
+                                HStack(spacing: 8) {
+                                    HStack(spacing: 4) {
+                                        Image(systemName: item.mode.icon)
+                                            .font(.system(size: 9, weight: .bold))
+                                        Text(item.mode.rawValue)
+                                            .font(.system(size: 11, weight: .bold))
+                                    }
+                                    .foregroundColor(item.mode == .learn ? Color(hex: 0x2E7D32) : AppTheme.accent)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(item.mode == .learn ? Color(hex: 0xE8F5E9) : AppTheme.accentLight.opacity(0.8))
+                                    .clipShape(Capsule())
+                                    
                                     Text(item.script.title)
                                         .font(.system(size: 12, weight: .bold))
-                                        .foregroundColor(AppTheme.accent)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 4)
-                                        .background(AppTheme.accentLight.opacity(0.8))
-                                        .clipShape(Capsule())
+                                        .foregroundColor(AppTheme.textPrimary)
                                     
                                     Spacer()
                                     
@@ -335,7 +381,7 @@ struct ReminderSheetView: View {
                 
                 // Test Notification Button
                 Button(action: {
-                    triggerTest(target: .kana(newKanaScript))
+                    triggerTest(target: .kana(newKanaScript, mode: newKanaMode))
                 }) {
                     HStack(spacing: 6) {
                         Image(systemName: "paperplane.fill")
@@ -412,79 +458,111 @@ struct ReminderSheetView: View {
                         .foregroundColor(AppTheme.textSecondary)
                         .tracking(0.5)
                     
-                    HStack(spacing: 6) {
-                        // Level Menu
-                        Menu {
-                            ForEach(JLPTLevel.allCases, id: \.self) { level in
-                                Button(level.rawValue) {
-                                    newWordLevel = level
+                    VStack(spacing: 8) {
+                        HStack(spacing: 8) {
+                            // Mode Menu (Learn vs Exercise)
+                            Menu {
+                                ForEach(ReminderMode.allCases) { mode in
+                                    Button(action: { newWordMode = mode }) {
+                                        Label(mode.rawValue, systemImage: mode.icon)
+                                    }
                                 }
-                            }
-                        } label: {
-                            HStack(spacing: 3) {
-                                Text(newWordLevel == .all ? "All" : newWordLevel.rawValue)
-                                    .font(.system(size: 12, weight: .bold))
-                                Image(systemName: "chevron.up.chevron.down")
-                                    .font(.system(size: 8, weight: .semibold))
-                            }
-                            .foregroundColor(Color(hex: 0xE65100))
-                            .padding(.horizontal, 9)
-                            .padding(.vertical, 7)
-                            .background(Color.orange.opacity(0.15))
-                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                        }
-                        .buttonStyle(.plain)
-                        
-                        // Type Menu
-                        Menu {
-                            ForEach(WordType.allCases, id: \.self) { type in
-                                Button(type.title) {
-                                    newWordType = type
+                            } label: {
+                                HStack(spacing: 4) {
+                                    Image(systemName: newWordMode.icon)
+                                        .font(.system(size: 10, weight: .bold))
+                                    Text(newWordMode.rawValue)
+                                        .font(.system(size: 12, weight: .bold))
+                                    Image(systemName: "chevron.up.chevron.down")
+                                        .font(.system(size: 7, weight: .semibold))
                                 }
+                                .foregroundColor(newWordMode == .learn ? Color(hex: 0x2E7D32) : Color(hex: 0xE65100))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 7)
+                                .background(
+                                    newWordMode == .learn 
+                                        ? Color(hex: 0xE8F5E9) 
+                                        : Color.orange.opacity(0.15)
+                                )
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                             }
-                        } label: {
-                            HStack(spacing: 3) {
-                                Text(newWordType.title)
-                                    .font(.system(size: 12, weight: .semibold))
-                                Image(systemName: "chevron.up.chevron.down")
-                                    .font(.system(size: 8, weight: .semibold))
+                            .buttonStyle(.plain)
+                            
+                            // Level Menu
+                            Menu {
+                                ForEach(JLPTLevel.allCases, id: \.self) { level in
+                                    Button(level.rawValue) {
+                                        newWordLevel = level
+                                    }
+                                }
+                            } label: {
+                                HStack(spacing: 3) {
+                                    Text(newWordLevel == .all ? "All" : newWordLevel.rawValue)
+                                        .font(.system(size: 12, weight: .bold))
+                                    Image(systemName: "chevron.up.chevron.down")
+                                        .font(.system(size: 8, weight: .semibold))
+                                }
+                                .foregroundColor(Color(hex: 0xE65100))
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 7)
+                                .background(Color.orange.opacity(0.15))
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                             }
-                            .foregroundColor(AppTheme.textPrimary)
-                            .padding(.horizontal, 9)
-                            .padding(.vertical, 7)
-                            .background(Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 8, style: .continuous)
-                                    .stroke(AppTheme.buttonBorder, lineWidth: 1)
-                            )
+                            .buttonStyle(.plain)
+                            
+                            // Type Menu
+                            Menu {
+                                ForEach(WordType.allCases, id: \.self) { type in
+                                    Button(type.title) {
+                                        newWordType = type
+                                    }
+                                }
+                            } label: {
+                                HStack(spacing: 3) {
+                                    Text(newWordType.title)
+                                        .font(.system(size: 12, weight: .semibold))
+                                    Image(systemName: "chevron.up.chevron.down")
+                                        .font(.system(size: 8, weight: .semibold))
+                                }
+                                .foregroundColor(AppTheme.textPrimary)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 7)
+                                .background(Color.white)
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 8, style: .continuous)
+                                        .stroke(AppTheme.buttonBorder, lineWidth: 1)
+                                )
+                            }
+                            .buttonStyle(.plain)
+                            
+                            Spacer()
                         }
-                        .buttonStyle(.plain)
                         
-                        Spacer()
-                        
-                        // Custom Styled Time Selector Pill
-                        TimeSelectorPill(hour: $newWordHour, minute: $newWordMinute)
-                        
-                        // Add Button
-                        Button(action: addWordReminder) {
-                            HStack(spacing: 3) {
-                                Image(systemName: "plus")
-                                    .font(.system(size: 11, weight: .bold))
-                                Text("Add")
-                                    .font(.system(size: 12, weight: .bold))
+                        HStack(spacing: 8) {
+                            TimeSelectorPill(hour: $newWordHour, minute: $newWordMinute)
+                            
+                            Spacer()
+                            
+                            Button(action: addWordReminder) {
+                                HStack(spacing: 4) {
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 12, weight: .bold))
+                                    Text("Add Reminder")
+                                        .font(.system(size: 12, weight: .bold))
+                                }
+                                .foregroundColor(.white)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 8)
+                                .background(Color.orange)
+                                .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
                             }
-                            .foregroundColor(.white)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 7)
-                            .background(Color.orange)
-                            .clipShape(RoundedRectangle(cornerRadius: 8, style: .continuous))
+                            .buttonStyle(.plain)
                         }
-                        .buttonStyle(.plain)
                     }
                     .padding(10)
                     .background(AppTheme.inputBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                 }
                 
                 // Scheduled List
@@ -516,15 +594,30 @@ struct ReminderSheetView: View {
                     } else {
                         VStack(spacing: 6) {
                             ForEach(wordSettings.items) { item in
-                                HStack(spacing: 8) {
+                                HStack(spacing: 6) {
+                                    // Mode pill
+                                    HStack(spacing: 3) {
+                                        Image(systemName: item.mode.icon)
+                                            .font(.system(size: 9, weight: .bold))
+                                        Text(item.mode.rawValue)
+                                            .font(.system(size: 11, weight: .bold))
+                                    }
+                                    .foregroundColor(item.mode == .learn ? Color(hex: 0x2E7D32) : Color(hex: 0xE65100))
+                                    .padding(.horizontal, 7)
+                                    .padding(.vertical, 4)
+                                    .background(item.mode == .learn ? Color(hex: 0xE8F5E9) : Color.orange.opacity(0.15))
+                                    .clipShape(Capsule())
+                                    
+                                    // Level pill
                                     Text(item.level.rawValue)
                                         .font(.system(size: 11, weight: .heavy))
                                         .foregroundColor(Color(hex: 0xE65100))
-                                        .padding(.horizontal, 8)
+                                        .padding(.horizontal, 7)
                                         .padding(.vertical, 4)
-                                        .background(Color.orange.opacity(0.15))
+                                        .background(Color.orange.opacity(0.12))
                                         .clipShape(Capsule())
                                     
+                                    // Type text
                                     Text(item.type.title)
                                         .font(.system(size: 12, weight: .semibold))
                                         .foregroundColor(AppTheme.textPrimary)
@@ -574,7 +667,7 @@ struct ReminderSheetView: View {
                 
                 // Test Notification Button
                 Button(action: {
-                    triggerTest(target: .words(level: newWordLevel, type: newWordType))
+                    triggerTest(target: .words(level: newWordLevel, type: newWordType, mode: newWordMode))
                 }) {
                     HStack(spacing: 6) {
                         Image(systemName: "paperplane.fill")
@@ -603,7 +696,7 @@ struct ReminderSheetView: View {
     
     // MARK: - Actions
     private func addKanaReminder() {
-        let item = KanaReminderItem(script: newKanaScript, hour: newKanaHour, minute: newKanaMinute)
+        let item = KanaReminderItem(script: newKanaScript, mode: newKanaMode, hour: newKanaHour, minute: newKanaMinute)
         withAnimation(.easeInOut(duration: 0.15)) {
             kanaSettings.items.append(item)
             kanaSettings.items.sort { ($0.hour * 60 + $0.minute) < ($1.hour * 60 + $1.minute) }
@@ -612,7 +705,7 @@ struct ReminderSheetView: View {
     }
     
     private func addWordReminder() {
-        let item = WordReminderItem(level: newWordLevel, type: newWordType, hour: newWordHour, minute: newWordMinute)
+        let item = WordReminderItem(level: newWordLevel, type: newWordType, mode: newWordMode, hour: newWordHour, minute: newWordMinute)
         withAnimation(.easeInOut(duration: 0.15)) {
             wordSettings.items.append(item)
             wordSettings.items.sort { ($0.hour * 60 + $0.minute) < ($1.hour * 60 + $1.minute) }

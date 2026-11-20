@@ -43,18 +43,44 @@ struct MainContainerView: View {
             guard let link = link else { return }
             withAnimation(.easeInOut(duration: 0.25)) {
                 switch link {
-                case .kana(let script):
-                    activeTabRaw = AppTab.learn.rawValue
-                    UserDefaults.standard.set(script.rawValue, forKey: "ganbatte_active_kana_subtab")
-                    NotificationCenter.default.post(name: NSNotification.Name("ganbatte_navigate_to_kana"), object: nil)
-                case .words(let level, let type):
-                    activeTabRaw = AppTab.learn.rawValue
-                    NotificationCenter.default.post(
-                        name: NSNotification.Name("ganbatte_apply_word_filter"),
-                        object: nil,
-                        userInfo: ["level": level.rawValue, "type": type.rawValue]
-                    )
-                    NotificationCenter.default.post(name: NSNotification.Name("ganbatte_navigate_to_words"), object: nil)
+                case .kana(let script, let mode):
+                    if mode == .learn {
+                        activeTabRaw = AppTab.learn.rawValue
+                        UserDefaults.standard.set(script.rawValue, forKey: "ganbatte_active_kana_subtab")
+                        NotificationCenter.default.post(name: NSNotification.Name("ganbatte_navigate_to_kana"), object: nil)
+                    } else {
+                        var kCfg = KanaQuizConfig.load()
+                        kCfg.kanaType = script
+                        kCfg.save()
+                        activeTabRaw = AppTab.exercise.rawValue
+                        NotificationCenter.default.post(
+                            name: NSNotification.Name("ganbatte_shortcut_to_exercise"),
+                            object: nil,
+                            userInfo: ["category": "Kana", "kanaType": script.rawValue]
+                        )
+                    }
+                    
+                case .words(let level, let type, let mode):
+                    if mode == .learn {
+                        activeTabRaw = AppTab.learn.rawValue
+                        NotificationCenter.default.post(
+                            name: NSNotification.Name("ganbatte_apply_word_filter"),
+                            object: nil,
+                            userInfo: ["level": level.rawValue, "type": type.rawValue]
+                        )
+                        NotificationCenter.default.post(name: NSNotification.Name("ganbatte_navigate_to_words"), object: nil)
+                    } else {
+                        var cfg = QuizConfig.load()
+                        cfg.level = level
+                        cfg.type = type
+                        cfg.save()
+                        activeTabRaw = AppTab.exercise.rawValue
+                        NotificationCenter.default.post(
+                            name: NSNotification.Name("ganbatte_shortcut_to_exercise"),
+                            object: nil,
+                            userInfo: ["category": "Kotoba", "level": level.rawValue, "type": type.rawValue]
+                        )
+                    }
                 }
             }
             notifService.pendingDeepLink = nil

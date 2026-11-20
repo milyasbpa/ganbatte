@@ -1,5 +1,20 @@
 import Foundation
 
+// MARK: - Reminder Training Mode
+enum ReminderMode: String, Codable, CaseIterable, Identifiable {
+    case learn = "Learn"
+    case exercise = "Exercise"
+    
+    var id: String { rawValue }
+    
+    var icon: String {
+        switch self {
+        case .learn: return "book.fill"
+        case .exercise: return "bolt.fill"
+        }
+    }
+}
+
 struct ReminderTime: Codable, Identifiable, Equatable, Hashable {
     var id: String
     var hour: Int
@@ -26,12 +41,14 @@ struct ReminderTime: Codable, Identifiable, Equatable, Hashable {
 struct KanaReminderItem: Codable, Identifiable, Equatable, Hashable {
     var id: String
     var script: KanaType
+    var mode: ReminderMode = .exercise
     var hour: Int
     var minute: Int
     
-    init(id: String = UUID().uuidString, script: KanaType = .katakana, hour: Int, minute: Int) {
+    init(id: String = UUID().uuidString, script: KanaType = .katakana, mode: ReminderMode = .exercise, hour: Int, minute: Int) {
         self.id = id
         self.script = script
+        self.mode = mode
         self.hour = hour
         self.minute = minute
     }
@@ -46,13 +63,15 @@ struct WordReminderItem: Codable, Identifiable, Equatable, Hashable {
     var id: String
     var level: JLPTLevel
     var type: WordType
+    var mode: ReminderMode = .exercise
     var hour: Int
     var minute: Int
     
-    init(id: String = UUID().uuidString, level: JLPTLevel = .n5, type: WordType = .verb, hour: Int, minute: Int) {
+    init(id: String = UUID().uuidString, level: JLPTLevel = .n5, type: WordType = .verb, mode: ReminderMode = .exercise, hour: Int, minute: Int) {
         self.id = id
         self.level = level
         self.type = type
+        self.mode = mode
         self.hour = hour
         self.minute = minute
     }
@@ -70,17 +89,15 @@ struct KanaReminderSettings: Codable, Equatable {
     init(
         isEnabled: Bool = true,
         items: [KanaReminderItem] = [
-            KanaReminderItem(script: .katakana, hour: 7, minute: 30),
-            KanaReminderItem(script: .hiragana, hour: 12, minute: 30),
-            KanaReminderItem(script: .katakana, hour: 12, minute: 45),
-            KanaReminderItem(script: .katakana, hour: 20, minute: 30)
+            KanaReminderItem(script: .katakana, mode: .exercise, hour: 7, minute: 30),
+            KanaReminderItem(script: .hiragana, mode: .exercise, hour: 17, minute: 30)
         ]
     ) {
         self.isEnabled = isEnabled
         self.items = items
     }
     
-    private static let userDefaultsKey = "ganbatte_kana_reminder_settings_v2"
+    private static let userDefaultsKey = "ganbatte_kana_reminder_settings_v3"
     
     static func load() -> KanaReminderSettings {
         guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
@@ -105,16 +122,19 @@ struct WordReminderSettings: Codable, Equatable {
     init(
         isEnabled: Bool = true,
         items: [WordReminderItem] = [
-            WordReminderItem(level: .n5, type: .verb, hour: 8, minute: 0),
-            WordReminderItem(level: .n5, type: .adjective, hour: 13, minute: 0),
-            WordReminderItem(level: .n2, type: .all, hour: 21, minute: 0)
+            WordReminderItem(level: .n4, type: .verb, mode: .learn, hour: 8, minute: 0),
+            WordReminderItem(level: .n5, type: .verb, mode: .exercise, hour: 12, minute: 30),
+            WordReminderItem(level: .n5, type: .adjective, mode: .exercise, hour: 13, minute: 0),
+            WordReminderItem(level: .n4, type: .adjective, mode: .learn, hour: 18, minute: 0),
+            WordReminderItem(level: .n4, type: .verb, mode: .exercise, hour: 19, minute: 30),
+            WordReminderItem(level: .n4, type: .adjective, mode: .exercise, hour: 20, minute: 0)
         ]
     ) {
         self.isEnabled = isEnabled
         self.items = items
     }
     
-    private static let userDefaultsKey = "ganbatte_word_reminder_settings_v2"
+    private static let userDefaultsKey = "ganbatte_word_reminder_settings_v3"
     
     static func load() -> WordReminderSettings {
         guard let data = UserDefaults.standard.data(forKey: userDefaultsKey),
@@ -133,6 +153,6 @@ struct WordReminderSettings: Codable, Equatable {
 
 // MARK: - Deep Link Target
 enum ReminderDeepLink: Equatable {
-    case kana(KanaType)
-    case words(level: JLPTLevel, type: WordType)
+    case kana(KanaType, mode: ReminderMode)
+    case words(level: JLPTLevel, type: WordType, mode: ReminderMode)
 }
