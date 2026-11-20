@@ -147,18 +147,44 @@ class ActivityService: ObservableObject {
         self.sessions = decoded.sorted(by: { $0.date < $1.date })
     }
     
-    private func saveSessions() {
+    private func saveSessionsLocallyOnly() {
         if let data = try? JSONEncoder().encode(sessions) {
             UserDefaults.standard.set(data, forKey: sessionsStorageKey)
         }
     }
     
-    private func saveUnlockedMedals() {
+    private func saveSessions() {
+        saveSessionsLocallyOnly()
+        syncWithCloud()
+    }
+    
+    private func saveUnlockedMedalsLocallyOnly() {
         var dict: [String: Double] = [:]
         for m in medals where m.isUnlocked {
             dict[m.id] = (m.unlockedDate ?? Date()).timeIntervalSince1970
         }
         UserDefaults.standard.set(dict, forKey: unlockedMedalsStorageKey)
+    }
+    
+    private func saveUnlockedMedals() {
+        saveUnlockedMedalsLocallyOnly()
+        syncWithCloud()
+    }
+    
+    var unlockedMedalsDictionary: [String: Double] {
+        var dict: [String: Double] = [:]
+        for m in medals where m.isUnlocked {
+            dict[m.id] = (m.unlockedDate ?? Date()).timeIntervalSince1970
+        }
+        return dict
+    }
+    
+    var uniqueCorrectWordsDictionary: [String: [Int]] {
+        var toSave: [String: [Int]] = [:]
+        for (key, set) in uniqueCorrectWordsByLevel {
+            toSave[key] = Array(set)
+        }
+        return toSave
     }
     
     private func loadUniqueCorrectWords() {
@@ -171,12 +197,13 @@ class ActivityService: ObservableObject {
         }
     }
     
+    private func saveUniqueCorrectWordsLocallyOnly() {
+        UserDefaults.standard.set(uniqueCorrectWordsDictionary, forKey: uniqueWordsStorageKey)
+    }
+    
     private func saveUniqueCorrectWords() {
-        var toSave: [String: [Int]] = [:]
-        for (key, set) in uniqueCorrectWordsByLevel {
-            toSave[key] = Array(set)
-        }
-        UserDefaults.standard.set(toSave, forKey: uniqueWordsStorageKey)
+        saveUniqueCorrectWordsLocallyOnly()
+        syncWithCloud()
     }
     
     // MARK: - Mistake Bank Persistence & Helpers
@@ -191,15 +218,133 @@ class ActivityService: ObservableObject {
         }
     }
     
-    func saveWordMistakes() {
+    private func saveWordMistakesLocallyOnly() {
         if let data = try? JSONEncoder().encode(activeWordMistakes) {
             UserDefaults.standard.set(data, forKey: activeWordMistakesKey)
         }
     }
     
-    func saveKanaMistakes() {
+    func saveWordMistakes() {
+        saveWordMistakesLocallyOnly()
+        syncWithCloud()
+    }
+    
+    private func saveKanaMistakesLocallyOnly() {
         if let data = try? JSONEncoder().encode(activeKanaMistakes) {
             UserDefaults.standard.set(data, forKey: activeKanaMistakesKey)
+        }
+    }
+    
+    func saveKanaMistakes() {
+        saveKanaMistakesLocallyOnly()
+        syncWithCloud()
+    }
+    
+    private func syncWithCloud() {
+        CloudSyncService.shared.pushLocalToCloud(
+            sessions: sessions,
+            medalsDict: unlockedMedalsDictionary,
+            uniqueWordsDict: uniqueCorrectWordsDictionary,
+            wordMistakes: activeWordMistakes,
+            kanaMistakes: activeKanaMistakes
+        )
+    }
+    
+    // MARK: - Intelligent Multi-Device Cloud Merge
+    func mergeIncomingSyncData(
+        remoteSessions: [SessionRecord]?,
+        remoteMedals: [String: Double]?,
+        remoteUniqueWords: [String: [Int]]?,
+        remoteWordMistakes: [WordMistakeEntry]?,
+        remoteKanaMistakes: [KanaMistakeEntry]?
+    ) {
+        // 1. Merge Sessions
+        if let incoming = remoteSessions, !incoming.isEmpty {
+            var existingMap = Dictionary(uniqueKeysWithValues: sessions.map { ($0.id, $0) })
+            for session in incoming {
+                if existingMap[session.id] == nil {
+                    existingMap[session.id] = session
+                }
+            }
+            self.sessions = Array(existingMap.values).sorted(by: { $0.date < $1.date })
+            saveSessionsLocallyOnly()
+        }
+        
+        // 2. Merge Unlocked Medals
+        if let incomingMedals = remoteMedals, !incomingMedals.isEmpty {
+            for i in 0..<medals.count {
+                let id = medals[i].id
+                if let remoteTime = incomingMedals[id] {
+                    if !medals[i].isUnlocked {
+                        medals[i].isUnlocked = true
+                        medals[i].unlockedDate = Date(timeIntervalSince1970: remoteTime)
+                    } else if let localDate = medals[i].unlockedDate, localDate.timeIntervalSince1970 > remoteTime {
+                        medals[i].unlockedDate = Date(timeIntervalSince1970: remoteTime)
+                    }
+                }
+            }
+            saveUnlockedMedalsLocallyOnly()
+        }
+        
+        // 3. Merge Unique Words
+        if let incomingWords = remoteUniqueWords, !incomingWords.isEmpty {
+            for (level, list) in incomingWords {
+                let currentSet = uniqueCorrectWordsByLevel[level] ?? []
+                let newSet = currentSet.union(Set(list))
+                uniqueCorrectWordsByLevel[level] = newSet
+            }
+            saveUniqueCorrectWordsLocallyOnly()
+        }
+        
+        // 4. Merge Word Mistakes
+        if let incomingMistakes = remoteWordMistakes, !incomingMistakes.isEmpty {
+            var localMap = Dictionary(uniqueKeysWithValues: activeWordMistakes.map { ($0.wordId, $0) })
+            for remote in incomingMistakes {
+                if let local = localMap[remote.wordId] {
+                    let isResolved = local.isResolved || remote.isResolved
+                    let cleanCount = max(local.consecutiveCleanCount, remote.consecutiveCleanCount)
+                    let failCount = max(local.failCount, remote.failCount)
+                    let latestFailed = max(local.lastFailedAt, remote.lastFailedAt)
+                    
+                    var merged = local
+                    merged.isResolved = isResolved
+                    merged.consecutiveCleanCount = cleanCount
+                    merged.failCount = failCount
+                    merged.lastFailedAt = latestFailed
+                    localMap[remote.wordId] = merged
+                } else {
+                    localMap[remote.wordId] = remote
+                }
+            }
+            self.activeWordMistakes = Array(localMap.values).sorted(by: { $0.lastFailedAt > $1.lastFailedAt })
+            saveWordMistakesLocallyOnly()
+        }
+        
+        // 5. Merge Kana Mistakes
+        if let incomingKana = remoteKanaMistakes, !incomingKana.isEmpty {
+            var localMap = Dictionary(uniqueKeysWithValues: activeKanaMistakes.map { ("\($0.character)_\($0.script.rawValue)", $0) })
+            for remote in incomingKana {
+                let key = "\(remote.character)_\(remote.script.rawValue)"
+                if let local = localMap[key] {
+                    let isResolved = local.isResolved || remote.isResolved
+                    let cleanCount = max(local.consecutiveCleanCount, remote.consecutiveCleanCount)
+                    let failCount = max(local.failCount, remote.failCount)
+                    let slowCount = max(local.slowCount, remote.slowCount)
+                    let latestFailed = max(local.lastFailedAt, remote.lastFailedAt)
+                    
+                    var merged = local
+                    merged.isResolved = isResolved
+                    merged.consecutiveCleanCount = cleanCount
+                    merged.failCount = failCount
+                    merged.slowCount = slowCount
+                    merged.lastFailedAt = latestFailed
+                    localMap[key] = merged
+                } else {
+                    localMap[key] = remote
+                }
+            }
+            self.activeKanaMistakes = Array(localMap.values).sorted(by: { $0.lastFailedAt > $1.lastFailedAt })
+            saveKanaMistakesLocallyOnly()
         }
     }
     

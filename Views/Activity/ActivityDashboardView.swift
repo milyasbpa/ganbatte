@@ -1,12 +1,15 @@
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ActivityDashboardView: View {
     @ObservedObject private var activityService = ActivityService.shared
+    @ObservedObject private var syncService = CloudSyncService.shared
     @State private var selectedMedal: Medal? = nil
     @State private var selectedDiagnosticCategory: ExerciseCategory = .kotoba
     @State private var isShowingTrophyCabinet: Bool = false
     @State private var isShowingWeaknessDetail: Bool = false
     @State private var weaknessDetailInitialTab: MistakeTab = .kotoba
+    @State private var isShowingFileImporter: Bool = false
     
     var body: some View {
         ZStack {
@@ -36,6 +39,9 @@ struct ActivityDashboardView: View {
                         
                         // 6. Trophy Highlights (Dashboard Showcase)
                         trophyHighlightsCard
+                        
+                        // 7. Cross-Device iCloud Sync & Backup
+                        cloudSyncCard
                     }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 90)
@@ -61,6 +67,23 @@ struct ActivityDashboardView: View {
                 medalDetailModal(medal)
                     .transition(.opacity.combined(with: .scale(scale: 0.95)))
                     .zIndex(300)
+            }
+        }
+        .fileImporter(
+            isPresented: $isShowingFileImporter,
+            allowedContentTypes: [.json]
+        ) { result in
+            switch result {
+            case .success(let url):
+                let hasAccess = url.startAccessingSecurityScopedResource()
+                defer {
+                    if hasAccess {
+                        url.stopAccessingSecurityScopedResource()
+                    }
+                }
+                _ = syncService.importPackage(from: url)
+            case .failure:
+                break
             }
         }
     }
@@ -295,7 +318,7 @@ struct ActivityDashboardView: View {
             HStack {
                 HStack(spacing: 6) {
                     Image(systemName: "cross.circle.fill")
-                        .font(.system(size: 12.5, weight: .bold))
+                        .font(.system(size: 11, weight: .bold))
                         .foregroundColor(AppTheme.accent)
                     
                     Text("WEAKNESS SPOTLIGHT & RADAR")
@@ -1080,5 +1103,141 @@ struct ActivityDashboardView: View {
             .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
             .shadow(color: Color.black.opacity(0.2), radius: 20, x: 0, y: 10)
         }
+    }
+    
+    // MARK: - 7. Cloud & Device Sync Card
+    private var cloudSyncCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                HStack(spacing: 6) {
+                    Image(systemName: "arrow.triangle.2.circlepath.icloud.fill")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(AppTheme.accent)
+                    
+                    Text("DEVICE SYNC & BACKUP")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(AppTheme.textSecondary)
+                }
+                
+                Spacer()
+                
+                // Status Badge
+                HStack(spacing: 5) {
+                    Circle()
+                        .fill(syncService.isCloudAvailable ? Color(red: 0.20, green: 0.70, blue: 0.45) : Color.orange)
+                        .frame(width: 7, height: 7)
+                    
+                    Text(syncService.isCloudAvailable ? "iCloud Ready" : "Local Sync Ready")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(AppTheme.textSecondary)
+                }
+                .padding(.horizontal, 9)
+                .padding(.vertical, 4)
+                .background(AppTheme.inputBackground)
+                .clipShape(Capsule())
+            }
+            
+            // Sync status info
+            HStack(alignment: .center) {
+                VStack(alignment: .leading, spacing: 3) {
+                    Text("Cross-Device Sync")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundColor(AppTheme.textPrimary)
+                    
+                    if let lastSync = syncService.lastSyncDate {
+                        Text("Last synced: \(formattedSyncDate(lastSync))")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(AppTheme.textSecondary)
+                    } else {
+                        Text("Synchronizes progress between Mac and iPhone")
+                            .font(.system(size: 12, weight: .medium))
+                            .foregroundColor(AppTheme.textSecondary)
+                    }
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    syncService.triggerManualSync()
+                }) {
+                    HStack(spacing: 5) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                            .font(.system(size: 11, weight: .bold))
+                            .rotationEffect(syncService.isSyncing ? .degrees(360) : .degrees(0))
+                            .animation(syncService.isSyncing ? Animation.linear(duration: 1).repeatForever(autoreverses: false) : .default, value: syncService.isSyncing)
+                        
+                        Text("Sync Now")
+                            .font(.system(size: 12, weight: .bold))
+                    }
+                    .foregroundColor(AppTheme.accent)
+                    .padding(.horizontal, 12)
+                    .padding(.vertical, 7)
+                    .background(AppTheme.accent.opacity(0.12))
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+            
+            Divider()
+                .background(AppTheme.buttonBorder)
+            
+            // Backup Export & Import Action Row
+            HStack(spacing: 10) {
+                if let exportURL = syncService.createExportPackage() {
+                    ShareLink(item: exportURL) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "square.and.arrow.up")
+                                .font(.system(size: 12, weight: .semibold))
+                            Text("Export Backup")
+                                .font(.system(size: 12, weight: .semibold))
+                        }
+                        .foregroundColor(AppTheme.textPrimary)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 9)
+                        .background(AppTheme.inputBackground)
+                        .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                    }
+                    .buttonStyle(.plain)
+                }
+                
+                Button(action: {
+                    isShowingFileImporter = true
+                }) {
+                    HStack(spacing: 6) {
+                        Image(systemName: "square.and.arrow.down")
+                            .font(.system(size: 12, weight: .semibold))
+                        Text("Import Backup")
+                            .font(.system(size: 12, weight: .semibold))
+                    }
+                    .foregroundColor(AppTheme.textPrimary)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 9)
+                    .background(AppTheme.inputBackground)
+                    .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
+                }
+                .buttonStyle(.plain)
+            }
+            
+            if !syncService.syncStatusMessage.isEmpty && syncService.syncStatusMessage != "Ready" {
+                Text(syncService.syncStatusMessage)
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(AppTheme.textSecondary)
+            }
+        }
+        .padding(18)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(AppTheme.buttonBorder, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 3)
+    }
+    
+    private func formattedSyncDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateStyle = .short
+        formatter.timeStyle = .short
+        return formatter.string(from: date)
     }
 }

@@ -17,6 +17,7 @@
 		1EB9AA90F6A66FBA7244A2D5 /* FuriganaText.swift in Sources */ = {isa = PBXBuildFile; fileRef = F5E8321309796EB901B7360F /* FuriganaText.swift */; };
 		202E8110D650661BC0931896 /* ActivityService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 41D75190FCAE261A875796B4 /* ActivityService.swift */; };
 		206F171197561180A4AC81A4 /* CardImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A788E58A61081DF1B779F771 /* CardImageView.swift */; };
+		242778509210B3BE29621F40 /* CloudSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8F78A3E6D4CCECC32FBC84 /* CloudSyncService.swift */; };
 		2530E69A9B871EA9BB9F6512 /* ReminderModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A93236321B5A4F96679183 /* ReminderModels.swift */; };
 		26E93AB26DF0DF28A071B07B /* NotificationIcon.png in Resources */ = {isa = PBXBuildFile; fileRef = A79D4BC0306CCFF83B0CC042 /* NotificationIcon.png */; };
 		26F2B088F9E61ECF7AA4576E /* ReminderModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18A93236321B5A4F96679183 /* ReminderModels.swift */; };
@@ -26,6 +27,7 @@
 		2B7F0FA7130BA6ED59502A21 /* FuriganaService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90BE7E0BBA16730D28BC42E7 /* FuriganaService.swift */; };
 		2DE2836BBB0400703D4C7099 /* ExerciseResultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0000A77C6170EDC644FB6FF8 /* ExerciseResultView.swift */; };
 		3BE4E9EC58F4F5309F0B2866 /* KanaExerciseConfigView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D06660EB1BBDA22DA062A9F4 /* KanaExerciseConfigView.swift */; };
+		40908DB44835E181CA501B5A /* CloudSyncService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3D8F78A3E6D4CCECC32FBC84 /* CloudSyncService.swift */; };
 		4392DDA3B5524E85E9BA23EB /* WordRowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 144576BC51639397EE639740 /* WordRowView.swift */; };
 		4548B49A13BBC8800193DE18 /* ExerciseCoordinatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5177098E3202B280565751D5 /* ExerciseCoordinatorView.swift */; };
 		47FA0C13FDB05DF08C7C2D4C /* Cards in Resources */ = {isa = PBXBuildFile; fileRef = 046D34CC71FDD248D11EF2E7 /* Cards */; };
@@ -107,6 +109,7 @@
 		2729E67E02F93FDAA4D7E9B4 /* DatabaseService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseService.swift; sourceTree = "<group>"; };
 		2AFB82848FC89296628C886C /* MainContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainContainerView.swift; sourceTree = "<group>"; };
 		2C09D2F9529A0EE00FA7CF4A /* ExerciseConfigView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseConfigView.swift; sourceTree = "<group>"; };
+		3D8F78A3E6D4CCECC32FBC84 /* CloudSyncService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CloudSyncService.swift; sourceTree = "<group>"; };
 		41D75190FCAE261A875796B4 /* ActivityService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityService.swift; sourceTree = "<group>"; };
 		5177098E3202B280565751D5 /* ExerciseCoordinatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExerciseCoordinatorView.swift; sourceTree = "<group>"; };
 		565E1A4E37218CB720AE6061 /* ReminderSheetView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReminderSheetView.swift; sourceTree = "<group>"; };
@@ -239,6 +242,7 @@
 			children = (
 				41D75190FCAE261A875796B4 /* ActivityService.swift */,
 				7A49D41154CDF6CE8F2404F3 /* AudioService.swift */,
+				3D8F78A3E6D4CCECC32FBC84 /* CloudSyncService.swift */,
 				2729E67E02F93FDAA4D7E9B4 /* DatabaseService.swift */,
 				D372E70E1D793985196EADB4 /* ExerciseService.swift */,
 				90BE7E0BBA16730D28BC42E7 /* FuriganaService.swift */,
@@ -442,6 +446,7 @@
 				D7E6E825287E7981F721DF1E /* AudioService.swift in Sources */,
 				B6209754D9422091332969CC /* BottomNavBar.swift in Sources */,
 				F2EABB207E93A433659D276F /* CardImageView.swift in Sources */,
+				40908DB44835E181CA501B5A /* CloudSyncService.swift in Sources */,
 				D48506FEA385908BE9B89618 /* DatabaseService.swift in Sources */,
 				945FBBFC96ABE4FE94AEE99F /* ExerciseConfigView.swift in Sources */,
 				E595B5AB0FED5AEB4AE24E67 /* ExerciseCoordinatorView.swift in Sources */,
@@ -487,6 +492,7 @@
 				A2C1838210F3FB14D0B0251C /* AudioService.swift in Sources */,
 				07354EB432894E96617FEECF /* BottomNavBar.swift in Sources */,
 				206F171197561180A4AC81A4 /* CardImageView.swift in Sources */,
+				242778509210B3BE29621F40 /* CloudSyncService.swift in Sources */,
 				2AE3D4EBF30B222F79B836BF /* DatabaseService.swift in Sources */,
 				DDDE0C7DD032D02D96115D76 /* ExerciseConfigView.swift in Sources */,
 				4548B49A13BBC8800193DE18 /* ExerciseCoordinatorView.swift in Sources */,

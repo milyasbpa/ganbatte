@@ -358,3 +358,24 @@ classDiagram
 ### 2. Backward Compatibility Guarantee:
 - All new fields (`level`, `wordType`, `kanaType`, `correctWordIds`) in `SessionRecord` are Swift optionals (`?`).
 - Existing saved sessions in `UserDefaults` (`ganbatte_activity_sessions_v1`) load smoothly without schema migrations or clearing past user activity.
+
+---
+
+## 9. Cross-Device Synchronization & Backup Architecture
+
+To maintain continuity between macOS and iOS devices, Ganbatte employs a dual-tier sync and offline-first persistence engine:
+
+### 1. Automatic iCloud Key-Value Synchronization
+- **Engine**: Built upon `NSUbiquitousKeyValueStore.default` through `CloudSyncService.swift`.
+- **Reactive Updates**: Observes `NSUbiquitousKeyValueStore.didChangeExternallyNotification`. Whenever progress is registered on one device, the cloud store broadcasts changes to all linked Apple ID devices without requiring manual reload.
+- **Intelligent Merge Strategy**:
+  - **Workouts / Sessions**: Unioned by immutable UUID (`session.id`), preserving full historical logs across both platforms.
+  - **Achievement Medals**: If a medal is unlocked on either device, it remains unlocked; the earliest `unlockedDate` is preserved.
+  - **Mastered Unique Words**: Set-union operation across level-keyed dictionaries (`Set<Int>`), preventing loss of discovered vocabulary.
+  - **Mistake Bank (Kotoba & Kana)**: Merges by word ID / Kana character key; retains the highest consecutive clean streak, highest fail count, and the most recent `lastFailedAt` timestamp.
+
+### 2. Manual AirDrop & JSON Backup Fallback
+- **Export Package**: `CloudSyncService.createExportPackage()` bundles all local sessions, medals, unique words, and mistake bank records into an encrypted JSON file (`ganbatte_progress_backup.json`).
+- **ShareLink Integration**: Native share sheet on iOS and macOS allowing instant AirDrop, saving to Files, or sending via Mail/Messages.
+- **Import Importer**: Secure `.fileImporter` supporting `.json` files with automatic security-scoped resource management and instant reactive UI re-population.
+
