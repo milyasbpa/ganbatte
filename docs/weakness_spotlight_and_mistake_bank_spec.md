@@ -155,6 +155,8 @@ struct KanaMistakeEntry: Codable, Identifiable, Equatable {
    - Displays top banner: `⚡ Mistake Workout: X Target Words Loaded [✕ Exit]`.
    - Retains Question Format selectors (`Image & Meaning`, `Audio Listening`, `Fill-in / Typing`).
    - Generates questions exclusively from active mistake IDs.
+   - Standard unified CTA button: `Start Quiz (N Questions)` with `play.fill` and standard `AppTheme.accent` styling.
+   - Reset: Tapping `[✕ Exit]` clears `mistakeDrillWordIds`, restores standard dictionary filters, and reverts to regular exercise mode.
    - Automatically evaluates the Dual-Key graduation rule upon submission.
 
 2. **Kana Mistake Smart Filter Workout:**
@@ -164,4 +166,21 @@ struct KanaMistakeEntry: Codable, Identifiable, Equatable {
      `⚡ KANA MISTAKE WORKOUT: Targeting X, Y [✕ Exit]` banner.
    - Drills are generated using smart character matching (`fetchKanaWordsContaining(characters:type:limit:)`), ensuring 100% of tested vocabulary contains the user's specific weak Kana characters.
    - Fast Romaji typing speed drill format with question count selector (10, 20, 30, 50).
+   - Standard unified CTA button: `Start Quiz (N Questions)` with `play.fill` and standard `AppTheme.accent` styling.
+   - Reset: Tapping `[✕ Exit]` clears `mistakeKanaCharacters`, restores standard Kana script selectors, and reverts to regular exercise mode.
    - Dual-Key graduation rule evaluated on each character answer.
+
+### D. Typography & Icon Alignment Standards
+- **Guidance & Rule Callouts:**
+  - All banners and footnotes pairing an SF Symbol with explanatory text (e.g. Dual-Key graduation rule, Romaji typing instructions, character filter tags) must use top-aligned layout:
+    ```swift
+    HStack(alignment: .top, spacing: 6) {
+        Image(systemName: "shield.lefthalf.filled")
+            .font(.system(size: 12))
+            .padding(.top, 1.5)
+        Text("Dual-Key Rule: ...")
+    }
+    ```
+  - This prevents icons from awkwardly floating centered between multiple wrapped lines of text on smaller screen widths.
+- **Card Headers:**
+  - Header icons (such as `cross.circle.fill` in `WEAKNESS SPOTLIGHT & RADAR`) are scaled to match the font size and baseline of uppercase headers, aligning flush with interactive pills (e.g. `[ Kotoba | Kana ]`).
