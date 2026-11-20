@@ -90,18 +90,13 @@ struct TrophyCabinetView: View {
                     isPresented = false
                 }
             }) {
-                HStack(spacing: 4) {
+                HStack(spacing: 6) {
                     Image(systemName: "chevron.left")
-                        .font(.system(size: 14, weight: .bold))
-                    Text("Activity")
-                        .font(.system(size: 14, weight: .semibold))
+                        .font(.system(size: 18, weight: .semibold))
+                    Text("Back")
+                        .font(.system(size: 18, weight: .semibold))
                 }
                 .foregroundColor(AppTheme.accent)
-                .padding(.vertical, 6)
-                .padding(.horizontal, 8)
-                .background(Color.white.opacity(0.8))
-                .clipShape(Capsule())
-                .overlay(Capsule().stroke(AppTheme.buttonBorder, lineWidth: 1))
             }
             .buttonStyle(.plain)
             
@@ -109,7 +104,7 @@ struct TrophyCabinetView: View {
             
             VStack(spacing: 2) {
                 Text("Trophy Cabinet")
-                    .font(.system(size: 17, weight: .bold))
+                    .font(.system(size: 18, weight: .bold))
                     .foregroundColor(AppTheme.textPrimary)
                 
                 Text("\(totalUnlocked) of \(activityService.medals.count) Unlocked")
@@ -119,13 +114,22 @@ struct TrophyCabinetView: View {
             
             Spacer()
             
-            // Balance spacing
-            Color.clear
-                .frame(width: 70, height: 32)
+            // Invisible balancing element for exact center alignment
+            HStack(spacing: 6) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 18, weight: .semibold))
+                Text("Back")
+                    .font(.system(size: 18, weight: .semibold))
+            }
+            .opacity(0)
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 20)
+        #if os(macOS)
+        .padding(.top, 36)
+        #else
         .padding(.top, 16)
-        .padding(.bottom, 12)
+        #endif
+        .padding(.bottom, 14)
         .background(Color.white)
         .overlay(
             Rectangle()
