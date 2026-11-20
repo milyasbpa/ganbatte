@@ -3,6 +3,8 @@ import SwiftUI
 struct ActivityDashboardView: View {
     @ObservedObject private var activityService = ActivityService.shared
     @State private var selectedMedal: Medal? = nil
+    @State private var selectedDiagnosticCategory: ExerciseCategory = .kotoba
+    @State private var selectedMedalFilter: MedalCategory = .all
     
     var body: some View {
         ZStack {
@@ -11,51 +13,26 @@ struct ActivityDashboardView: View {
             
             VStack(spacing: 0) {
                 // Header
-                HStack {
-                    VStack(alignment: .leading, spacing: 3) {
-                        Text("Activity")
-                            .font(.system(size: 24, weight: .bold))
-                            .foregroundColor(AppTheme.textPrimary)
-                        
-                        Text("Your pace, volume & milestones")
-                            .font(.system(size: 13, weight: .medium))
-                            .foregroundColor(AppTheme.textSecondary)
-                    }
-                    
-                    Spacer()
-                    
-                    // Session Count Badge
-                    HStack(spacing: 4) {
-                        Image(systemName: "figure.run")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(AppTheme.accent)
-                        
-                        Text("\(activityService.completedSessionsCount) workouts")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(AppTheme.textPrimary)
-                    }
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 6)
-                    .background(Color.white)
-                    .clipShape(Capsule())
-                    .overlay(Capsule().stroke(AppTheme.buttonBorder, lineWidth: 1))
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 20)
-                .padding(.bottom, 16)
+                headerView
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 16) {
-                        // 1. Streak Hero Card
+                        // 1. Streak Hero Card (Strictly Hardcore)
                         streakHeroCard
                         
-                        // 2. Reaction Pace (Speed) Card
+                        // 2. Reaction Pace & Speed Card (Benchmark-Aware)
                         reactionPaceCard
                         
-                        // 3. Weekly Volume Chart
+                        // 3. Weakness Spotlight & Diagnostic Radar (NEW)
+                        diagnosticRadarCard
+                        
+                        // 4. Level Mastery Carousel (N5 - N1 Horizontal Swipe)
+                        levelMasteryCarousel
+                        
+                        // 5. Weekly Practice Volume Bar Chart
                         weeklyVolumeCard
                         
-                        // 4. Trophy Cabinet
+                        // 6. Dual-Axis Trophy Cabinet (45+ Medals with Level Filters)
                         trophyCabinetSection
                     }
                     .padding(.horizontal, 20)
@@ -70,6 +47,42 @@ struct ActivityDashboardView: View {
                     .zIndex(300)
             }
         }
+    }
+    
+    // MARK: - Header
+    private var headerView: some View {
+        HStack {
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Activity")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundColor(AppTheme.textPrimary)
+                
+                Text("Your pace, volume & milestones")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundColor(AppTheme.textSecondary)
+            }
+            
+            Spacer()
+            
+            // Session Count Badge
+            HStack(spacing: 4) {
+                Image(systemName: "figure.run")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(AppTheme.accent)
+                
+                Text("\(activityService.completedSessionsCount) workouts")
+                    .font(.system(size: 12, weight: .bold))
+                    .foregroundColor(AppTheme.textPrimary)
+            }
+            .padding(.horizontal, 10)
+            .padding(.vertical, 6)
+            .background(Color.white)
+            .clipShape(Capsule())
+            .overlay(Capsule().stroke(AppTheme.buttonBorder, lineWidth: 1))
+        }
+        .padding(.horizontal, 20)
+        .padding(.top, 20)
+        .padding(.bottom, 16)
     }
     
     // MARK: - 1. Streak Hero Card
@@ -165,7 +178,7 @@ struct ActivityDashboardView: View {
         .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 3)
     }
     
-    // MARK: - 2. Reaction Pace (Speed) Card
+    // MARK: - 2. Reaction Pace & Speed Card (Benchmark-Aware)
     private var reactionPaceCard: some View {
         VStack(alignment: .leading, spacing: 14) {
             HStack {
@@ -181,9 +194,13 @@ struct ActivityDashboardView: View {
                 
                 Spacer()
                 
-                Text("sec / question")
-                    .font(.system(size: 11, weight: .medium))
-                    .foregroundColor(AppTheme.textTertiary)
+                Text(activityService.nativeBenchmarkBracketTitle)
+                    .font(.system(size: 10, weight: .bold))
+                    .foregroundColor(AppTheme.accent)
+                    .padding(.horizontal, 8)
+                    .padding(.vertical, 3)
+                    .background(AppTheme.accentLight.opacity(0.4))
+                    .clipShape(Capsule())
             }
             
             HStack(spacing: 12) {
@@ -256,7 +273,351 @@ struct ActivityDashboardView: View {
         .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 3)
     }
     
-    // MARK: - 3. Weekly Volume Chart
+    // MARK: - 3. Weakness Spotlight & Diagnostic Radar
+    private var diagnosticRadarCard: some View {
+        VStack(alignment: .leading, spacing: 14) {
+            HStack {
+                HStack(spacing: 6) {
+                    Image(systemName: "cross.circle.fill")
+                        .font(.system(size: 14, weight: .bold))
+                        .foregroundColor(AppTheme.accent)
+                    
+                    Text("WEAKNESS SPOTLIGHT & RADAR")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(AppTheme.textSecondary)
+                }
+                
+                Spacer()
+                
+                // Category Picker
+                HStack(spacing: 4) {
+                    Button(action: { selectedDiagnosticCategory = .kotoba }) {
+                        Text("Kotoba")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(selectedDiagnosticCategory == .kotoba ? .white : AppTheme.textSecondary)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(selectedDiagnosticCategory == .kotoba ? AppTheme.accent : Color.clear)
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                    
+                    Button(action: { selectedDiagnosticCategory = .kana }) {
+                        Text("Kana")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(selectedDiagnosticCategory == .kana ? .white : AppTheme.textSecondary)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 4)
+                            .background(selectedDiagnosticCategory == .kana ? AppTheme.accent : Color.clear)
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(2)
+                .background(AppTheme.inputBackground)
+                .clipShape(Capsule())
+            }
+            
+            if selectedDiagnosticCategory == .kotoba {
+                kotobaDiagnosticView
+            } else {
+                kanaDiagnosticView
+            }
+        }
+        .padding(18)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(AppTheme.buttonBorder, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 3)
+    }
+    
+    private var kotobaDiagnosticView: some View {
+        VStack(spacing: 12) {
+            let diags = activityService.wordTypeDiagnostics()
+            
+            HStack(spacing: 8) {
+                ForEach(diags) { item in
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text(item.type.rawValue)
+                            .font(.system(size: 12, weight: .bold))
+                            .foregroundColor(AppTheme.textPrimary)
+                        
+                        if item.totalQuestions > 0 {
+                            HStack(spacing: 4) {
+                                Text("\(Int(round(item.accuracyPercentage)))%")
+                                    .font(.system(size: 16, weight: .black))
+                                    .foregroundColor(item.accuracyPercentage >= 90 ? Color(red: 0.20, green: 0.70, blue: 0.45) : (item.accuracyPercentage >= 75 ? Color.orange : Color(hex: 0xDC3545)))
+                                
+                                Text(item.averagePace > 0 ? String(format: "• %.1fs", item.averagePace) : "")
+                                    .font(.system(size: 10, weight: .medium))
+                                    .foregroundColor(AppTheme.textSecondary)
+                            }
+                            
+                            Text("\(item.totalQuestions) words")
+                                .font(.system(size: 10))
+                                .foregroundColor(AppTheme.textTertiary)
+                        } else {
+                            Text("No data yet")
+                                .font(.system(size: 11))
+                                .foregroundColor(AppTheme.textTertiary)
+                                .frame(height: 30)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(10)
+                    .background(AppTheme.background)
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                }
+            }
+            
+            // Automated Recommendation Strip with 1-Tap Practice Launcher
+            if let weakType = activityService.identifiedWeakWordType {
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(Color(hex: 0xE65100))
+                    
+                    Text("Focus Area: \(weakType.rawValue) needs practice.")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(AppTheme.textPrimary)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        var cfg = QuizConfig.load()
+                        cfg.type = weakType
+                        cfg.save()
+                        NotificationCenter.default.post(
+                            name: NSNotification.Name("ganbatte_shortcut_to_exercise"),
+                            object: nil,
+                            userInfo: ["category": "Kotoba", "type": weakType.rawValue]
+                        )
+                        UserDefaults.standard.set(AppTab.exercise.rawValue, forKey: "ganbatte_active_main_tab")
+                    }) {
+                        Text("Train \(weakType.rawValue) ➔")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(AppTheme.accent)
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(10)
+                .background(Color(red: 0.98, green: 0.92, blue: 0.82))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+        }
+    }
+    
+    private var kanaDiagnosticView: some View {
+        VStack(spacing: 12) {
+            let diags = activityService.kanaScriptDiagnostics()
+            
+            HStack(spacing: 10) {
+                // Hiragana Card
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text("Hiragana")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(AppTheme.textPrimary)
+                        Spacer()
+                        Text("あ")
+                            .font(.system(size: 15, weight: .black))
+                            .foregroundColor(AppTheme.accent)
+                    }
+                    
+                    if diags.hiragana.totalQuestions > 0 {
+                        Text("\(Int(round(diags.hiragana.accuracyPercentage)))% Accuracy")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(diags.hiragana.accuracyPercentage >= 90 ? Color(red: 0.20, green: 0.70, blue: 0.45) : Color.orange)
+                        
+                        Text(String(format: "Avg pace: %.1fs", diags.hiragana.averagePace))
+                            .font(.system(size: 11))
+                            .foregroundColor(AppTheme.textSecondary)
+                    } else {
+                        Text("No sessions yet")
+                            .font(.system(size: 11))
+                            .foregroundColor(AppTheme.textTertiary)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(AppTheme.background)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                
+                // Katakana Card
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack {
+                        Text("Katakana")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(AppTheme.textPrimary)
+                        Spacer()
+                        Text("ア")
+                            .font(.system(size: 15, weight: .black))
+                            .foregroundColor(Color(red: 0.25, green: 0.48, blue: 0.88))
+                    }
+                    
+                    if diags.katakana.totalQuestions > 0 {
+                        Text("\(Int(round(diags.katakana.accuracyPercentage)))% Accuracy")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(diags.katakana.accuracyPercentage >= 90 ? Color(red: 0.20, green: 0.70, blue: 0.45) : Color.orange)
+                        
+                        Text(String(format: "Avg pace: %.1fs", diags.katakana.averagePace))
+                            .font(.system(size: 11))
+                            .foregroundColor(AppTheme.textSecondary)
+                    } else {
+                        Text("No sessions yet")
+                            .font(.system(size: 11))
+                            .foregroundColor(AppTheme.textTertiary)
+                    }
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(12)
+                .background(AppTheme.background)
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            
+            if activityService.identifiedWeakKanaScript == .katakana {
+                HStack(spacing: 8) {
+                    Image(systemName: "exclamationmark.triangle.fill")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(Color(hex: 0xE65100))
+                    
+                    Text("Katakana hesitation detected.")
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(AppTheme.textPrimary)
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        var kCfg = KanaQuizConfig.load()
+                        kCfg.kanaType = .katakana
+                        kCfg.save()
+                        NotificationCenter.default.post(
+                            name: NSNotification.Name("ganbatte_shortcut_to_exercise"),
+                            object: nil,
+                            userInfo: ["category": "Kana", "kanaType": "Katakana"]
+                        )
+                        UserDefaults.standard.set(AppTab.exercise.rawValue, forKey: "ganbatte_active_main_tab")
+                    }) {
+                        Text("Practice Katakana ➔")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(AppTheme.accent)
+                            .clipShape(Capsule())
+                    }
+                    .buttonStyle(.plain)
+                }
+                .padding(10)
+                .background(Color(red: 0.98, green: 0.92, blue: 0.82))
+                .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+        }
+    }
+    
+    // MARK: - 4. Level Mastery Carousel (N5 - N1 Horizontal Swipe)
+    private var levelMasteryCarousel: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack {
+                HStack(spacing: 6) {
+                    Image(systemName: "map.fill")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(Color(red: 0.95, green: 0.55, blue: 0.15))
+                    
+                    Text("LEVEL MASTERY QUEST")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(AppTheme.textSecondary)
+                }
+                
+                Spacer()
+                
+                Text("Swipe N5 ➔ N1")
+                    .font(.system(size: 10, weight: .medium))
+                    .foregroundColor(AppTheme.textTertiary)
+            }
+            
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 12) {
+                    ForEach(activityService.allLevelsMastery) { levelInfo in
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Text(levelInfo.level.rawValue)
+                                    .font(.system(size: 15, weight: .black))
+                                    .foregroundColor(AppTheme.textPrimary)
+                                
+                                Spacer()
+                                
+                                Text("\(Int(round(levelInfo.coveragePercentage)))% Cleared")
+                                    .font(.system(size: 11, weight: .bold))
+                                    .foregroundColor(levelInfo.coveragePercentage > 0 ? Color(red: 0.20, green: 0.70, blue: 0.45) : AppTheme.textTertiary)
+                            }
+                            
+                            // Progress bar
+                            GeometryReader { geo in
+                                ZStack(alignment: .leading) {
+                                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                                        .fill(Color.black.opacity(0.06))
+                                        .frame(height: 6)
+                                    
+                                    RoundedRectangle(cornerRadius: 4, style: .continuous)
+                                        .fill(AppTheme.accent)
+                                        .frame(width: max(4.0, geo.size.width * CGFloat(levelInfo.coveragePercentage / 100.0)), height: 6)
+                                }
+                            }
+                            .frame(height: 6)
+                            
+                            HStack {
+                                Text("\(levelInfo.uniqueCorrectWords) of \(levelInfo.totalWords) words")
+                                    .font(.system(size: 10))
+                                    .foregroundColor(AppTheme.textSecondary)
+                                Spacer()
+                            }
+                            
+                            // Micro-step Badges
+                            HStack(spacing: 6) {
+                                microBadge("Noun", isDone: levelInfo.nounMastered)
+                                microBadge("Adj", isDone: levelInfo.adjMastered)
+                                microBadge("Verb", isDone: levelInfo.verbMastered)
+                                microBadge("All", isDone: levelInfo.allMastered)
+                            }
+                            .padding(.top, 2)
+                        }
+                        .frame(width: 230)
+                        .padding(14)
+                        .background(Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                                .stroke(AppTheme.buttonBorder, lineWidth: 1)
+                        )
+                    }
+                }
+            }
+        }
+    }
+    
+    private func microBadge(_ label: String, isDone: Bool) -> some View {
+        HStack(spacing: 3) {
+            Image(systemName: isDone ? "checkmark" : "lock.fill")
+                .font(.system(size: 8, weight: .bold))
+            Text(label)
+                .font(.system(size: 9, weight: .bold))
+        }
+        .foregroundColor(isDone ? Color(red: 0.20, green: 0.70, blue: 0.45) : AppTheme.textTertiary)
+        .padding(.horizontal, 6)
+        .padding(.vertical, 3)
+        .background(isDone ? Color(red: 0.20, green: 0.70, blue: 0.45).opacity(0.12) : AppTheme.inputBackground)
+        .clipShape(Capsule())
+    }
+    
+    // MARK: - 5. Weekly Volume Chart
     private var weeklyVolumeCard: some View {
         let weeklyTotalMinutes = activityService.weeklyVolume.reduce(0.0) { $0 + $1.minutes }
         let maxMinute = max(15.0, activityService.weeklyVolume.map(\.minutes).max() ?? 15.0)
@@ -325,10 +686,18 @@ struct ActivityDashboardView: View {
         .shadow(color: Color.black.opacity(0.04), radius: 8, x: 0, y: 3)
     }
     
-    // MARK: - 4. Trophy Cabinet Section
+    // MARK: - 6. Dual-Axis Trophy Cabinet
+    private var filteredMedals: [Medal] {
+        if selectedMedalFilter == .all {
+            return activityService.medals
+        }
+        return activityService.medals.filter { $0.category == selectedMedalFilter }
+    }
+    
     private var trophyCabinetSection: some View {
-        let unlockedCount = activityService.medals.filter(\.isUnlocked).count
-        let totalCount = activityService.medals.count
+        let currentFiltered = filteredMedals
+        let unlockedCount = currentFiltered.filter(\.isUnlocked).count
+        let totalCount = currentFiltered.count
         
         return VStack(alignment: .leading, spacing: 14) {
             HStack {
@@ -349,9 +718,32 @@ struct ActivityDashboardView: View {
                     .foregroundColor(AppTheme.textPrimary)
             }
             
+            // Category Filter Pills
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(MedalCategory.allCases, id: \.self) { cat in
+                        let isSelected = selectedMedalFilter == cat
+                        Button(action: {
+                            withAnimation(.easeInOut(duration: 0.2)) {
+                                selectedMedalFilter = cat
+                            }
+                        }) {
+                            Text(cat.rawValue)
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
+                                .padding(.horizontal, 12)
+                                .padding(.vertical, 6)
+                                .background(isSelected ? AppTheme.accent : AppTheme.inputBackground)
+                                .clipShape(Capsule())
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+            }
+            
             // 3-Column Medal Grid
             LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                ForEach(activityService.medals) { medal in
+                ForEach(currentFiltered) { medal in
                     Button(action: {
                         withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
                             selectedMedal = medal
@@ -433,13 +825,13 @@ struct ActivityDashboardView: View {
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(AppTheme.textPrimary)
                     
-                    Text("\(medal.tier.rawValue.capitalized) • \(medal.category.rawValue)")
+                    Text("\(medal.tier.title) • \(medal.category.rawValue) • \(medal.axis.rawValue)")
                         .font(.system(size: 11, weight: .bold))
                         .foregroundColor(medal.tier.color)
                 }
                 
                 Text(medal.description)
-                    .font(.system(size: 14))
+                    .font(.system(size: 13))
                     .foregroundColor(AppTheme.textSecondary)
                     .multilineTextAlignment(.center)
                     .padding(.horizontal, 16)

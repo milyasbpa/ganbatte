@@ -250,9 +250,18 @@ struct ExerciseHubView: View {
                         
                         Spacer()
                         
-                        Text("\(totalWords) Words Available")
-                            .font(.system(size: 11, weight: .semibold))
-                            .foregroundColor(AppTheme.accent)
+                        let covPct = activityService.coveragePercentage(level: kotobaConfig.level)
+                        HStack(spacing: 4) {
+                            Text("\(totalWords) Words Available")
+                            if kotobaConfig.level != .all && covPct > 0 {
+                                Text("•")
+                                    .foregroundColor(AppTheme.textTertiary)
+                                Text("\(Int(round(covPct)))% Cleared")
+                                    .foregroundColor(Color(red: 0.20, green: 0.70, blue: 0.45))
+                            }
+                        }
+                        .font(.system(size: 11, weight: .semibold))
+                        .foregroundColor(AppTheme.accent)
                     }
                     
                     HStack(spacing: 6) {

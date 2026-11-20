@@ -6,6 +6,8 @@ struct ExerciseResultView: View {
     var onChangeConfig: () -> Void
     var onFinish: () -> Void
     
+    @ObservedObject private var activityService = ActivityService.shared
+    
     var body: some View {
         ZStack {
             AppTheme.background
@@ -31,6 +33,11 @@ struct ExerciseResultView: View {
                 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 20) {
+                        // Unlocked Medal Banner
+                        if let medal = activityService.newlyUnlockedMedal {
+                            unlockedMedalBanner(medal)
+                        }
+                        
                         // 1. Main Score Card
                         VStack(spacing: 14) {
                             Text("FINAL SCORE")
@@ -176,6 +183,9 @@ struct ExerciseResultView: View {
                 .background(AppTheme.background)
             }
         }
+        .onDisappear {
+            activityService.newlyUnlockedMedal = nil
+        }
     }
     
     // MARK: - Result Row
@@ -293,5 +303,49 @@ struct ExerciseResultView: View {
             RoundedRectangle(cornerRadius: 14, style: .continuous)
                 .stroke(res.isCorrect ? Color(hex: 0x28A745).opacity(0.3) : Color(hex: 0xDC3545).opacity(0.3), lineWidth: 1)
         )
+    }
+    
+    private func unlockedMedalBanner(_ medal: Medal) -> some View {
+        HStack(spacing: 12) {
+            ZStack {
+                Circle()
+                    .fill(medal.tier.color.opacity(0.2))
+                    .frame(width: 44, height: 44)
+                
+                Image(systemName: medal.icon)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(medal.tier.color)
+            }
+            
+            VStack(alignment: .leading, spacing: 2) {
+                HStack(spacing: 4) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(Color(red: 0.95, green: 0.75, blue: 0.15))
+                    Text("NEW TROPHY UNLOCKED!")
+                        .font(.system(size: 10, weight: .heavy))
+                        .foregroundColor(Color(red: 0.95, green: 0.75, blue: 0.15))
+                }
+                
+                Text(medal.title)
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundColor(AppTheme.textPrimary)
+                
+                Text(medal.description)
+                    .font(.system(size: 11))
+                    .foregroundColor(AppTheme.textSecondary)
+                    .lineLimit(1)
+            }
+            
+            Spacer()
+        }
+        .padding(14)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(medal.tier.color.opacity(0.4), lineWidth: 1.5)
+        )
+        .shadow(color: medal.tier.color.opacity(0.2), radius: 8, x: 0, y: 3)
     }
 }
