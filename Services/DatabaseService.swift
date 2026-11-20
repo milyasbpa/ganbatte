@@ -252,6 +252,96 @@ final class DatabaseService {
         }
     }
     
+    // MARK: - Fetch Kana Words Filtered by Characters
+    func fetchKanaWordsContaining(characters: [String], type: KanaType? = nil, limit: Int = 500) -> [KanaWord] {
+        guard !characters.isEmpty else { return [] }
+        return queue.sync {
+            guard let db = db else { return [] }
+            
+            var conditions: [String] = []
+            var params: [String] = []
+            
+            // Match any of the target characters in kana or kanji
+            var charConditions: [String] = []
+            for ch in characters {
+                charConditions.append("(kana LIKE ? OR kanji LIKE ?)")
+                params.append("%\(ch)%")
+                params.append("%\(ch)%")
+            }
+            if !charConditions.isEmpty {
+                conditions.append("(" + charConditions.joined(separator: " OR ") + ")")
+            }
+            
+            if let type = type {
+                if type == .katakana {
+                    conditions.append("(kanji GLOB '*[ァ-ン]*' OR kana GLOB '*[ァ-ン]*')")
+                } else {
+                    conditions.append("kana NOT GLOB '*[ァ-ン]*'")
+                }
+            }
+            
+            // Filter out punctuation / formatting artifacts
+            conditions.append("kana NOT LIKE '%(%'")
+            conditions.append("kana NOT LIKE '%（%'")
+            conditions.append("kana NOT LIKE '%～%'")
+            
+            var query = "SELECT id, kanji, kana, romaji, meaning_en FROM words"
+            if !conditions.isEmpty {
+                query += " WHERE " + conditions.joined(separator: " AND ")
+            }
+            query += " ORDER BY id ASC LIMIT ?"
+            
+            var statement: OpaquePointer?
+            defer { sqlite3_finalize(statement) }
+            
+            guard sqlite3_prepare_v2(db, query, -1, &statement, nil) == SQLITE_OK else {
+                return []
+            }
+            
+            var paramIndex: Int32 = 1
+            for param in params {
+                sqlite3_bind_text(statement, paramIndex, (param as NSString).utf8String, -1, nil)
+                paramIndex += 1
+            }
+            sqlite3_bind_int(statement, paramIndex, Int32(limit))
+            
+            var results: [KanaWord] = []
+            while sqlite3_step(statement) == SQLITE_ROW {
+                let id = Int(sqlite3_column_int(statement, 0))
+                let kanji = String(cString: sqlite3_column_text(statement, 1))
+                let kana = String(cString: sqlite3_column_text(statement, 2))
+                let romaji = String(cString: sqlite3_column_text(statement, 3))
+                let meaningEn = String(cString: sqlite3_column_text(statement, 4))
+                
+                let detectedType: KanaType
+                if let t = type {
+                    detectedType = t
+                } else {
+                    let hasKatakana = kana.unicodeScalars.contains { (0x30A0...0x30FF).contains($0.value) } ||
+                                      kanji.unicodeScalars.contains { (0x30A0...0x30FF).contains($0.value) }
+                    detectedType = hasKatakana ? .katakana : .hiragana
+                }
+                
+                var displayKana = kana
+                if detectedType == .katakana {
+                    let hasKatakana = kanji.unicodeScalars.contains { scalar in
+                        (0x30A0...0x30FF).contains(scalar.value)
+                    }
+                    displayKana = hasKatakana ? kanji : kana
+                }
+                
+                results.append(KanaWord(
+                    id: id,
+                    kana: displayKana,
+                    romaji: romaji,
+                    meaningEn: meaningEn,
+                    type: detectedType
+                ))
+            }
+            return results
+        }
+    }
+    
     // MARK: - Fetch Words by IDs
     func fetchWords(by ids: [Int]) -> [Word] {
         guard !ids.isEmpty else { return [] }

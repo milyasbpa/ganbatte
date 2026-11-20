@@ -25,6 +25,8 @@ struct ExerciseHubView: View {
     // Mistake Drill Mode State
     @State private var mistakeDrillWordIds: [Int]? = nil
     @State private var customMistakeQuestions: [QuizQuestion]? = nil
+    @State private var mistakeKanaCharacters: [String]? = nil
+    @State private var customKanaMistakeQuestions: [KanaQuizQuestion]? = nil
     
     // Kotoba Configuration State
     @State private var kotobaConfig = QuizConfig.load()
@@ -105,10 +107,14 @@ struct ExerciseHubView: View {
             } else if activeWorkout == .kana {
                 KanaExerciseCoordinatorView(
                     initialConfig: kanaConfig,
+                    customQuestions: customKanaMistakeQuestions,
                     startImmediately: true,
                     onDismiss: {
                         withAnimation(.easeInOut(duration: 0.25)) {
                             activeWorkout = nil
+                            customKanaMistakeQuestions = nil
+                            mistakeKanaCharacters = nil
+                            activityService.clearPendingKanaMistakeWorkout()
                             hideBottomBar = false
                         }
                     }
@@ -122,7 +128,12 @@ struct ExerciseHubView: View {
             kanaConfig = KanaQuizConfig.load()
             updateKotobaTotalWords()
             if let pending = activityService.pendingMistakeWorkoutWordIds {
+                self.selectedCategory = .kotoba
                 self.mistakeDrillWordIds = pending
+            }
+            if let pendingKana = activityService.pendingKanaMistakeWorkoutCharacters {
+                self.selectedCategory = .kana
+                self.mistakeKanaCharacters = pendingKana
             }
         }
         .onChange(of: kotobaConfig.level) { _ in
@@ -142,6 +153,16 @@ struct ExerciseHubView: View {
                 mistakeDrillWordIds = pending
             } else {
                 mistakeDrillWordIds = activityService.unresolvedWordMistakes.map { $0.wordId }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ganbatte_shortcut_to_kana_mistakes"))) { notif in
+            selectedCategory = .kana
+            if let chars = notif.userInfo?["characters"] as? [String] {
+                mistakeKanaCharacters = chars
+            } else if let pending = activityService.pendingKanaMistakeWorkoutCharacters {
+                mistakeKanaCharacters = pending
+            } else {
+                mistakeKanaCharacters = activityService.unresolvedKanaMistakes.map { $0.character }
             }
         }
         .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ganbatte_shortcut_to_exercise"))) { notif in
@@ -537,64 +558,151 @@ struct ExerciseHubView: View {
     // MARK: - Kana Live Console
     private var kanaConsoleView: some View {
         VStack(spacing: 12) {
-            // Card 1: Script Selection
-            VStack(alignment: .leading, spacing: 10) {
-                Text("PRACTICE SCRIPT")
-                    .font(.system(size: 11, weight: .bold))
-                    .foregroundColor(AppTheme.textSecondary)
-                    .tracking(0.5)
+            if let characters = mistakeKanaCharacters, !characters.isEmpty {
+                kanaMistakeWorkoutBannerCard(characters: characters)
+            } else {
+                kanaScriptSelectionCard
+            }
+            
+            // Card 2: Question Count Presets & Instructions
+            kanaQuestionLengthCard
+        }
+    }
+    
+    // MARK: - Kana Mistake Workout Banner Card
+    private func kanaMistakeWorkoutBannerCard(characters: [String]) -> some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .center, spacing: 10) {
+                ZStack {
+                    Circle()
+                        .fill(Color(hex: 0x1565C0).opacity(0.15))
+                        .frame(width: 38, height: 38)
+                    
+                    Image(systemName: "bolt.fill")
+                        .font(.system(size: 17, weight: .bold))
+                        .foregroundColor(Color(hex: 0x1565C0))
+                }
                 
-                HStack(spacing: 12) {
-                    ForEach(KanaType.allCases) { kType in
-                        let isSelected = kanaConfig.kanaType == kType
-                        Button(action: {
-                            kanaConfig.kanaType = kType
-                        }) {
-                            VStack(spacing: 4) {
-                                ZStack {
-                                    Circle()
-                                        .fill(
-                                            isSelected
-                                            ? (kType == .hiragana ? AppTheme.accent : Color(red: 0.25, green: 0.48, blue: 0.88))
-                                            : AppTheme.inputBackground
-                                        )
-                                        .frame(width: 40, height: 40)
-                                    
-                                    Text(kType == .hiragana ? "あ" : "ア")
-                                        .font(.system(size: 20, weight: .bold))
-                                        .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
-                                }
-                                
-                                Text(kType.title)
-                                    .font(.system(size: 13, weight: .bold))
-                                    .foregroundColor(AppTheme.textPrimary)
-                                
-                                Text(kType == .hiragana ? "1,000 words" : "500 words")
-                                    .font(.system(size: 10))
-                                    .foregroundColor(AppTheme.textSecondary)
-                            }
-                            .frame(maxWidth: .infinity)
-                            .padding(.vertical, 10)
-                            .background(isSelected ? AppTheme.accentLight.opacity(0.3) : Color.white)
-                            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                            .overlay(
-                                RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                    .stroke(isSelected ? AppTheme.accent : AppTheme.buttonBorder, lineWidth: 1.5)
-                            )
-                        }
-                        .buttonStyle(.plain)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("KANA MISTAKE WORKOUT")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(Color(hex: 0x1565C0))
+                        .tracking(0.5)
+                    
+                    let charsList = characters.joined(separator: ", ")
+                    Text("Targeting: \(charsList)")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundColor(AppTheme.textPrimary)
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    withAnimation(.easeInOut(duration: 0.2)) {
+                        mistakeKanaCharacters = nil
+                        customKanaMistakeQuestions = nil
+                        activityService.clearPendingKanaMistakeWorkout()
                     }
+                }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 11, weight: .bold))
+                        Text("Exit")
+                            .font(.system(size: 11, weight: .bold))
+                    }
+                    .foregroundColor(AppTheme.textSecondary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(AppTheme.inputBackground)
+                    .clipShape(Capsule())
+                }
+                .buttonStyle(.plain)
+            }
+            
+            Divider()
+            
+            HStack(spacing: 6) {
+                Image(systemName: "shield.lefthalf.filled")
+                    .font(.system(size: 12))
+                    .foregroundColor(Color(hex: 0x1565C0))
+                Text("Words filtered exclusively to ones containing: \(characters.joined(separator: ", "))")
+                    .font(.system(size: 11, weight: .medium))
+                    .foregroundColor(AppTheme.textSecondary)
+            }
+        }
+        .padding(14)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(Color(hex: 0x1565C0).opacity(0.4), lineWidth: 1.5)
+        )
+        .shadow(color: Color(hex: 0x1565C0).opacity(0.06), radius: 6, x: 0, y: 2)
+    }
+    
+    // MARK: - Kana Script Selection Card
+    private var kanaScriptSelectionCard: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            Text("PRACTICE SCRIPT")
+                .font(.system(size: 11, weight: .bold))
+                .foregroundColor(AppTheme.textSecondary)
+                .tracking(0.5)
+            
+            HStack(spacing: 12) {
+                ForEach(KanaType.allCases) { kType in
+                    let isSelected = kanaConfig.kanaType == kType
+                    Button(action: {
+                        kanaConfig.kanaType = kType
+                    }) {
+                        VStack(spacing: 4) {
+                            ZStack {
+                                Circle()
+                                    .fill(
+                                        isSelected
+                                        ? (kType == .hiragana ? AppTheme.accent : Color(red: 0.25, green: 0.48, blue: 0.88))
+                                        : AppTheme.inputBackground
+                                    )
+                                    .frame(width: 40, height: 40)
+                                
+                                Text(kType == .hiragana ? "あ" : "ア")
+                                    .font(.system(size: 20, weight: .bold))
+                                    .foregroundColor(isSelected ? .white : AppTheme.textPrimary)
+                            }
+                            
+                            Text(kType.title)
+                                .font(.system(size: 13, weight: .bold))
+                                .foregroundColor(AppTheme.textPrimary)
+                            
+                            Text(kType == .hiragana ? "1,000 words" : "500 words")
+                                .font(.system(size: 10))
+                                .foregroundColor(AppTheme.textSecondary)
+                        }
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 10)
+                        .background(isSelected ? AppTheme.accentLight.opacity(0.3) : Color.white)
+                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                                .stroke(isSelected ? AppTheme.accent : AppTheme.buttonBorder, lineWidth: 1.5)
+                        )
+                    }
+                    .buttonStyle(.plain)
                 }
             }
-            .padding(14)
-            .background(Color.white)
-            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18, style: .continuous)
-                    .stroke(AppTheme.buttonBorder, lineWidth: 1)
-            )
-            .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
-            
+        }
+        .padding(14)
+        .background(Color.white)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(AppTheme.buttonBorder, lineWidth: 1)
+        )
+        .shadow(color: Color.black.opacity(0.03), radius: 5, x: 0, y: 2)
+    }
+    
+    // MARK: - Kana Question Length Card
+    private var kanaQuestionLengthCard: some View {
+        VStack(spacing: 12) {
             // Card 2: Question Count Presets
             VStack(alignment: .leading, spacing: 10) {
                 Text("QUESTION COUNT")
@@ -708,27 +816,63 @@ struct ExerciseHubView: View {
                     .buttonStyle(BubbleScaleButtonStyle())
                 }
             } else if selectedCategory == .kana {
-                Button(action: {
-                    kanaConfig.save()
-                    withAnimation(.easeInOut(duration: 0.25)) {
-                        activeWorkout = .kana
-                        hideBottomBar = true
+                if let characters = mistakeKanaCharacters, !characters.isEmpty {
+                    Button(action: {
+                        kanaConfig.save()
+                        customKanaMistakeQuestions = KanaDataService.shared.generateMistakeQuiz(
+                            characters: characters,
+                            type: kanaConfig.kanaType,
+                            count: kanaConfig.questionCount
+                        )
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            activeWorkout = .kana
+                            hideBottomBar = true
+                        }
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "bolt.fill")
+                                .font(.system(size: 15, weight: .bold))
+                            Text("Start Kana Mistake Workout (\(kanaConfig.questionCount) Questions)")
+                                .font(.system(size: 15, weight: .bold))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(
+                            LinearGradient(
+                                colors: [Color(hex: 0x1565C0), Color(hex: 0x1E88E5)],
+                                startPoint: .leading,
+                                endPoint: .trailing
+                            )
+                        )
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .shadow(color: Color(hex: 0x1565C0).opacity(0.3), radius: 8, x: 0, y: 4)
                     }
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "play.fill")
-                            .font(.system(size: 15, weight: .bold))
-                        Text("Start Quiz (\(kanaConfig.questionCount) Questions)")
-                            .font(.system(size: 15, weight: .bold))
+                    .buttonStyle(BubbleScaleButtonStyle())
+                } else {
+                    Button(action: {
+                        kanaConfig.save()
+                        customKanaMistakeQuestions = nil
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            activeWorkout = .kana
+                            hideBottomBar = true
+                        }
+                    }) {
+                        HStack(spacing: 8) {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 15, weight: .bold))
+                            Text("Start Quiz (\(kanaConfig.questionCount) Questions)")
+                                .font(.system(size: 15, weight: .bold))
+                        }
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 50)
+                        .background(AppTheme.accent)
+                        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+                        .shadow(color: AppTheme.accent.opacity(0.3), radius: 8, x: 0, y: 4)
                     }
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 50)
-                    .background(AppTheme.accent)
-                    .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-                    .shadow(color: AppTheme.accent.opacity(0.3), radius: 8, x: 0, y: 4)
+                    .buttonStyle(BubbleScaleButtonStyle())
                 }
-                .buttonStyle(BubbleScaleButtonStyle())
             }
         }
     }

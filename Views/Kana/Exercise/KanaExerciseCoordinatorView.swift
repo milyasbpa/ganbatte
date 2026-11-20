@@ -9,6 +9,7 @@ enum KanaExerciseFlowState {
 struct KanaExerciseCoordinatorView: View {
     var initialConfig: KanaQuizConfig? = nil
     var initialType: KanaType = .hiragana
+    var customQuestions: [KanaQuizQuestion]? = nil
     var startImmediately: Bool = false
     var onDismiss: () -> Void
     
@@ -20,11 +21,13 @@ struct KanaExerciseCoordinatorView: View {
     init(
         initialConfig: KanaQuizConfig? = nil,
         initialType: KanaType = .hiragana,
+        customQuestions: [KanaQuizQuestion]? = nil,
         startImmediately: Bool = false,
         onDismiss: @escaping () -> Void
     ) {
         self.initialConfig = initialConfig
         self.initialType = initialType
+        self.customQuestions = customQuestions
         self.startImmediately = startImmediately
         self.onDismiss = onDismiss
         
@@ -36,7 +39,7 @@ struct KanaExerciseCoordinatorView: View {
         
         if startImmediately {
             self._flowState = State(initialValue: .quiz)
-            let questions = KanaDataService.shared.generateQuiz(config: loadedConfig)
+            let questions = customQuestions ?? KanaDataService.shared.generateQuiz(config: loadedConfig)
             self._currentQuestions = State(initialValue: questions)
         } else {
             self._flowState = State(initialValue: .config)

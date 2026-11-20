@@ -27,6 +27,7 @@ class ActivityService: ObservableObject {
     @Published var activeWordMistakes: [WordMistakeEntry] = []
     @Published var activeKanaMistakes: [KanaMistakeEntry] = []
     @Published var pendingMistakeWorkoutWordIds: [Int]? = nil
+    @Published var pendingKanaMistakeWorkoutCharacters: [String]? = nil
     
     private init() {
         loadSessions()
@@ -236,6 +237,7 @@ class ActivityService: ObservableObject {
         activeWordMistakes.removeAll()
         activeKanaMistakes.removeAll()
         pendingMistakeWorkoutWordIds = nil
+        pendingKanaMistakeWorkoutCharacters = nil
         saveWordMistakes()
         saveKanaMistakes()
     }
@@ -252,6 +254,19 @@ class ActivityService: ObservableObject {
     
     func clearPendingMistakeWorkout() {
         self.pendingMistakeWorkoutWordIds = nil
+    }
+    
+    func triggerKanaMistakeWorkout(characters: [String]) {
+        self.pendingKanaMistakeWorkoutCharacters = characters
+        NotificationCenter.default.post(
+            name: NSNotification.Name("ganbatte_shortcut_to_kana_mistakes"),
+            object: nil,
+            userInfo: ["characters": characters]
+        )
+    }
+    
+    func clearPendingKanaMistakeWorkout() {
+        self.pendingKanaMistakeWorkoutCharacters = nil
     }
     
     // MARK: - Unique Correct Word Tracking

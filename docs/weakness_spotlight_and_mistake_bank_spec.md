@@ -146,11 +146,22 @@ struct KanaMistakeEntry: Codable, Identifiable, Equatable {
   - Tapping card opens full [WordDetailView](file:///Users/ilyasbashirah/Documents/kerja/bas.co/pictango/ganbatte/Views/WordDetailView.swift).
 - **Kana Grid:**
   - Troublesome characters grid (e.g. `ツ`, `シ`, `ソ`, `ン`) with error rate and hesitation latency badge.
+  - Interactive "⚡ Practice Kana Mistakes (N)" CTA routing directly into Exercise Hub.
 
 ### C. Unified Exercise Hub Routing (`ExerciseHubView.swift`)
-- When launched via `ganbatte_shortcut_to_mistakes`:
-  - Suppresses normal Level, Type, and Range selectors.
-  - Displays top banner: `⚡ Mistake Workout: X Target Words Loaded [✕ Exit]`.
-  - Retains Question Format selectors (`Image & Meaning`, `Audio Listening`, `Fill-in / Typing`).
-  - Generates questions exclusively from active mistake IDs.
-  - Automatically evaluates the Dual-Key graduation rule upon submission.
+1. **Kotoba Mistake Workout:**
+   - Launched via `ganbatte_shortcut_to_mistakes` or `ActivityService.shared.pendingMistakeWorkoutWordIds`.
+   - Suppresses normal Level, Type, and Range selectors.
+   - Displays top banner: `⚡ Mistake Workout: X Target Words Loaded [✕ Exit]`.
+   - Retains Question Format selectors (`Image & Meaning`, `Audio Listening`, `Fill-in / Typing`).
+   - Generates questions exclusively from active mistake IDs.
+   - Automatically evaluates the Dual-Key graduation rule upon submission.
+
+2. **Kana Mistake Smart Filter Workout:**
+   - Launched via `ganbatte_shortcut_to_kana_mistakes` or `ActivityService.shared.pendingKanaMistakeWorkoutCharacters`.
+   - Automatically activates the `.kana` category tab.
+   - Suppresses general character set selection (Basic, Dakuon, Combo) and replaces it with:
+     `⚡ KANA MISTAKE WORKOUT: Targeting X, Y [✕ Exit]` banner.
+   - Drills are generated using smart character matching (`fetchKanaWordsContaining(characters:type:limit:)`), ensuring 100% of tested vocabulary contains the user's specific weak Kana characters.
+   - Fast Romaji typing speed drill format with question count selector (10, 20, 30, 50).
+   - Dual-Key graduation rule evaluated on each character answer.

@@ -254,4 +254,40 @@ final class KanaDataService {
             return KanaQuizQuestion(word: word, acceptableAnswers: acceptable)
         }
     }
+    
+    // MARK: - Targeted Kana Mistake Quiz Generation
+    func generateMistakeQuiz(characters: [String], type: KanaType? = nil, count: Int = 10) -> [KanaQuizQuestion] {
+        guard !characters.isEmpty else { return [] }
+        
+        var words = DatabaseService.shared.fetchKanaWordsContaining(
+            characters: characters,
+            type: type,
+            limit: 500
+        )
+        
+        // If pool is empty or tiny, fallback to general kana words
+        if words.isEmpty {
+            words = DatabaseService.shared.fetchKanaPracticeWords(
+                type: type ?? .hiragana,
+                limit: 100
+            )
+        }
+        
+        guard !words.isEmpty else { return [] }
+        
+        var selectedWords: [KanaWord] = []
+        let shuffled = words.shuffled()
+        
+        while selectedWords.count < count {
+            for word in shuffled {
+                selectedWords.append(word)
+                if selectedWords.count >= count { break }
+            }
+        }
+        
+        return selectedWords.map { word in
+            let acceptable = generateAcceptableAnswers(for: word.romaji)
+            return KanaQuizQuestion(word: word, acceptableAnswers: acceptable)
+        }
+    }
 }

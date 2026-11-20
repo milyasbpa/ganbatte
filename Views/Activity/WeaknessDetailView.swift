@@ -191,11 +191,8 @@ struct WeaknessDetailView: View {
                 let kCount = activityService.unresolvedKanaMistakesCount
                 if kCount > 0 {
                     Button(action: {
-                        NotificationCenter.default.post(
-                            name: NSNotification.Name("ganbatte_shortcut_to_exercise"),
-                            object: nil,
-                            userInfo: ["category": "Kana"]
-                        )
+                        let chars = activityService.unresolvedKanaMistakes.map { $0.character }
+                        activityService.triggerKanaMistakeWorkout(characters: chars)
                         withAnimation(.easeInOut(duration: 0.25)) {
                             isPresented = false
                         }
@@ -205,9 +202,9 @@ struct WeaknessDetailView: View {
                                 .font(.system(size: 18, weight: .bold))
                             
                             VStack(alignment: .leading, spacing: 2) {
-                                Text("Practice Kana (\(kCount) Characters)")
+                                Text("Practice Kana Mistakes (\(kCount) Characters)")
                                     .font(.system(size: 15, weight: .bold))
-                                Text("Sharpen recall speed in Kana drills")
+                                Text("Filtered exclusively for target characters")
                                     .font(.system(size: 11, weight: .medium))
                                     .opacity(0.9)
                             }

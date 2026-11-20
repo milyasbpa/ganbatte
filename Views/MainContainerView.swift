@@ -44,6 +44,11 @@ struct MainContainerView: View {
                 activeTabRaw = AppTab.exercise.rawValue
             }
         }
+        .onReceive(NotificationCenter.default.publisher(for: NSNotification.Name("ganbatte_shortcut_to_kana_mistakes"))) { _ in
+            withAnimation(.easeInOut(duration: 0.25)) {
+                activeTabRaw = AppTab.exercise.rawValue
+            }
+        }
         .onReceive(notifService.$pendingDeepLink) { link in
             guard let link = link else { return }
             withAnimation(.easeInOut(duration: 0.25)) {
