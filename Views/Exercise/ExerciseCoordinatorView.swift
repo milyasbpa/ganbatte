@@ -16,6 +16,7 @@ struct ExerciseCoordinatorView: View {
     @State private var config: QuizConfig
     @State private var currentQuestions: [QuizQuestion] = []
     @State private var sessionResult: QuizSessionResult? = nil
+    @State private var quizSessionId: UUID = UUID()
     
     init(
         initialConfig: QuizConfig? = nil,
@@ -84,13 +85,29 @@ struct ExerciseCoordinatorView: View {
                         }
                     }
                 )
+                .id(quizSessionId)
                 .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
                 
             case .result:
                 if let result = sessionResult {
                     ExerciseResultView(
                         summary: result,
+                        onNextRound: {
+                            let newQuestions: [QuizQuestion]
+                            if let custom = customQuestions, !custom.isEmpty {
+                                newQuestions = custom.shuffled()
+                            } else {
+                                newQuestions = ExerciseService.shared.generateQuiz(config: self.config)
+                            }
+                            guard !newQuestions.isEmpty else { return }
+                            self.currentQuestions = newQuestions
+                            self.quizSessionId = UUID()
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                self.flowState = .quiz
+                            }
+                        },
                         onRetrySameQuestions: {
+                            self.quizSessionId = UUID()
                             withAnimation(.easeInOut(duration: 0.25)) {
                                 self.flowState = .quiz
                             }

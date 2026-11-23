@@ -2,8 +2,9 @@ import SwiftUI
 
 struct KanaExerciseResultView: View {
     let summary: KanaSessionSummary
+    var onNextRound: () -> Void
     var onRetrySameQuestions: () -> Void
-    var onChangeConfig: () -> Void
+    var onChangeConfig: (() -> Void)? = nil
     var onFinish: () -> Void
     
     @ObservedObject private var activityService = ActivityService.shared
@@ -129,14 +130,14 @@ struct KanaExerciseResultView: View {
                     .padding(.bottom, 20)
                 }
                 
-                // Bottom 3 Action Buttons (Pinned)
+                // Bottom Action Buttons (Pinned)
                 VStack(spacing: 10) {
-                    // 1. Primary: Retry Same Words
-                    Button(action: onRetrySameQuestions) {
+                    // 1. Primary Hero: Next Round
+                    Button(action: onNextRound) {
                         HStack(spacing: 8) {
-                            Image(systemName: "arrow.counterclockwise")
+                            Image(systemName: "play.fill")
                                 .font(.system(size: 15, weight: .bold))
-                            Text("Retry Same Words")
+                            Text("Next Round (\(summary.totalQuestions) Words)")
                                 .font(.system(size: 16, weight: .bold))
                         }
                         .foregroundColor(.white)
@@ -148,34 +149,48 @@ struct KanaExerciseResultView: View {
                     }
                     .buttonStyle(.plain)
                     
-                    // 2. Secondary: Change Quiz Settings
-                    Button(action: onChangeConfig) {
-                        HStack(spacing: 8) {
-                            Image(systemName: "slider.horizontal.3")
-                                .font(.system(size: 14, weight: .semibold))
-                            Text("Change Quiz Settings")
-                                .font(.system(size: 15, weight: .semibold))
+                    // 2. Secondary Row (Split 50/50)
+                    HStack(spacing: 10) {
+                        // Left: Retry Same
+                        Button(action: onRetrySameQuestions) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "arrow.counterclockwise")
+                                    .font(.system(size: 13, weight: .bold))
+                                Text("Retry Same")
+                                    .font(.system(size: 14, weight: .bold))
+                            }
+                            .foregroundColor(AppTheme.textPrimary)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 44)
+                            .background(Color.white)
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(AppTheme.buttonBorder, lineWidth: 1.2)
+                            )
                         }
-                        .foregroundColor(AppTheme.textPrimary)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 46)
-                        .background(Color.white)
-                        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .stroke(AppTheme.buttonBorder, lineWidth: 1.2)
-                        )
-                    }
-                    .buttonStyle(.plain)
-                    
-                    // 3. Tertiary: Finish / Back to Kana Chart
-                    Button(action: onFinish) {
-                        Text("← Finish (Back to Kana)")
-                            .font(.system(size: 14, weight: .medium))
+                        .buttonStyle(.plain)
+                        
+                        // Right: Finish
+                        Button(action: onFinish) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "xmark")
+                                    .font(.system(size: 12, weight: .bold))
+                                Text("Finish")
+                                    .font(.system(size: 14, weight: .bold))
+                            }
                             .foregroundColor(AppTheme.textSecondary)
-                            .padding(.vertical, 6)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 44)
+                            .background(AppTheme.inputBackground)
+                            .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(AppTheme.buttonBorder.opacity(0.8), lineWidth: 1)
+                            )
+                        }
+                        .buttonStyle(.plain)
                     }
-                    .buttonStyle(.plain)
                 }
                 .padding(.horizontal, 20)
                 .padding(.top, 10)

@@ -17,6 +17,7 @@ struct KanaExerciseCoordinatorView: View {
     @State private var config: KanaQuizConfig
     @State private var currentQuestions: [KanaQuizQuestion] = []
     @State private var sessionSummary: KanaSessionSummary? = nil
+    @State private var quizSessionId: UUID = UUID()
     
     init(
         initialConfig: KanaQuizConfig? = nil,
@@ -90,13 +91,29 @@ struct KanaExerciseCoordinatorView: View {
                         }
                     }
                 )
+                .id(quizSessionId)
                 .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
                 
             case .result:
                 if let summary = sessionSummary {
                     KanaExerciseResultView(
                         summary: summary,
+                        onNextRound: {
+                            let newQuestions: [KanaQuizQuestion]
+                            if let custom = customQuestions, !custom.isEmpty {
+                                newQuestions = custom.shuffled()
+                            } else {
+                                newQuestions = KanaDataService.shared.generateQuiz(config: self.config)
+                            }
+                            guard !newQuestions.isEmpty else { return }
+                            self.currentQuestions = newQuestions
+                            self.quizSessionId = UUID()
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                self.flowState = .quiz
+                            }
+                        },
                         onRetrySameQuestions: {
+                            self.quizSessionId = UUID()
                             withAnimation(.easeInOut(duration: 0.25)) {
                                 self.flowState = .quiz
                             }
