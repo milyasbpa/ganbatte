@@ -179,14 +179,14 @@ struct ExerciseResultView: View {
                                 Text("Finish")
                                     .font(.system(size: 14, weight: .bold))
                             }
-                            .foregroundColor(AppTheme.textSecondary)
+                            .foregroundColor(AppTheme.textPrimary)
                             .frame(maxWidth: .infinity)
                             .frame(height: 44)
-                            .background(AppTheme.inputBackground)
+                            .background(Color.white)
                             .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                             .overlay(
                                 RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .stroke(AppTheme.buttonBorder.opacity(0.8), lineWidth: 1)
+                                    .stroke(AppTheme.buttonBorder, lineWidth: 1.2)
                             )
                         }
                         .buttonStyle(.plain)
