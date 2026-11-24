@@ -286,8 +286,12 @@ struct WordListView: View {
                let idx = words.firstIndex(where: { $0.id == word.id }) {
                 WordDetailView(
                     initialIndex: idx,
-                    wordsList: words,
+                    wordsList: $words,
+                    totalCount: totalCount,
                     selectedType: selectedType,
+                    onLoadMore: { completion in
+                        loadMoreWords(completion: completion)
+                    },
                     onDismiss: {
                         withAnimation(.easeInOut(duration: 0.25)) {
                             selectedWordForDetail = nil
@@ -366,8 +370,11 @@ struct WordListView: View {
         }
     }
     
-    private func loadMoreWords() {
-        guard canLoadMore && !isLoadingMore else { return }
+    private func loadMoreWords(completion: (() -> Void)? = nil) {
+        guard canLoadMore && !isLoadingMore else {
+            completion?()
+            return
+        }
         isLoadingMore = true
         
         DispatchQueue.global(qos: .userInitiated).async {
@@ -386,6 +393,7 @@ struct WordListView: View {
                 if self.words.count >= self.totalCount || more.isEmpty {
                     self.canLoadMore = false
                 }
+                completion?()
             }
         }
     }

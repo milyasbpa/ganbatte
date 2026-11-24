@@ -6,8 +6,10 @@ enum SlideDirection {
 
 struct WordDetailView: View {
     let initialIndex: Int
-    let wordsList: [Word]
+    @Binding var wordsList: [Word]
+    let totalCount: Int
     let selectedType: WordType
+    var onLoadMore: (((() -> Void)?) -> Void)? = nil
     var onDismiss: () -> Void
     
     @State private var currentIndex: Int
@@ -16,12 +18,43 @@ struct WordDetailView: View {
     @State private var keyMonitor: Any?
     #endif
     
-    init(initialIndex: Int, wordsList: [Word], selectedType: WordType = .all, onDismiss: @escaping () -> Void) {
+    init(
+        initialIndex: Int,
+        wordsList: Binding<[Word]>,
+        totalCount: Int? = nil,
+        selectedType: WordType = .all,
+        onLoadMore: (((() -> Void)?) -> Void)? = nil,
+        onDismiss: @escaping () -> Void
+    ) {
         self.initialIndex = initialIndex
-        self.wordsList = wordsList
+        self._wordsList = wordsList
+        self.totalCount = totalCount ?? wordsList.wrappedValue.count
         self.selectedType = selectedType
+        self.onLoadMore = onLoadMore
         self.onDismiss = onDismiss
         self._currentIndex = State(initialValue: initialIndex)
+    }
+    
+    init(
+        initialIndex: Int,
+        wordsList: [Word],
+        totalCount: Int? = nil,
+        selectedType: WordType = .all,
+        onLoadMore: (((() -> Void)?) -> Void)? = nil,
+        onDismiss: @escaping () -> Void
+    ) {
+        self.init(
+            initialIndex: initialIndex,
+            wordsList: .constant(wordsList),
+            totalCount: totalCount ?? wordsList.count,
+            selectedType: selectedType,
+            onLoadMore: onLoadMore,
+            onDismiss: onDismiss
+        )
+    }
+    
+    var effectiveTotalCount: Int {
+        max(totalCount, wordsList.count)
     }
     
     var currentWord: Word {
@@ -52,7 +85,7 @@ struct WordDetailView: View {
                     
                     Spacer()
                     
-                    Text("\(currentIndex + 1) / \(max(wordsList.count, 1))")
+                    Text("\(currentIndex + 1) / \(max(effectiveTotalCount, 1))")
                         .font(.system(size: 18, weight: .bold))
                         .foregroundColor(AppTheme.textPrimary)
                     
@@ -141,7 +174,7 @@ struct WordDetailView: View {
                             Text("→")
                                 .font(.system(size: 16, weight: .semibold))
                         }
-                        .foregroundColor(currentIndex < wordsList.count - 1 ? AppTheme.textPrimary : AppTheme.buttonDisabledText)
+                        .foregroundColor(currentIndex < effectiveTotalCount - 1 ? AppTheme.textPrimary : AppTheme.buttonDisabledText)
                         .frame(maxWidth: .infinity)
                         .frame(height: 48)
                         .background(Color.white)
@@ -153,7 +186,7 @@ struct WordDetailView: View {
                         .shadow(color: Color.black.opacity(0.02), radius: 2, x: 0, y: 1)
                     }
                     .buttonStyle(.plain)
-                    .disabled(currentIndex >= wordsList.count - 1)
+                    .disabled(currentIndex >= effectiveTotalCount - 1)
                     .keyboardShortcut(.rightArrow, modifiers: [])
                 }
                 .padding(.horizontal, 16)
@@ -199,8 +232,10 @@ struct WordDetailView: View {
         .onChange(of: currentIndex) { newIndex in
             guard newIndex >= 0 && newIndex < wordsList.count else { return }
             AudioService.shared.speak(wordsList[newIndex].kana)
+            checkAndLoadMore(for: newIndex)
         }
         .onAppear {
+            checkAndLoadMore(for: currentIndex)
             // Auto play voice on initial open
             AudioService.shared.speak(currentWord.kana)
             
@@ -348,8 +383,34 @@ struct WordDetailView: View {
         .frame(maxHeight: .infinity)
     }
     
+    private func checkAndLoadMore(for index: Int) {
+        if index >= wordsList.count - 5 && wordsList.count < effectiveTotalCount {
+            onLoadMore?(nil)
+        }
+    }
+    
     private func nextCard() {
-        guard currentIndex < wordsList.count - 1 else { return }
+        guard currentIndex < effectiveTotalCount - 1 else { return }
+        
+        if currentIndex >= wordsList.count - 1 {
+            // Buffer boundary reached: request load more and advance once available
+            onLoadMore? {
+                if self.currentIndex < self.wordsList.count - 1 {
+                    #if os(macOS)
+                    self.slideDirection = .forward
+                    #endif
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        self.currentIndex += 1
+                    }
+                }
+            }
+            return
+        }
+        
+        if currentIndex >= wordsList.count - 5 {
+            onLoadMore?(nil)
+        }
+        
         #if os(macOS)
         slideDirection = .forward
         #endif
@@ -370,7 +431,7 @@ struct WordDetailView: View {
     
     private func navigateToExercise() {
         let batchStart = (currentIndex / 10) * 10 + 1
-        let batchEnd = min(batchStart + 9, wordsList.count)
+        let batchEnd = min(batchStart + 9, effectiveTotalCount)
         let wordType = selectedType
         
         var cfg = QuizConfig.load()
